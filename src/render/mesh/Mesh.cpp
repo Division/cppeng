@@ -4,6 +4,7 @@
 
 #include "Mesh.h"
 #include <iostream>
+#include "Logging.h"
 
 const int JOINT_PER_VERTEX_MAX = 3;
 const int JOINTS_MAX = 30;
@@ -64,6 +65,8 @@ void Mesh::setVertices(const vec3 *vertices, int vertexCount) {
   _vertexCount = vertexCount;
   memcpy(&_vertices[0], vertices, sizeof(vec3) * vertexCount);
 
+  _hasVertices = true;
+
   _updateFaceCount();
 }
 
@@ -72,6 +75,8 @@ void Mesh::setVertices(const float *vertexComponents, int vertexCount) {
   _vertexCount = vertexCount;
   memcpy(&_vertices[0], vertexComponents, sizeof(vec3) * vertexCount);
 
+  _hasVertices = true;
+
   _updateFaceCount();
 }
 
@@ -79,6 +84,8 @@ void Mesh::setVertices(const std::vector<vec3> &vertices) {
   _vertices.resize(vertices.size() * 3);
   _vertexCount = (int)vertices.size();
   memcpy(&_vertices[0], &vertices[0], sizeof(vec3) * vertices.size());
+
+  _hasVertices = true;
 
   _updateFaceCount();
 }
@@ -100,6 +107,7 @@ void Mesh::setIndices(const GLushort *indices, int indexCount) {
 
 void Mesh::setIndices(const std::vector<GLushort> &indices) {
   _indices = indices; // will be copied
+  _hasIndices = true;
 }
 
 

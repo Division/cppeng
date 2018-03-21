@@ -137,7 +137,7 @@ float ang = 0;
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 void Engine::update(double dt) {
-  glClearColor(0, 0, 0, 0);
+  glClearColor(1, 0, 0, 1);
   glViewport(0, 0, 640, 480);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -154,10 +154,10 @@ void Engine::update(double dt) {
   shader->getUniform(UniformType::ProjectionMatrix)->setMatrix(projection);
   shader->getUniform(UniformType::ModelViewMatrix)->setMatrix(modelview);
 
-//  int off = mesh->vertexOffsetBytes();
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  int off = mesh->vertexOffsetBytes();
+  glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo());
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, BUFFER_OFFSET(0));
+  glVertexAttribPointer(0, mesh->componentCount(), GL_FLOAT, GL_FALSE, mesh->strideBytes(), BUFFER_OFFSET(off));
 
   glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -171,14 +171,14 @@ void Engine::init() {
   float vertices[] = {    -1.0f, -1.0f, 0.0f,
                           1.0f, -1.0f, 0.0f,
                           0.0f,  1.0f, 0.0f };
+//
+//  glGenBuffers(1, &vbo);
+//  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+//  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * 3, &vertices[0], GL_STATIC_DRAW);
 
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * 3, &vertices[0], GL_STATIC_DRAW);
-
-//  mesh->setVertices(vertices, 3);
-//  mesh->setIndices(indices, 3);
-//  mesh->createBuffer();
+  mesh->setVertices(vertices, 3);
+  mesh->setIndices(indices, 3);
+  mesh->createBuffer();
 
   Resources::loadShader("resources/shaders/white.shader");
   this->checkGLError();
