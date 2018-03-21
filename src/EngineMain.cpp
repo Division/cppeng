@@ -21,6 +21,6 @@ Engine *lerp(float a, float b, float t) {
 #ifdef __EMSCRIPTEN__
 #include <emscripten/bind.h>
 EMSCRIPTEN_BINDINGS(EngineMain) {
-    emscripten::function("lerp", &lerp, emscripten::allow_raw_pointers());
+  emscripten::function("lerp", &lerp, emscripten::allow_raw_pointers());
 }
 #endif
