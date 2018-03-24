@@ -4,7 +4,7 @@
 
 #include "Mesh.h"
 #include <iostream>
-#include "Logging.h"
+#include "system/Logging.h"
 
 const int JOINT_PER_VERTEX_MAX = 3;
 const int JOINTS_MAX = 30;

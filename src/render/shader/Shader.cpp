@@ -3,8 +3,9 @@
 //
 
 #include "Shader.h"
-#include <Logging.h>
+#include <system/Logging.h>
 #include <engine/EngineMain.h>
+#include "EngineGL.h"
 
 const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
     { ShaderAttrib::Position, "aPosition" },
@@ -35,7 +36,7 @@ GLuint Shader::_compileShader(const std::string &vertexSource, const std::string
   GLuint program = glCreateProgram();
 
   this->_setupAttribs(program);
-  GetEngine()->checkGLError();
+  engine::checkGLError();
 
   glAttachShader(program, vertexShader);
   glAttachShader(program, fragmentShader);

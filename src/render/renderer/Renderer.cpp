@@ -7,7 +7,7 @@
 
 #import "render/mesh/Mesh.h"
 #import "render/shader/Shader.h"
-#import "Logging.h"
+#import "system/Logging.h"
 #import "glm/glm.hpp"
 
 using namespace glm;

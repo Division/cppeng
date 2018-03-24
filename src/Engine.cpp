@@ -1,16 +1,16 @@
 #include "engine/Engine.h"
 #include <iostream>
-#include "SDL.h"
-#include "SDL_opengl.h"
+#include "EngineGL.h"
+#include "system/Window.h"
+#include "system/Input.h"
 #include "Resources.h"
-#include <Logging.h>
+#include <system/Logging.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "render/mesh/Mesh.h"
 #include <loader/ShaderLoader.h>
 #include "render/shader/Shader.h"
 #include "render/renderer/Renderer.h"
-
 
 using namespace glm;
 
@@ -20,21 +20,18 @@ using namespace glm;
 
 Engine::Engine() {
   _renderer = new Renderer();
+  _input = new Input();
+  _window = new Window(_input);
 }
 
-SDL_Window* window;
-SDL_GLContext context;
-SDL_Renderer* renderer;
+Engine::~Engine() {
+  delete _renderer;
+  delete _window;
+  delete _input;
+}
 
 void Engine::quit() {
-#ifdef __EMSCRIPTEN__
-  emscripten_log(EM_LOG_NO_PATHS, "Print a log message: int: %d, string: %s.", 42, "hello");
-  emscripten_cancel_main_loop();
-#else
-  SDL_DestroyWindow(window);
-  SDL_Quit();
-#endif
-
+  _window->quit();
   this->_shouldQuit = true;
 }
 
@@ -60,23 +57,15 @@ void mainLoop(void *arg) {
 
   // Update
   engine->update(dt);
-  SDL_GL_SwapWindow(window);
+  engine->_window->swapBuffers();
+  engine->_window->processEvents();
 
 //  ENGLog("TIME: %f", engine->_currentTime);
 
-  SDL_Event e;
-
-  SDL_PollEvent(&e);
-
-  if (e.type == SDL_QUIT) {
+  if (engine->_window->quitTriggered()) {
     engine->quit();
   }
-//  if (e.type == SDL_KEYDOWN) {
-//    engine->quit();
-//  }
-  if (e.type == SDL_MOUSEBUTTONDOWN) {
-    engine->quit();
-  }
+
 }
 
 void Engine::printStatus() {
@@ -88,9 +77,9 @@ void Engine::printStatus() {
 }
 
 void Engine::startSDLLoop() {
-    while (!this->_shouldQuit) {
-        mainLoop(this);
-    }
+  while (!this->_shouldQuit) {
+    mainLoop(this);
+  }
 }
 
 #ifdef __EMSCRIPTEN__
@@ -101,36 +90,7 @@ void Engine::startEmscriptenLoop() {
 #endif
 
 void Engine::setupSDL() {
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-      ENGLog("Error init sdl\n");
-  };
-
-// breaks webgl build
-#ifndef __EMSCRIPTEN__
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-#endif
-
-  window = SDL_CreateWindow("engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
-  if (!window) {
-      printf("Error creating window\n");
-  }
-
-  ENGLog("SDL ERR: %s", SDL_GetError());
-  context = SDL_GL_CreateContext(window);
-  SDL_GL_SetSwapInterval(0);
-
-  GLint min = 0;
-  GLint maj = 0;
-  glGetIntegerv(GL_MAJOR_VERSION, &maj);
-  glGetIntegerv(GL_MINOR_VERSION, &min);
-
-  ENGLog("GL VERSION %i.%i / %s", maj, min, glGetString(GL_VERSION));
-
-  ENGLog("Engine window created. Starting mainloop.");
+  _window->initOpenGLWindow();
 
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -151,9 +111,12 @@ GLuint vbo;
 float ang = 0;
 
 void Engine::update(double dt) {
-
   if (!shader) {
     return;
+  }
+
+  if (_input->keyDown(Key::Space)) {
+    ENGLog("SPACE");
   }
 
   glClearColor(1, 0, 0, 1);
@@ -176,7 +139,7 @@ void Engine::update(double dt) {
   glBindVertexArray(mesh->vao());
   glDrawArrays(GL_TRIANGLES, 0, 3);
 
-  this->checkGLError();
+  engine::checkGLError();
 }
 
 void Engine::init() {
@@ -193,36 +156,12 @@ void Engine::init() {
   mesh->setIndices(indices, 3);
   mesh->createBuffer();
 
-//  Resources::loadShader("resources/shaders/white.shader");
-
   ShaderCapsSetPtr caps(new ShaderCapsSet());
 
   shader = _renderer->getShaderWithCaps(caps).get();
   shader->addUniform(UniformType::ProjectionMatrix);
   shader->addUniform(UniformType::ModelViewMatrix);
-  this->checkGLError();
-}
-
-void Engine::checkGLError() {
-
-  const GLenum err = glGetError();
-  if (GL_NO_ERROR == err) {
-    return;
-  }
-
-  std::string errorStr;
-
-  switch (err) {
-    case GL_INVALID_ENUM:      errorStr = "Invalid enum"; break;
-    case GL_INVALID_VALUE:     errorStr = "Invalid value"; break;
-    case GL_INVALID_OPERATION: errorStr = "Invalid operation"; break;
-    case GL_STACK_OVERFLOW:    errorStr = "Stack overflow"; break;
-    case GL_STACK_UNDERFLOW:   errorStr = "Stack underflow"; break;
-    case GL_OUT_OF_MEMORY:     errorStr = "Out of memory"; break;
-    default:                   errorStr = "Unknown error"; break;
-  }
-
-  ENGLog("GL Error: %s", errorStr.c_str());
+  engine::checkGLError();
 }
 
 // JS Bindings

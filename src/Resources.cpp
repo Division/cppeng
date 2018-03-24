@@ -7,7 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <render/shader/Shader.h>
-#include <Logging.h>
+#include <system/Logging.h>
 #include <loader/ShaderLoader.h>
 
 std::map<std::string, Shader *> Resources::_shaders;

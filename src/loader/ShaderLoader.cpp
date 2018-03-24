@@ -5,7 +5,7 @@
 #import "ShaderLoader.h"
 #include <sstream>
 #include <iostream>
-#include <Logging.h>
+#include <system/Logging.h>
 
 const std::string VERTEX_HEADER = "[vertex]";
 const std::string FRAGMENT_HEADER = "[fragment]";

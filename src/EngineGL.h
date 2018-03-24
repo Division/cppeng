@@ -5,7 +5,10 @@
 #ifndef CPPWRAPPER_ENGINEGL_JS_H
 #define CPPWRAPPER_ENGINEGL_JS_H
 
-#include "SDL.h"
 #include "SDL_opengl.h"
+
+namespace engine {
+  void checkGLError();
+}
 
 #endif //CPPWRAPPER_ENGINEGL_JS_H

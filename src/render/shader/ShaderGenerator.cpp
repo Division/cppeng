@@ -5,7 +5,6 @@
 #include "ShaderGenerator.h"
 
 
-
 #ifdef __EMSCRIPTEN__
 const std::string GLSL_VERSION = "300 es";
 const bool PLATFORM_WEBGL = true;
