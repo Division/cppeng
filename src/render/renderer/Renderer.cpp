@@ -3,12 +3,39 @@
 //
 
 #include "Renderer.h"
+#include "loader/ShaderLoader.h"
+
 #import "render/mesh/Mesh.h"
 #import "render/shader/Shader.h"
 #import "Logging.h"
 #import "glm/glm.hpp"
 
 using namespace glm;
+
+void Renderer::setupShaders() {
+  _generator.setupTemplates();
+}
+
+ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) {
+  ShaderPtr result;
+
+  auto iterator = _shaders.find(caps->getBitmask());
+  if (iterator == _shaders.end()) {
+    std::string shaderSource = _generator.generateShaderSource(caps);
+    std::stringstream stream;
+    stream.str(shaderSource);
+    std::string vertexSource;
+    std::string fragmentSource;
+
+    loader::loadShader(stream, &vertexSource, &fragmentSource);
+    result = ShaderPtr(new Shader(vertexSource, fragmentSource));
+    _shaders[caps->getBitmask()] = result;
+  } else {
+    result = iterator->second;
+  }
+
+  return result;
+}
 
 //const mat4 identityMatrix;
 /*
@@ -138,5 +165,4 @@ void Renderer::renderMesh(const Mesh &mesh, Shader &shader, const mat4 *transfor
 }
 
  */
-
 

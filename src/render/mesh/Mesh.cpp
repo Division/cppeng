@@ -16,6 +16,8 @@ const int JOINT_INDEX_SIZE = JOINT_PER_VERTEX_MAX;
 const int WEIGHT_SIZE = JOINT_PER_VERTEX_MAX;
 const int COLOR_SIZE = 4;
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 Mesh::Mesh(bool keepData, int componentCount, GLenum bufferUsage) :
     _keepData(keepData),
     _componentCount(componentCount),
@@ -27,6 +29,7 @@ Mesh::Mesh(bool keepData, int componentCount, GLenum bufferUsage) :
   _vertexCount = 0;
   _indexBuffer = 0;
   _vbo = 0;
+  _vao = 0;
 
   _hasIndices = false;
   _hasVertices = false;
@@ -233,6 +236,8 @@ void Mesh::createBuffer() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(GLfloat), &_indices[0], _bufferUsage);
   }
 
+  glBindVertexArray(0);
+
   // Free data arrays
   if (!_keepData) {
     std::vector<GLfloat>().swap(_vertices);
@@ -245,7 +250,23 @@ void Mesh::createBuffer() {
     std::vector<GLfloat>().swap(_colors);
     std::vector<GLushort>().swap(_indices);
   }
+
+  this->_prepareVAO();
 }
+
+void Mesh::_prepareVAO() {
+  glGenVertexArrays(1, &_vao);
+  glBindVertexArray(_vao);
+
+  int off = this->vertexOffsetBytes();
+  glBindBuffer(GL_ARRAY_BUFFER, this->vbo());
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, this->componentCount(), GL_FLOAT, GL_FALSE, this->strideBytes(), BUFFER_OFFSET(off));
+
+
+  glBindVertexArray(0);
+}
+
 
 int Mesh::_getStrideSize() {
   int result = 0;

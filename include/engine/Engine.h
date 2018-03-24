@@ -5,6 +5,8 @@
 #ifndef TESTLIBRARY_ENGINE_H
 #define TESTLIBRARY_ENGINE_H
 
+class Renderer;
+
 class Engine {
 public:
   Engine();
@@ -24,6 +26,8 @@ private:
   void init();
 
 private:
+  Renderer *_renderer;
+
   bool _shouldQuit;
   double _currentTime = 0;
   double _startTime = 0;

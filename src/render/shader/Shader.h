@@ -5,15 +5,53 @@
 #ifndef CPPWRAPPER_SHADER_H
 #define CPPWRAPPER_SHADER_H
 
-#include "SDL_opengl.h"
 #include "Uniform.h"
 #include <common/ICleanableObserver.h>
 #include <common/ICleanable.h>
 #include <vector>
 #include <string>
 #include <map>
+#include <unordered_set>
+
+#include <SDL.h>
+#include <SDL_opengl.h>
 
 class Uniform;
+
+//---------------------
+// Shader Caps
+
+
+enum class ShaderCaps : int {
+  ColorWrite = 0,
+  Lighting,
+  NormalMap
+};
+
+class ShaderCapsSet {
+public:
+  typedef unsigned int Bitmask;
+
+  bool hasCap(ShaderCaps cap) const;
+  void addCap (ShaderCaps cap);
+  void removeCap (ShaderCaps cap);
+  Bitmask getBitmask() const;
+
+private:
+  mutable Bitmask _bitmask = 0; // cached bitmask
+  mutable bool _maskDirty = false;
+  std::unordered_set<int> _caps;
+
+private:
+  Bitmask _calculateBitMask() const;
+};
+
+typedef std::shared_ptr<ShaderCapsSet> ShaderCapsSetPtr;
+
+
+//---------------------
+// Shader
+
 
 enum class ShaderAttrib : int {
   Position = 0,
@@ -22,7 +60,6 @@ enum class ShaderAttrib : int {
 };
 
 extern const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES;
-
 
 class Shader
 {
@@ -44,8 +81,8 @@ private:
   GLuint _program;
   std::vector<ICleanable *> _dirtyUniforms;
 
-
 };
 
+typedef std::shared_ptr<Shader> ShaderPtr;
 
 #endif //CPPWRAPPER_SHADER_H

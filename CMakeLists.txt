@@ -5,7 +5,7 @@ message("CXX COMP " $ENV{CXX})
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_library(cppeng src/Engine.cpp src/EngineMain.cpp include/engine/Engine.h include/engine/EngineMain.h src/render/shader/Shader.cpp src/render/shader/Shader.h src/common/ICleanable.h src/common/ICleanableObserver.h src/Resources.cpp src/Resources.h src/Logging.h src/loader/ShaderLoader.h src/loader/ShaderLoader.cpp src/render/debug/DebugDraw.cpp src/render/debug/DebugDraw.h src/render/mesh/Mesh.cpp src/render/mesh/Mesh.h src/render/renderer/Renderer.cpp src/render/renderer/Renderer.h src/render/shader/Uniform.cpp src/render/shader/Uniform.h)
+add_library(cppeng src/Engine.cpp src/EngineMain.cpp include/engine/Engine.h include/engine/EngineMain.h src/render/shader/Shader.cpp src/render/shader/Shader.h src/common/ICleanable.h src/common/ICleanableObserver.h src/Resources.cpp src/Resources.h src/Logging.h src/loader/ShaderLoader.h src/loader/ShaderLoader.cpp src/render/debug/DebugDraw.cpp src/render/debug/DebugDraw.h src/render/mesh/Mesh.cpp src/render/mesh/Mesh.h src/render/renderer/Renderer.cpp src/render/renderer/Renderer.h src/render/shader/Uniform.cpp src/render/shader/Uniform.h include/engine/EngineGL.js.h lib/nlohmann/json.hpp lib/inja.hpp src/render/shader/ShaderGenerator.cpp src/render/shader/ShaderGenerator.h)
 
 target_compile_definitions(cppeng PRIVATE GL_GLEXT_PROTOTYPES=1)
 

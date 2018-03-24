@@ -5,6 +5,7 @@
 #ifndef CPPWRAPPER_MESH_H
 #define CPPWRAPPER_MESH_H
 
+#include "SDL.h"
 #include "SDL_opengl.h"
 #include <vector>
 #include <glm/glm.hpp>
@@ -28,6 +29,7 @@ public:
   // Properties
 
   GLuint vbo() const { return _vbo; }
+  GLuint vao() const { return _vao; }
 
   int componentCount() const { return _componentCount; }
   int strideBytes() const { return _strideBytes; };
@@ -53,6 +55,8 @@ public:
 private:
   int _getStrideSize();
   void _deleteBuffer();
+  void _updateFaceCount();
+  void _prepareVAO();
 
 private:
   bool _keepData;
@@ -64,6 +68,7 @@ private:
   GLenum _bufferUsage;
   GLuint _indexBuffer;
   GLuint _vbo;
+  GLuint _vao = 100;
 
   // Attrib flags
   bool _hasIndices;
@@ -102,8 +107,6 @@ private:
   std::vector<GLfloat> _weights;
   std::vector<GLfloat> _jointIndices;
   std::vector<GLfloat> _colors;
-
-  void _updateFaceCount();
 };
 
 

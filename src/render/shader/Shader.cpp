@@ -15,6 +15,8 @@ const std::string VERTEX_STR = "vertex";
 const std::string FRAGMENT_STR = "fragment";
 
 Shader::Shader(const std::string &vertexSource, const std::string &fragmentSource) {
+  ENGLog("VERTEX SHADER SRC: %s", vertexSource.c_str());
+  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
   GLuint program = this->_compileShader(vertexSource, fragmentSource);
   if (program) {
     this->_program = program;
@@ -100,4 +102,40 @@ Uniform *Shader::addUniform(const UniformType type) {
 
 Uniform *Shader::getUniform (const UniformType type) {
   return _uniforms[(int)type].get();
+}
+
+//------------------------------------------------------------------------
+// ShaderCapsSet
+//------------------------------------------------------------------------
+
+bool ShaderCapsSet::hasCap(const ShaderCaps cap) const {
+  return _caps.find((int)cap) != _caps.end();
+}
+
+void ShaderCapsSet::addCap(const ShaderCaps cap) {
+  _caps.insert((int)cap);
+  _maskDirty = true;
+}
+
+void ShaderCapsSet::removeCap(const ShaderCaps cap) {
+  _caps.erase((int)cap);
+  _maskDirty = true;
+}
+
+ShaderCapsSet::Bitmask ShaderCapsSet::getBitmask() const {
+  if (_maskDirty) {
+    _bitmask = _calculateBitMask();
+    _maskDirty = false;
+  }
+  return _bitmask;
+}
+
+ShaderCapsSet::Bitmask ShaderCapsSet::_calculateBitMask() const {
+  Bitmask result = 0;
+
+  for (auto cap : _caps) {
+    result |= (Bitmask)cap;
+  }
+
+  return result;
 }

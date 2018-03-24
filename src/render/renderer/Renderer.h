@@ -5,14 +5,18 @@
 #ifndef CPPWRAPPER_RENDERER_H
 #define CPPWRAPPER_RENDERER_H
 
-//class Mesh;
-//class Shader;
-//class mat4;
+#include "render/shader/ShaderGenerator.h"
+#include "render/shader/Shader.h"
+#include <unordered_map>
 
 class Renderer {
 public:
-//  void renderMesh(const Mesh &mesh, Shader &shader, const mat4 *transform);
-
+  Renderer() {};
+  void setupShaders();
+  ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps);
+private:
+  ShaderGenerator _generator;
+  std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
 };
 
 
