@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include <iostream>
 #include "system/Logging.h"
+#include "render/shader/Shader.h"
 
 const int JOINT_PER_VERTEX_MAX = 3;
 const int JOINTS_MAX = 30;
@@ -93,6 +94,14 @@ void Mesh::setVertices(const std::vector<vec3> &vertices) {
   _updateFaceCount();
 }
 
+void Mesh::setTexCoord0(const float *components, int count) {
+  _texCoord0.resize(count * 2);
+  _vertexCount = count;
+  memcpy(&_texCoord0[0], components, sizeof(vec2) * count);
+
+  _hasTexCoord0 = true;
+}
+
 void Mesh::_updateFaceCount() {
   if (!_hasIndices) {
     _faceCount = (int)floor((float)_vertexCount/ (float)_componentCount);
@@ -104,7 +113,7 @@ void Mesh::_updateFaceCount() {
 void Mesh::setIndices(const GLushort *indices, int indexCount) {
   _indices.resize(indexCount);
   memcpy(&_indices[0], indices, sizeof(GLushort) * indexCount);
-
+  _hasIndices = true;
   _updateFaceCount();
 }
 
@@ -233,7 +242,7 @@ void Mesh::createBuffer() {
   if (_hasIndices) {
     glGenBuffers(1, &_indexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(GLfloat), &_indices[0], _bufferUsage);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(GLushort), &_indices[0], _bufferUsage);
   }
 
   glBindVertexArray(0);
@@ -257,12 +266,26 @@ void Mesh::createBuffer() {
 void Mesh::_prepareVAO() {
   glGenVertexArrays(1, &_vao);
   glBindVertexArray(_vao);
-
-  int off = this->vertexOffsetBytes();
   glBindBuffer(GL_ARRAY_BUFFER, this->vbo());
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, this->componentCount(), GL_FLOAT, GL_FALSE, this->strideBytes(), BUFFER_OFFSET(off));
 
+  if (_hasIndices) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
+  }
+
+  void *offset;
+  GLuint attribIndex = 0;
+  offset = BUFFER_OFFSET(this->vertexOffsetBytes());
+
+  attribIndex = (GLuint)ShaderAttrib::Position;
+  glEnableVertexAttribArray(attribIndex);
+  glVertexAttribPointer(attribIndex, VERTEX_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+
+  if (_hasTexCoord0) {
+    attribIndex = (GLuint)ShaderAttrib::TexCoord0;
+    offset = BUFFER_OFFSET(this->texCoordOffsetBytes());
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribPointer(attribIndex, TEXCOORD_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+  }
 
   glBindVertexArray(0);
 }
@@ -278,4 +301,5 @@ int Mesh::_getStrideSize() {
   if (_hasWeights) result += JOINT_INDEX_SIZE + WEIGHT_SIZE;
   return result;
 }
+
 

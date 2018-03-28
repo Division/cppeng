@@ -3,7 +3,7 @@
 //
 
 #include "ShaderGenerator.h"
-
+#include "system/Logging.h"
 
 #ifdef __EMSCRIPTEN__
 const std::string GLSL_VERSION = "300 es";
@@ -16,11 +16,32 @@ const bool PLATFORM_WEBGL = false;
 const std::string TEMPLATE_ROOT = "resources/shaderTpl/";
 
 const std::string TEMPLATE_LIST[] = {
-    "root.shader" // First goes the root template
+    "root", // First goes the root template
+    "uniforms_vs"
 };
+
+const auto ROOT_TEMPLATE = TEMPLATE_LIST[0];
 
 ShaderGenerator::ShaderGenerator() {
   this->setupTemplates();
+
+  // Add non-root templates as callbacks so that
+  // they can be referenced as {{ template_name }}
+  for (auto filename : TEMPLATE_LIST) {
+    if (filename != ROOT_TEMPLATE) {
+      _addTemplateCallback(filename);
+    }
+  }
+}
+
+void ShaderGenerator::_addTemplateCallback(std::string tplName) {
+  auto env = _env;
+  const auto &templateMap = _templateMap;
+  auto name = tplName;
+  _env.add_callback(tplName, 0, [&env, name, templateMap](inja::Parsed::Arguments args, json data) {
+    std::string res = env.render_template(templateMap.at(name), data);
+    return res;
+  });
 }
 
 std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) {
@@ -28,13 +49,14 @@ std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) {
   data["version"] = GLSL_VERSION;
   data["WEBGL"] = PLATFORM_WEBGL;
 
-  return _env.render_template(_templateMap[TEMPLATE_LIST[0]], data);
+  return _env.render_template(_templateMap[ROOT_TEMPLATE], data);
 }
 
 void ShaderGenerator::setupTemplates () {
   for (auto filename : TEMPLATE_LIST) {
-    auto path = TEMPLATE_ROOT + filename;
-    _templateMap[filename] = _env.parse_template(path);
+    auto path = TEMPLATE_ROOT + filename + ".tpl";
+    auto tpl = _env.parse_template(path);
+    _templateMap[filename] = tpl;
   }
 }
 

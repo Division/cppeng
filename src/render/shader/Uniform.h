@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <map>
+#include "render/texture/Texture.h"
 
 using namespace glm;
 
@@ -18,6 +19,9 @@ enum class UniformType : int {
   ProjectionMatrix,
   ModelViewMatrix,
   ViewMatrix,
+  Texture0,
+  Texture1,
+  NormalMap,
   Count
 };
 
@@ -32,6 +36,10 @@ public:
 
   void setMatrix(const mat4 &matrix) {
     glUniformMatrix4fv(_location, 1, GL_FALSE, glm::value_ptr(matrix));
+  }
+
+  void setTexture(int index) {
+    glUniform1i(_location, index);
   }
 
 protected:

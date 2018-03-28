@@ -6,6 +6,7 @@
 #define CPPWRAPPER_SHADERLOADER_JS_H
 
 #include <string>
+#include <ios>
 
 namespace loader {
 

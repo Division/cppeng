@@ -10,6 +10,7 @@
 const std::string VERTEX_HEADER = "[vertex]";
 const std::string FRAGMENT_HEADER = "[fragment]";
 
+// Splits vertex and fragment shaders from the source stream into two separate strings
 void loader::loadShader(std::stringstream &sourceStream, std::string *outVertexSource, std::string *outFragmentSource)
 {
   std::string line;

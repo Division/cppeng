@@ -27,6 +27,7 @@ private:
 private:
   json _getJSONForCaps(ShaderCapsSetPtr shaderCaps);
 
+  void _addTemplateCallback(std::string tplName);
 };
 
 

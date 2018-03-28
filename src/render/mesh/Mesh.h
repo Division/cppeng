@@ -21,6 +21,8 @@ public:
   void setVertices(const float *vertexComponents, int vertexCount);
   void setVertices(const std::vector<vec3> &vertices);
 
+  void setTexCoord0(const float *texcoordComponents, int count);
+
   void setIndices(const GLushort *indices, int indexCount);
   void setIndices(const std::vector<GLushort> &indices);
 
@@ -31,9 +33,10 @@ public:
   GLuint vbo() const { return _vbo; }
   GLuint vao() const { return _vao; }
 
-  int componentCount() const { return _componentCount; }
+  int componentCount() const { return _componentCount; } // Number of vertices to complete the primitive (3 for triangle)
   int strideBytes() const { return _strideBytes; };
   int faceCount() const {return _faceCount; }
+  int indexCount() const { return _hasIndices ? _faceCount * _componentCount : 0; }
 
   bool hasVertices() const { return _hasVertices; }
   bool hasIndices() const { return _hasIndices; }
@@ -68,7 +71,7 @@ private:
   GLenum _bufferUsage;
   GLuint _indexBuffer;
   GLuint _vbo;
-  GLuint _vao = 100;
+  GLuint _vao;
 
   // Attrib flags
   bool _hasIndices;

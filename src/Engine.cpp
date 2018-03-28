@@ -5,12 +5,13 @@
 #include "system/Input.h"
 #include "Resources.h"
 #include <system/Logging.h>
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "render/mesh/Mesh.h"
-#include <loader/ShaderLoader.h>
 #include "render/shader/Shader.h"
 #include "render/renderer/Renderer.h"
+#include "loader/TextureLoader.h"
+#include "render/texture/Texture.h"
+#include "EngMath.h"
 
 using namespace glm;
 
@@ -90,7 +91,7 @@ void Engine::startEmscriptenLoop() {
 #endif
 
 void Engine::setupSDL() {
-  _window->initOpenGLWindow();
+  _window->initOpenGLWindow(640, 480);
 
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -109,6 +110,8 @@ Mesh *mesh;
 Shader *shader = nullptr;
 GLuint vbo;
 float ang = 0;
+TexturePtr tex;
+Texture *tex2;
 
 void Engine::update(double dt) {
   if (!shader) {
@@ -116,28 +119,33 @@ void Engine::update(double dt) {
   }
 
   if (_input->keyDown(Key::Space)) {
-    ENGLog("SPACE");
+    ShaderCapsSetPtr caps(new ShaderCapsSet());
+    ENGLog("GENERATED: %s", _renderer->generator()->generateShaderSource(caps).c_str());
   }
 
   glClearColor(1, 0, 0, 1);
-  glViewport(0, 0, 640, 480);
+  glViewport(0, 0, _window->width(), _window->height());
   glClear(GL_COLOR_BUFFER_BIT);
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
-  mat4x4 projection =  glm::perspective(glm::radians(45.f), 640.0f / 480.0f, 0.1f, 1000.0f);
+  mat4x4 projection =  glm::perspective(glm::radians(45.f), _window->aspect(), 0.1f, 1000.0f);
   mat4 modelview(1.0f);
   modelview = glm::translate(modelview, vec3(0, 0, -10));
   modelview = glm::rotate(modelview, ang, vec3(0, 0, 1));
   ang += 3 * dt;
 
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, tex->id());
+
   shader->bind();
   shader->getUniform(UniformType::ProjectionMatrix)->setMatrix(projection);
   shader->getUniform(UniformType::ModelViewMatrix)->setMatrix(modelview);
+  shader->getUniform(UniformType::Texture0)->setTexture(0);
 
   glBindVertexArray(mesh->vao());
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glDrawElements(GL_TRIANGLES, mesh->indexCount(), GL_UNSIGNED_SHORT, 0);
 
   engine::checkGLError();
 }
@@ -147,20 +155,30 @@ void Engine::init() {
 
   mesh = new Mesh();
 
-  unsigned short indices[] = {0, 1, 2};
+  GLushort indices[] = {0, 1, 2, 0, 2, 3};
   float vertices[] = {    -1.0f, -1.0f, 0.0f,
                           1.0f, -1.0f, 0.0f,
-                          0.0f,  1.0f, 0.0f };
+                          1.0f, 1.0f, 0.0f,
+                          -1.0f,  1.0f, 0.0f };
 
-  mesh->setVertices(vertices, 3);
-  mesh->setIndices(indices, 3);
+  float texcoords[] = {   0, 0,
+                          1.0f, 0,
+                          1.0f, 1.0f,
+                          0,  1.0f };
+
+  mesh->setVertices(vertices, 4);
+  mesh->setIndices(indices, 6);
+  mesh->setTexCoord0(texcoords, 4);
   mesh->createBuffer();
+
+  tex = loader::loadTexture("resources/platform.png");
 
   ShaderCapsSetPtr caps(new ShaderCapsSet());
 
   shader = _renderer->getShaderWithCaps(caps).get();
   shader->addUniform(UniformType::ProjectionMatrix);
   shader->addUniform(UniformType::ModelViewMatrix);
+  shader->addUniform(UniformType::Texture0);
   engine::checkGLError();
 }
 

@@ -13,6 +13,7 @@ class Renderer {
 public:
   Renderer() {};
   void setupShaders();
+  ShaderGenerator *generator() { return &_generator; }
   ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps);
 private:
   ShaderGenerator _generator;
