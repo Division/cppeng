@@ -5,6 +5,7 @@
 #include "GameObject.h"
 
 GameObjectID GameObject::instanceCounter = 0;
+IGameObjectManager *GameObject::_defaultManager = nullptr;
 
 GameObject::GameObject() {
   _id = ++instanceCounter;

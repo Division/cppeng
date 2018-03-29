@@ -13,6 +13,8 @@
 #include "render/texture/Texture.h"
 #include "EngMath.h"
 
+#include "scene/Scene.h"
+
 using namespace glm;
 
 #ifdef __EMSCRIPTEN__
@@ -111,12 +113,14 @@ Shader *shader = nullptr;
 GLuint vbo;
 float ang = 0;
 TexturePtr tex;
-Texture *tex2;
+Scene *scene;
 
 void Engine::update(double dt) {
   if (!shader) {
     return;
   }
+
+  scene->update((float)dt);
 
   if (_input->keyDown(Key::Space)) {
     ShaderCapsSetPtr caps(new ShaderCapsSet());
@@ -172,6 +176,8 @@ void Engine::init() {
   mesh->createBuffer();
 
   tex = loader::loadTexture("resources/platform.png");
+
+  scene = new Scene();
 
   ShaderCapsSetPtr caps(new ShaderCapsSet());
 

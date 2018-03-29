@@ -29,9 +29,27 @@ void Scene::addGameObject(GameObject *object) {
 }
 
 void Scene::removeGameObject(GameObject *object) {
-  object->transform()->setParent(nullptr);
+  if (_objectMap.find(object->id()) == _objectMap.end()) {
+    object->transform()->setParent(nullptr);
+  }
+
 }
 
 void Scene::transformChangeParent(Transform *transform, Transform *oldParent, Transform *newParent) {
+  if (oldParent) {
+    oldParent->_removeChild(transform);
+  }
+
+  if (newParent) {
+    newParent->_addChild(transform);
+    _rootTransformMap.erase(transform->gameObject()->id());
+  } else {
+    _rootTransformMap[transform->gameObject()->id()] = transform;
+  }
+
+  transform->_parent = newParent;
+}
+
+void Scene::update(float dt) {
 
 }

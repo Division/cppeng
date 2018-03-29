@@ -21,6 +21,7 @@ public:
   friend class GameObject;
   friend class Scene;
 
+  GameObject *gameObject() { return _gameObject; }
   Transform *parent() { return _parent; }
   void setParent(Transform *transform);
 
@@ -28,8 +29,6 @@ public:
   void setPosition(const vec3 &position) { _position = position; setDirty(); }
   void setRotation(const quat &rotation) { _rotation = rotation; setDirty(); }
   void setScale(const vec3 &scale) { _scale = scale; setDirty(); }
-
-  void addChild(Transform *transform);
 
 private:
   vec3 _position = vec3(0, 0, 0);
@@ -47,6 +46,9 @@ private:
 
 private:
   void _updateTransform(const mat4 *parentTransform, bool forceUpdate);
+
+  void _removeChild(Transform *child);
+  void _addChild(Transform *child);
 };
 
 

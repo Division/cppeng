@@ -14,6 +14,9 @@ public:
   void setAsDefault();
   Scene();
 
+  const std::vector<GameObjectPtr> &gameObjects() const { return _gameObjects; }
+  void update(float dt);
+
 protected:
   // IGameObjectManager
   void addGameObject(GameObjectPtr object) override;
@@ -25,7 +28,8 @@ protected:
 
 private:
   std::unordered_map<GameObjectID, GameObjectPtr> _objectMap; // maps GameObject::id() to GameObject
-  std::vector<GameObjectPtr> _gameObjects;
+  std::vector<GameObjectPtr> _gameObjects; // Full list of scene game objects
+  std::unordered_map<GameObjectID, Transform *>_rootTransformMap; // maps GameObject::id() to the top level transforms
 };
 
 
