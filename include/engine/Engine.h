@@ -5,19 +5,23 @@
 #ifndef TESTLIBRARY_ENGINE_H
 #define TESTLIBRARY_ENGINE_H
 
+#include <IGame.h>
+
 class Window;
 class Renderer;
 class Input;
+class Scene;
 
 class Engine {
 public:
   Engine();
   ~Engine();
 
-  void setupSDL();
+  void setup(IGame *game);
   void quit();
   void printStatus();
   void update(double dt);
+  void renderScene(Scene &scene);
 
   friend void mainLoop(void *arg);
 
@@ -32,6 +36,7 @@ private:
   Window *_window;
   Renderer *_renderer;
   Input *_input;
+  IGame *_game;
 
   bool _shouldQuit;
   double _currentTime = 0;

@@ -9,6 +9,7 @@
 #import "render/shader/Shader.h"
 #import "system/Logging.h"
 #import "glm/glm.hpp"
+#import "scene/Scene.h"
 
 using namespace glm;
 
@@ -35,6 +36,23 @@ ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) {
   }
 
   return result;
+}
+
+void Renderer::renderMesh(Mesh &mesh, const mat4 &transform) {
+
+}
+
+void Renderer::renderScene(Scene &scene) {
+  auto visibleObjects = scene.visibleObjects();
+  for (auto object : visibleObjects) {
+    object->render(*this);
+  }
+
+  _processRenderPipeline();
+}
+
+void Renderer::_processRenderPipeline() {
+  // Handling passes, render queues etc
 }
 
 //const mat4 identityMatrix;

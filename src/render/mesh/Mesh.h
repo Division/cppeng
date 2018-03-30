@@ -112,5 +112,7 @@ private:
   std::vector<GLfloat> _colors;
 };
 
+typedef std::shared_ptr<Mesh> MeshPtr;
+
 
 #endif //CPPWRAPPER_MESH_H

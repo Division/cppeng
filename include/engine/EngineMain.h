@@ -5,7 +5,11 @@
 #ifndef TESTLIBRARY_ENGINEMAIN_H
 #define TESTLIBRARY_ENGINEMAIN_H
 
-#import "Engine.h"
+#include "Engine.h"
+#include "scene/Scene.h"
+#include "Resources.h"
+#include "system/Logging.h"
+#include "Objects.h"
 
 Engine *GetEngine();
 

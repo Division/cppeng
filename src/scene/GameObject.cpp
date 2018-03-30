@@ -7,12 +7,8 @@
 GameObjectID GameObject::instanceCounter = 0;
 IGameObjectManager *GameObject::_defaultManager = nullptr;
 
-GameObject::GameObject() {
+GameObject::GameObject() : _transform(this) {
   _id = ++instanceCounter;
-
-  if (_defaultManager) {
-    _defaultManager->addGameObject(this);
-  }
 }
 
 void GameObject::_setManager(IGameObjectManager *manager) {
@@ -21,5 +17,9 @@ void GameObject::_setManager(IGameObjectManager *manager) {
 }
 
 void GameObject::update(float dt) {
+
+}
+
+void GameObject::render(IRenderer &renderer) {
 
 }

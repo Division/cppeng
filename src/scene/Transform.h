@@ -21,14 +21,29 @@ public:
   friend class GameObject;
   friend class Scene;
 
+  explicit Transform(GameObject *object) : _gameObject(object) {};
+
   GameObject *gameObject() { return _gameObject; }
   Transform *parent() { return _parent; }
   void setParent(Transform *transform);
 
+  const vec3 &position() { return _position; }
+  void position(const vec3 &position) { _position = position; setDirty(); }
+
+  const quat &rotation() { return _rotation; }
+  void rotation(const quat &rotation) { _rotation = rotation; setDirty(); }
+
+  const vec3 &scale() { return _scale; }
+  void scale(const vec3 &scale) { _scale = scale; setDirty(); }
+
+  const mat4 &worldMatrix() { return _worldMatrix; }
+
   void setDirty() { _dirty = true; }
+
   void setPosition(const vec3 &position) { _position = position; setDirty(); }
   void setRotation(const quat &rotation) { _rotation = rotation; setDirty(); }
   void setScale(const vec3 &scale) { _scale = scale; setDirty(); }
+  void rotate(vec3 axis, float angle);
 
 private:
   vec3 _position = vec3(0, 0, 0);
@@ -38,9 +53,9 @@ private:
   mat4 _worldMatrix;
 
   GameObject *_gameObject;
-  Transform *_parent;
+  Transform *_parent = nullptr;
   std::vector<Transform *> _children;
-  ITransformManager *_manager;
+  ITransformManager *_manager = nullptr;
 
   bool _dirty = true;
 

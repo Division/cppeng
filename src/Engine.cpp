@@ -92,8 +92,9 @@ void Engine::startEmscriptenLoop() {
 }
 #endif
 
-void Engine::setupSDL() {
+void Engine::setup(IGame *game) {
   _window->initOpenGLWindow(640, 480);
+  _game = game;
 
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -113,14 +114,14 @@ Shader *shader = nullptr;
 GLuint vbo;
 float ang = 0;
 TexturePtr tex;
-Scene *scene;
 
 void Engine::update(double dt) {
+
+  _game->update(dt);
+
   if (!shader) {
     return;
   }
-
-  scene->update((float)dt);
 
   if (_input->keyDown(Key::Space)) {
     ShaderCapsSetPtr caps(new ShaderCapsSet());
@@ -156,6 +157,7 @@ void Engine::update(double dt) {
 
 void Engine::init() {
   _renderer->setupShaders();
+  _game->init(this);
 
   mesh = new Mesh();
 
@@ -177,8 +179,6 @@ void Engine::init() {
 
   tex = loader::loadTexture("resources/platform.png");
 
-  scene = new Scene();
-
   ShaderCapsSetPtr caps(new ShaderCapsSet());
 
   shader = _renderer->getShaderWithCaps(caps).get();
@@ -186,6 +186,10 @@ void Engine::init() {
   shader->addUniform(UniformType::ModelViewMatrix);
   shader->addUniform(UniformType::Texture0);
   engine::checkGLError();
+}
+
+void Engine::renderScene(Scene &scene) {
+  _renderer->renderScene(scene);
 }
 
 // JS Bindings

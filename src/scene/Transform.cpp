@@ -61,3 +61,8 @@ void Transform::setParent(Transform *transform) {
     _dirty = true;
   }
 }
+
+void Transform::rotate(vec3 axis, float angle) {
+  _rotation = glm::rotate(_rotation, angle, axis);
+  setDirty();
+}

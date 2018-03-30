@@ -15,24 +15,24 @@ Scene::Scene() {
 }
 
 void Scene::addGameObject(GameObjectPtr object) {
-  addGameObject(object.get());
+  if (_objectMap.find(object->id()) == _objectMap.end()) {
+    _gameObjects.push_back(object);
+    _objectMap[object->id()] = object;
+    object->_setManager(this);
+    this->transformChangeParent(object->transform(), nullptr, nullptr);
+  }
 }
 
 void Scene::addGameObject(GameObject *object) {
   GameObjectPtr objectPtr(object);
 
-  if (_objectMap.find(objectPtr->id()) == _objectMap.end()) {
-    _gameObjects.push_back(objectPtr);
-    _objectMap[objectPtr->id()] = objectPtr;
-    objectPtr->_setManager(this);
-  }
+
 }
 
 void Scene::removeGameObject(GameObject *object) {
   if (_objectMap.find(object->id()) == _objectMap.end()) {
     object->transform()->setParent(nullptr);
   }
-
 }
 
 void Scene::transformChangeParent(Transform *transform, Transform *oldParent, Transform *newParent) {
@@ -51,5 +51,17 @@ void Scene::transformChangeParent(Transform *transform, Transform *oldParent, Tr
 }
 
 void Scene::update(float dt) {
+  for (auto object : _gameObjects) {
+    if (object->active()) {
+      object->update(dt);
+    }
+  }
 
+  _updateTransforms();
+}
+
+void Scene::_updateTransforms() {
+  for (auto transform : _rootTransformMap) {
+    transform.second->_updateTransform(nullptr, false);
+  }
 }
