@@ -11,6 +11,7 @@
 #include "IRenderer.h"
 
 class Scene;
+class Material;
 
 class Renderer : IRenderer {
 public:
@@ -22,11 +23,11 @@ public:
   void renderScene(Scene &scene);
 
   // IRenderer
-  void renderMesh(Mesh &mesh, const mat4 &transform) override;
+  void renderMesh(Mesh &mesh, const Material &material, const mat4 &transform) override;
 
 protected:
-  ShaderGenerator _generator;
-  std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
+  mutable ShaderGenerator _generator;
+  mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
 
 protected:
   void _processRenderPipeline();

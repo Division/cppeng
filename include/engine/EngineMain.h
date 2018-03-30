@@ -9,8 +9,7 @@
 #include "scene/Scene.h"
 #include "Resources.h"
 #include "system/Logging.h"
-#include "Objects.h"
 
-Engine *GetEngine();
+Engine *getEngine();
 
 #endif //TESTLIBRARY_ENGINEMAIN_H

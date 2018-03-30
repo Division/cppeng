@@ -10,6 +10,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define PI M_PI
 #define RAD(value) (value * (float)PI / 180)

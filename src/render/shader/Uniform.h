@@ -5,9 +5,8 @@
 #ifndef CPPWRAPPER_UNIFORM_H
 #define CPPWRAPPER_UNIFORM_H
 
-#include "SDL_opengl.h"
-#include "glm/glm.hpp"
-#include <glm/gtc/type_ptr.hpp>
+#include "EngineGL.h"
+#include "EngMath.h"
 #include <string>
 #include <map>
 #include "render/texture/Texture.h"

@@ -1,0 +1,11 @@
+//
+// Created by Sidorenko Nikita on 3/30/18.
+//
+
+#ifndef CPPWRAPPER_MATERIALBINDING_H
+#define CPPWRAPPER_MATERIALBINDING_H
+
+
+
+
+#endif //CPPWRAPPER_MATERIALBINDING_H

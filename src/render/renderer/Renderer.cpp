@@ -38,7 +38,7 @@ ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) {
   return result;
 }
 
-void Renderer::renderMesh(Mesh &mesh, const mat4 &transform) {
+void Renderer::renderMesh(Mesh &mesh, const Material &material, const mat4 &transform) {
 
 }
 

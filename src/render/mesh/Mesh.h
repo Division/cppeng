@@ -5,10 +5,9 @@
 #ifndef CPPWRAPPER_MESH_H
 #define CPPWRAPPER_MESH_H
 
-#include "SDL.h"
-#include "SDL_opengl.h"
+#include "EngineGL.h"
+#include "EngMath.h"
 #include <vector>
-#include <glm/glm.hpp>
 
 using namespace glm;
 

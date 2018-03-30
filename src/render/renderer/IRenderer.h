@@ -8,10 +8,11 @@
 #include "EngMath.h"
 
 class Mesh;
+class Material;
 
 class IRenderer {
 public:
-  virtual void renderMesh(Mesh &mesh, const mat4 &transform) = 0;
+  virtual void renderMesh(Mesh &mesh, const Material &material, const mat4 &transform) = 0;
 };
 
 #endif //CPPWRAPPER_IRENDERER_H

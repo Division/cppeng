@@ -23,10 +23,12 @@ public:
   void update(double dt);
   void renderScene(Scene &scene);
 
+  const Renderer *renderer() { return _renderer; }
+
   friend void mainLoop(void *arg);
 
 private:
-  void startSDLLoop();
+  void startEngineLoop();
 #ifdef __EMSCRIPTEN__
   void startEmscriptenLoop();
 #endif

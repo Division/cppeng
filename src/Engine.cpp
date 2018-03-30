@@ -1,6 +1,6 @@
 #include "engine/Engine.h"
-#include <iostream>
 #include "EngineGL.h"
+#include <iostream>
 #include "system/Window.h"
 #include "system/Input.h"
 #include "Resources.h"
@@ -79,7 +79,7 @@ void Engine::printStatus() {
 //  glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Engine::startSDLLoop() {
+void Engine::startEngineLoop() {
   while (!this->_shouldQuit) {
     mainLoop(this);
   }
@@ -104,7 +104,7 @@ void Engine::setup(IGame *game) {
 #ifdef __EMSCRIPTEN__
   this->startEmscriptenLoop();
 #else
-  this->startSDLLoop();
+  this->startEngineLoop();
 #endif
 
 }

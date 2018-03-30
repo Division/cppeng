@@ -8,11 +8,14 @@
 #include <scene/GameObject.h>
 #include <render/mesh/Mesh.h>
 
+class Material;
+
 class MeshObject : public GameObject {
 public:
   MeshObject();
 protected:
   MeshPtr _mesh;
+
   void render(IRenderer &renderer) override;
 };
 

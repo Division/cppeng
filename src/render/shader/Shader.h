@@ -5,6 +5,7 @@
 #ifndef CPPWRAPPER_SHADER_H
 #define CPPWRAPPER_SHADER_H
 
+#include "EngineGL.h"
 #include "Uniform.h"
 #include <common/ICleanableObserver.h>
 #include <common/ICleanable.h>
@@ -13,9 +14,6 @@
 #include <map>
 #include <memory>
 #include <unordered_set>
-
-#include <SDL.h>
-#include <SDL_opengl.h>
 
 class Uniform;
 

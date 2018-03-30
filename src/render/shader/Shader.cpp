@@ -4,8 +4,6 @@
 
 #include "Shader.h"
 #include <system/Logging.h>
-#include <engine/EngineMain.h>
-#include "EngineGL.h"
 
 const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
     { ShaderAttrib::Position, "aPosition" },

@@ -6,7 +6,7 @@
 
 Engine *engineInstance = nullptr;
 
-Engine *GetEngine () {
+Engine *getEngine() {
   if (!engineInstance) {
     engineInstance = new Engine();
   }
@@ -15,7 +15,7 @@ Engine *GetEngine () {
 }
 
 Engine *lerp(float a, float b, float t) {
-  return GetEngine();
+  return getEngine();
 }
 
 #ifdef __EMSCRIPTEN__
