@@ -68,15 +68,15 @@ public:
 
   void bind();
 
-  Uniform *addUniform (UniformType type);
-  Uniform *getUniform(UniformType type);
+  Uniform *addUniform (UniformName type);
+  Uniform *getUniform(UniformName type);
 
 private:
   GLuint _compileShader(const std::string &vertexSource, const std::string &fragmentSource);
   GLuint _loadShader(const std::string &source, GLenum type);
   void _setupAttribs(GLuint program);
 private:
-  std::unique_ptr<Uniform> _uniforms[(int)UniformType::Count];
+  std::unique_ptr<Uniform> _uniforms[(int)UniformName::Count];
   GLuint _program;
   std::vector<ICleanable *> _dirtyUniforms;
 

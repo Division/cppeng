@@ -25,8 +25,6 @@ void Scene::addGameObject(GameObjectPtr object) {
 
 void Scene::addGameObject(GameObject *object) {
   GameObjectPtr objectPtr(object);
-
-
 }
 
 void Scene::removeGameObject(GameObject *object) {

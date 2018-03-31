@@ -9,6 +9,10 @@
 #include "scene/Scene.h"
 #include "Resources.h"
 #include "system/Logging.h"
+#include "Objects.h"
+#include "render/shader/Shader.h"
+#include "render/material/Material.h"
+#include "render/material/MaterialTypes.h"
 
 Engine *getEngine();
 

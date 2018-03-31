@@ -7,14 +7,14 @@
 
 #include <scene/GameObject.h>
 #include <render/mesh/Mesh.h>
-
-class Material;
+#include "render/material/Material.h"
 
 class MeshObject : public GameObject {
 public:
   MeshObject();
 protected:
   MeshPtr _mesh;
+  MaterialPtr _material;
 
   void render(IRenderer &renderer) override;
 };

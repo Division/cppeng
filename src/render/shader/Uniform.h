@@ -13,7 +13,7 @@
 
 using namespace glm;
 
-enum class UniformType : int {
+enum class UniformName : int {
   None = 0,
   ProjectionMatrix,
   ModelViewMatrix,
@@ -24,12 +24,12 @@ enum class UniformType : int {
   Count
 };
 
-extern const std::map<UniformType, std::string> UNIFORM_NAMES;
+extern const std::map<UniformName, std::string> UNIFORM_NAMES;
 
 class Uniform {
 public:
   Uniform () : _location(0) {}
-  Uniform(GLint location, UniformType type) :
+  Uniform(GLint location, UniformName type) :
       _location(location),
       _type(type) {}
 
@@ -43,7 +43,7 @@ public:
 
 protected:
   GLint _location;
-  UniformType _type = UniformType::None;
+  UniformName _type = UniformName::None;
 };
 
 

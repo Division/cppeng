@@ -89,7 +89,7 @@ void Shader::bind() {
   glUseProgram(_program);
 }
 
-Uniform *Shader::addUniform(const UniformType type) {
+Uniform *Shader::addUniform(const UniformName type) {
   auto &uniformName = UNIFORM_NAMES.at(type);
   GLint location = glGetUniformLocation(_program, uniformName.c_str());
   if (location == -1) {
@@ -99,7 +99,7 @@ Uniform *Shader::addUniform(const UniformType type) {
   return this->getUniform(type);
 }
 
-Uniform *Shader::getUniform (const UniformType type) {
+Uniform *Shader::getUniform (const UniformName type) {
   return _uniforms[(int)type].get();
 }
 

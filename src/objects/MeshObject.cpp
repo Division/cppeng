@@ -6,9 +6,13 @@
 //#include <render/material/Material.h>
 
 MeshObject::MeshObject() : GameObject() {
-  _mesh = std::make_shared<Mesh>();
+
 }
 
 void MeshObject::render(IRenderer &renderer) {
-//  renderer.renderMesh(*_mesh, _material, transform()->worldMatrix());
+  if (!_mesh || !_material) {
+    return;
+  }
+
+  renderer.renderMesh(*_mesh, *_material, transform()->worldMatrix());
 }

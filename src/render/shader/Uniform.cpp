@@ -5,11 +5,11 @@
 #include "Uniform.h"
 #include <iostream>
 
-const std::map<UniformType, std::string> UNIFORM_NAMES = {
-    { UniformType::ProjectionMatrix, "uPMatrix" },
-    { UniformType::ModelViewMatrix, "uMVMatrix" },
-    { UniformType::ViewMatrix, "uViewMatrix" },
-    { UniformType::Texture0, "uTexture0" },
-    { UniformType::Texture1, "uTexture1" },
-    { UniformType::NormalMap, "uNormalMap" }
+const std::map<UniformName, std::string> UNIFORM_NAMES = {
+    { UniformName::ProjectionMatrix, "uPMatrix" },
+    { UniformName::ModelViewMatrix, "uMVMatrix" },
+    { UniformName::ViewMatrix, "uViewMatrix" },
+    { UniformName::Texture0, "uTexture0" },
+    { UniformName::Texture1, "uTexture1" },
+    { UniformName::NormalMap, "uNormalMap" }
 };

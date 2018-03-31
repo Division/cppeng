@@ -18,12 +18,12 @@ public:
   Renderer() {};
   void setupShaders();
   ShaderGenerator *generator() { return &_generator; }
-  ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps);
+  ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps) const;
 
   void renderScene(Scene &scene);
 
   // IRenderer
-  void renderMesh(Mesh &mesh, const Material &material, const mat4 &transform) override;
+  void renderMesh(Mesh &mesh, Material &material, const mat4 &transform) override;
 
 protected:
   mutable ShaderGenerator _generator;

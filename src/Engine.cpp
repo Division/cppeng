@@ -116,9 +116,6 @@ float ang = 0;
 TexturePtr tex;
 
 void Engine::update(double dt) {
-
-  _game->update(dt);
-
   if (!shader) {
     return;
   }
@@ -135,22 +132,24 @@ void Engine::update(double dt) {
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
+  _game->update(dt);
+
   mat4x4 projection =  glm::perspective(glm::radians(45.f), _window->aspect(), 0.1f, 1000.0f);
   mat4 modelview(1.0f);
   modelview = glm::translate(modelview, vec3(0, 0, -10));
-  modelview = glm::rotate(modelview, ang, vec3(0, 0, 1));
+//  modelview = glm::rotate(modelview, ang, vec3(0, 0, 1));
   ang += 3 * dt;
 
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, tex->id());
+//  glActiveTexture(GL_TEXTURE0);
+//  glBindTexture(GL_TEXTURE_2D, tex->id());
 
-  shader->bind();
-  shader->getUniform(UniformType::ProjectionMatrix)->setMatrix(projection);
-  shader->getUniform(UniformType::ModelViewMatrix)->setMatrix(modelview);
-  shader->getUniform(UniformType::Texture0)->setTexture(0);
-
-  glBindVertexArray(mesh->vao());
-  glDrawElements(GL_TRIANGLES, mesh->indexCount(), GL_UNSIGNED_SHORT, 0);
+//  shader->bind();
+//  shader->getUniform(UniformName::ProjectionMatrix)->setMatrix(projection);
+//  shader->getUniform(UniformName::ModelViewMatrix)->setMatrix(modelview);
+//  shader->getUniform(UniformName::Texture0)->setTexture(0);
+//
+//  glBindVertexArray(mesh->vao());
+//  glDrawElements(GL_TRIANGLES, mesh->indexCount(), GL_UNSIGNED_SHORT, 0);
 
   engine::checkGLError();
 }
@@ -182,9 +181,9 @@ void Engine::init() {
   ShaderCapsSetPtr caps(new ShaderCapsSet());
 
   shader = _renderer->getShaderWithCaps(caps).get();
-  shader->addUniform(UniformType::ProjectionMatrix);
-  shader->addUniform(UniformType::ModelViewMatrix);
-  shader->addUniform(UniformType::Texture0);
+  shader->addUniform(UniformName::ProjectionMatrix);
+  shader->addUniform(UniformName::ModelViewMatrix);
+  shader->addUniform(UniformName::Texture0);
   engine::checkGLError();
 }
 
