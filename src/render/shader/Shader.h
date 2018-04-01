@@ -22,7 +22,7 @@ class Uniform;
 
 
 enum class ShaderCaps : int {
-  ColorWrite = 0,
+  Color = 0,
   Lighting,
   NormalMap
 };
@@ -35,6 +35,7 @@ public:
   void addCap (ShaderCaps cap);
   void removeCap (ShaderCaps cap);
   Bitmask getBitmask() const;
+  const std::unordered_set<int> &caps() { return _caps; }
 
 private:
   mutable Bitmask _bitmask = 0; // cached bitmask

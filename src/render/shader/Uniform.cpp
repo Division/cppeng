@@ -6,6 +6,7 @@
 #include <iostream>
 
 const std::map<UniformName, std::string> UNIFORM_NAMES = {
+    { UniformName::Color, "uColor" },
     { UniformName::ProjectionMatrix, "uPMatrix" },
     { UniformName::ModelViewMatrix, "uMVMatrix" },
     { UniformName::ViewMatrix, "uViewMatrix" },

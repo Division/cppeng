@@ -12,6 +12,8 @@
 class MeshObject : public GameObject {
 public:
   MeshObject();
+  MaterialPtr material() { return _material; }
+  MeshPtr mesh() { return _mesh; }
 protected:
   MeshPtr _mesh;
   MaterialPtr _material;

@@ -109,47 +109,15 @@ void Engine::setup(IGame *game) {
 
 }
 
-Mesh *mesh;
-Shader *shader = nullptr;
-GLuint vbo;
-float ang = 0;
-TexturePtr tex;
-
 void Engine::update(double dt) {
-  if (!shader) {
-    return;
-  }
-
-  if (_input->keyDown(Key::Space)) {
-    ShaderCapsSetPtr caps(new ShaderCapsSet());
-    ENGLog("GENERATED: %s", _renderer->generator()->generateShaderSource(caps).c_str());
-  }
-
-  glClearColor(1, 0, 0, 1);
+  glClearColor(0, 0, 0, 0);
   glViewport(0, 0, _window->width(), _window->height());
   glClear(GL_COLOR_BUFFER_BIT);
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
-  _game->update(dt);
-
-  mat4x4 projection =  glm::perspective(glm::radians(45.f), _window->aspect(), 0.1f, 1000.0f);
-  mat4 modelview(1.0f);
-  modelview = glm::translate(modelview, vec3(0, 0, -10));
-//  modelview = glm::rotate(modelview, ang, vec3(0, 0, 1));
-  ang += 3 * dt;
-
-//  glActiveTexture(GL_TEXTURE0);
-//  glBindTexture(GL_TEXTURE_2D, tex->id());
-
-//  shader->bind();
-//  shader->getUniform(UniformName::ProjectionMatrix)->setMatrix(projection);
-//  shader->getUniform(UniformName::ModelViewMatrix)->setMatrix(modelview);
-//  shader->getUniform(UniformName::Texture0)->setTexture(0);
-//
-//  glBindVertexArray(mesh->vao());
-//  glDrawElements(GL_TRIANGLES, mesh->indexCount(), GL_UNSIGNED_SHORT, 0);
+  _game->update((float)dt);
 
   engine::checkGLError();
 }
@@ -157,33 +125,6 @@ void Engine::update(double dt) {
 void Engine::init() {
   _renderer->setupShaders();
   _game->init(this);
-
-  mesh = new Mesh();
-
-  GLushort indices[] = {0, 1, 2, 0, 2, 3};
-  float vertices[] = {    -1.0f, -1.0f, 0.0f,
-                          1.0f, -1.0f, 0.0f,
-                          1.0f, 1.0f, 0.0f,
-                          -1.0f,  1.0f, 0.0f };
-
-  float texcoords[] = {   0, 0,
-                          1.0f, 0,
-                          1.0f, 1.0f,
-                          0,  1.0f };
-
-  mesh->setVertices(vertices, 4);
-  mesh->setIndices(indices, 6);
-  mesh->setTexCoord0(texcoords, 4);
-  mesh->createBuffer();
-
-  tex = loader::loadTexture("resources/platform.png");
-
-  ShaderCapsSetPtr caps(new ShaderCapsSet());
-
-  shader = _renderer->getShaderWithCaps(caps).get();
-  shader->addUniform(UniformName::ProjectionMatrix);
-  shader->addUniform(UniformName::ModelViewMatrix);
-  shader->addUniform(UniformName::Texture0);
   engine::checkGLError();
 }
 

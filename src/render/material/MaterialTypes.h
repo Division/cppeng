@@ -6,10 +6,15 @@
 #define CPPWRAPPER_MATERIALTYPES_H
 
 #include "Material.h"
+#include "EngMath.h"
 
-class MaterialWhite: public Material {
+class MaterialSingleColor: public Material {
 public:
-  MaterialWhite();
+  MaterialSingleColor();
+  void color(vec4 color) { _bindings.vec4Bindings[_colorBinging].v = color; }
+  vec4 color() const { return _bindings.vec4Bindings[_colorBinging].v; }
+
+  int _colorBinging = -1;
 };
 
 

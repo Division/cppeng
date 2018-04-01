@@ -4,6 +4,8 @@
 
 #include "ShaderGenerator.h"
 #include "system/Logging.h"
+#include <unordered_map>
+#include <string>
 
 #ifdef __EMSCRIPTEN__
 const std::string GLSL_VERSION = "300 es";
@@ -18,6 +20,10 @@ const std::string TEMPLATE_ROOT = "resources/shaderTpl/";
 const std::string TEMPLATE_LIST[] = {
     "root", // First goes the root template
     "uniforms_vs"
+};
+
+const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
+    { ShaderCaps::Color, "COLOR" }
 };
 
 const auto ROOT_TEMPLATE = TEMPLATE_LIST[0];
@@ -62,6 +68,12 @@ void ShaderGenerator::setupTemplates () {
 
 json ShaderGenerator::_getJSONForCaps(ShaderCapsSetPtr caps) {
   json result;
+
+  for (auto cap : caps->caps()) {
+    auto scap = (ShaderCaps)cap;
+    bool hasCap = CAPS_TO_PARAM_MAP.find((ShaderCaps)cap) != CAPS_TO_PARAM_MAP.end();
+    result[CAPS_TO_PARAM_MAP.at(scap)] = hasCap;
+  }
 
 //  if (SET_CONTAINS_CAP(caps, ShaderCaps.ColorWrite)) {
 //

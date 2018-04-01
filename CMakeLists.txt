@@ -34,12 +34,15 @@ include_directories(lib)
 
 # Unit testing
 # Prepare "Catch" library for other executables
-set(CATCH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
-add_library(Catch INTERFACE)
-target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
-add_executable(tests tests/test_main.cpp tests/test_scene.cpp tests/catch.hpp )
-target_link_libraries(tests Catch)
-target_link_libraries(tests cppeng)
+
+IF(NOT EMSCRIPTEN)
+    set(CATCH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+    add_library(Catch INTERFACE)
+    target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
+    add_executable(tests tests/test_main.cpp tests/test_scene.cpp tests/catch.hpp )
+    target_link_libraries(tests Catch)
+    target_link_libraries(tests cppeng)
+ENDIF(NOT EMSCRIPTEN)
 
 target_include_directories(cppeng PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

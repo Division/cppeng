@@ -22,7 +22,14 @@ public:
 protected:
   int _modelViewBinding = -1;
   int _projectionBinding = -1;
+
   int _addMat4Binding(UniformName uniform);
+  int _addMat3Binding(UniformName uniform);
+  int _addVec4Binding(UniformName uniform);
+  int _addVec3Binding(UniformName uniform);
+  int _addVec2Binding(UniformName uniform);
+  int _addFloatBinding(UniformName uniform);
+  int _addTextureBinding(UniformName uniform);
 
   MaterialBingings _bindings;
   ShaderPtr _shader;

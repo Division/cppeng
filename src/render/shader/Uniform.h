@@ -15,6 +15,7 @@ using namespace glm;
 
 enum class UniformName : int {
   None = 0,
+  Color,
   ProjectionMatrix,
   ModelViewMatrix,
   ViewMatrix,
@@ -33,11 +34,27 @@ public:
       _location(location),
       _type(type) {}
 
-  void setMatrix(const mat4 &matrix) {
+  void setMat4(const mat4 &matrix) {
     glUniformMatrix4fv(_location, 1, GL_FALSE, glm::value_ptr(matrix));
   }
 
-  void setTexture(int index) {
+  void setMat3(const mat3 &matrix) {
+    glUniformMatrix3fv(_location, 1, GL_FALSE, glm::value_ptr(matrix));
+  }
+
+  void setVec4(const vec4 &vec) {
+    glUniform4fv(_location, 1, glm::value_ptr(vec));
+  }
+
+  void setVec3(const vec3 &vec) {
+    glUniform3fv(_location, 1, glm::value_ptr(vec));
+  }
+
+  void setVec2(const vec2 &vec) {
+    glUniform2fv(_location, 1, glm::value_ptr(vec));
+  }
+
+  void setInt(int index) {
     glUniform1i(_location, index);
   }
 
