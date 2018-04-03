@@ -4,6 +4,8 @@
 
 #include "Scene.h"
 
+#define IS_CAMERA(object) (bool)dynamic_cast<Camera *>((object).get())
+
 void Scene::setAsDefault() {
   GameObject::_defaultManager = this;
 }
@@ -18,18 +20,56 @@ void Scene::addGameObject(GameObjectPtr object) {
   if (_objectMap.find(object->id()) == _objectMap.end()) {
     _gameObjects.push_back(object);
     _objectMap[object->id()] = object;
+
     object->_setManager(this);
     this->transformChangeParent(object->transform(), nullptr, nullptr);
+
+    this->_processAddedObject(object);
   }
 }
 
-void Scene::addGameObject(GameObject *object) {
-  GameObjectPtr objectPtr(object);
+void Scene::_processAddedObject(GameObjectPtr object) {
+  // Object is camera
+  if (IS_CAMERA(object)) {
+    CameraPtr camera = std::dynamic_pointer_cast<Camera>(object);
+    _cameraMap[object->id()] = camera;
+  }
 }
 
-void Scene::removeGameObject(GameObject *object) {
-  if (_objectMap.find(object->id()) == _objectMap.end()) {
+void Scene::_processRemovedObject(GameObjectPtr object) {
+  // Object is camera
+  if (IS_CAMERA(object)) {
+    _cameraMap.erase(object->id());
+  }
+
+  object->_destroy();
+}
+
+void Scene::destroyGameObject(GameObjectPtr object) {
+  if (object->destroyed()) {
+    ENGLog("ERROR: attempt to destroy already destroyed object")
+    return;
+  }
+
+  if (_objectMap.find(object->id()) != _objectMap.end()) {
+    _objectMap.erase(object->id());
     object->transform()->setParent(nullptr);
+
+    auto foundObject = std::find_if(_gameObjects.begin(), _gameObjects.end(), [&object](const GameObjectPtr &obj) -> bool {
+      return object->id() == obj->id();
+    });
+
+    if (foundObject == _gameObjects.end()) {
+      std::string error = "ERROR destroying object, not found in the list";
+      ENGLog(error.c_str());
+      throw error;
+    }
+
+    auto index = foundObject - _gameObjects.begin();
+    _gameObjects[index] = _gameObjects[_gameObjects.size() - 1];
+    _gameObjects.pop_back();
+
+    _processRemovedObject(object);
   }
 }
 
@@ -49,7 +89,7 @@ void Scene::transformChangeParent(Transform *transform, Transform *oldParent, Tr
 }
 
 void Scene::update(float dt) {
-  for (auto object : _gameObjects) {
+  for (auto &object : _gameObjects) {
     if (object->active()) {
       object->update(dt);
     }
@@ -59,7 +99,7 @@ void Scene::update(float dt) {
 }
 
 void Scene::_updateTransforms() {
-  for (auto transform : _rootTransformMap) {
+  for (auto &transform : _rootTransformMap) {
     transform.second->_updateTransform(nullptr, false);
   }
 }

@@ -55,7 +55,7 @@ void Renderer::renderMesh(Mesh &mesh, Material &material, const mat4 &transform)
 
 void Renderer::renderScene(Scene &scene) {
   auto visibleObjects = scene.visibleObjects();
-  for (auto object : visibleObjects) {
+  for (auto object : *visibleObjects) {
     object->render(*this);
   }
 

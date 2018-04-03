@@ -33,7 +33,7 @@ ShaderGenerator::ShaderGenerator() {
 
   // Add non-root templates as callbacks so that
   // they can be referenced as {{ template_name }}
-  for (auto filename : TEMPLATE_LIST) {
+  for (auto &filename : TEMPLATE_LIST) {
     if (filename != ROOT_TEMPLATE) {
       _addTemplateCallback(filename);
     }
@@ -59,7 +59,7 @@ std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) {
 }
 
 void ShaderGenerator::setupTemplates () {
-  for (auto filename : TEMPLATE_LIST) {
+  for (auto &filename : TEMPLATE_LIST) {
     auto path = TEMPLATE_ROOT + filename + ".tpl";
     auto tpl = _env.parse_template(path);
     _templateMap[filename] = tpl;

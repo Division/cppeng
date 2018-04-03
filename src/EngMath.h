@@ -18,4 +18,11 @@
 
 using namespace glm;
 
+extern const vec3 VectorLeft;
+extern const vec3 VectorRight;
+extern const vec3 VectorUp;
+extern const vec3 VectorDown;
+extern const vec3 VectorForward;
+extern const vec3 VectorBack;
+
 #endif //CPPWRAPPER_MATH_H

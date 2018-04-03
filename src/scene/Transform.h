@@ -25,6 +25,7 @@ public:
 
   GameObject *gameObject() { return _gameObject; }
   Transform *parent() { return _parent; }
+  void parent(Transform *transform) { setParent(transform); };
   void setParent(Transform *transform);
 
   const vec3 &position() { return _position; }
@@ -39,6 +40,8 @@ public:
   const mat4 &worldMatrix() { return _worldMatrix; }
 
   void setDirty() { _dirty = true; }
+
+  const std::vector<Transform *> * const children() const { return &_children; }
 
   void setPosition(const vec3 &position) { _position = position; setDirty(); }
   void setRotation(const quat &rotation) { _rotation = rotation; setDirty(); }

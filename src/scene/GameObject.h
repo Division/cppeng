@@ -8,6 +8,7 @@
 #include <memory>
 #include "Transform.h"
 #include "render/renderer/IRenderer.h"
+#include "system/Logging.h"
 
 class GameObject;
 typedef std::shared_ptr<GameObject> GameObjectPtr;
@@ -17,20 +18,20 @@ typedef int GameObjectID;
 class IGameObjectManager : public ITransformManager {
 public:
   virtual void addGameObject(GameObjectPtr addGameObject) = 0;
-  virtual void addGameObject(GameObject *addGameObject) = 0;
-  virtual void removeGameObject(GameObject *addGameObject) = 0;
+  virtual void destroyGameObject(GameObjectPtr addGameObject) = 0;
 };
 
 class GameObject {
 public:
   friend class Scene;
-
   template <typename T> friend std::shared_ptr<T> CreateGameObject();
+  friend void DestroyGameObject(GameObjectPtr object);
 
   virtual ~GameObject() = default;
 
   int id() { return _id; }
   bool active() { return _active; }
+  bool destroyed() { return _destroyed; }
 
   Transform *transform() { return &_transform; }
 
@@ -41,6 +42,7 @@ protected:
   GameObject();
 
   bool _active = true;
+  bool _destroyed = false;
   Transform _transform;
   IGameObjectManager *_manager;
   void _setManager (IGameObjectManager *manager);
@@ -49,6 +51,8 @@ protected:
 private:
   static IGameObjectManager *_defaultManager;
   static int instanceCounter;
+
+  void _destroy();
 };
 
 template <typename T>
@@ -63,5 +67,6 @@ std::shared_ptr<T> CreateGameObject() {
   return object;
 }
 
+extern void DestroyGameObject(GameObjectPtr object);
 
 #endif //CPPWRAPPER_GAMEOBJECT_H

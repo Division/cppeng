@@ -23,7 +23,7 @@ void Transform::_updateTransform(const mat4 *parentTransform, bool parentUpdated
     }
   }
 
-  for (auto childTransform : _children) {
+  for (auto &childTransform : _children) {
     childTransform->_updateTransform(&_worldMatrix, _dirty || parentUpdated);
   }
 
