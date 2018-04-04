@@ -41,7 +41,7 @@ void Engine::quit() {
 bool shouldPrint = false;
 
 void mainLoop(void *arg) {
-  Engine *engine = static_cast<Engine*>(arg);
+  auto engine = static_cast<Engine*>(arg);
 
   // Time
   auto now = std::chrono::system_clock::now().time_since_epoch();

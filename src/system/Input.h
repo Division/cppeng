@@ -19,8 +19,13 @@ enum class Key : int {
   D,
   W,
   S,
+  E,
+  Q,
   Space,
-  Esc
+  Esc,
+
+  MouseLeft,
+  MouseRight,
 };
 
 class Input {
@@ -33,6 +38,8 @@ private:
 private:
   void updateWithSDLEvent(SDL_Event &e);
   void _handleSDLKeyState(SDL_KeyboardEvent &e, bool isDown);
+
+  void _handleSDLMouseState(SDL_MouseButtonEvent &e, bool isDown);
 };
 
 

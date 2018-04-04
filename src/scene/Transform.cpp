@@ -5,7 +5,7 @@
 #include "Transform.h"
 #include "GameObject.h"
 
-void Transform::_updateTransform(const mat4 *parentTransform, bool parentUpdated, bool skipChildren) {
+void Transform::_updateTransform(const mat4 *parentTransform, bool parentUpdated, bool skipChildren) const {
 
   // Update local transform if needed
   if (_dirty) {
@@ -67,4 +67,38 @@ void Transform::setParent(Transform *transform) {
 void Transform::rotate(vec3 axis, float angle) {
   _rotation = glm::rotate(_rotation, angle, axis);
   setDirty();
+}
+
+const vec3 Transform::left() const {
+  return -right();
+}
+
+const vec3 Transform::up() const {
+  if (_dirty) {
+    _updateTransform(&parent()->_worldMatrix, false, true);
+  }
+  return vec3(_worldMatrix[1]);
+}
+
+const vec3 Transform::forward() const {
+  return -backward();
+}
+
+const vec3 Transform::right() const {
+  if (_dirty) {
+    _updateTransform(&parent()->_worldMatrix, false, true);
+  }
+  return vec3(_worldMatrix[0]);
+
+}
+
+const vec3 Transform::down() const {
+  return -up();
+}
+
+const vec3 Transform::backward() const {
+  if (_dirty) {
+    _updateTransform(&parent()->_worldMatrix, false, true);
+  }
+  return vec3(_worldMatrix[2]);
 }

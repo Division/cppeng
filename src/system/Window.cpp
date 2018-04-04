@@ -85,7 +85,6 @@ void Window::processEvents() {
       break;
 
     case SDL_WINDOWEVENT:
-      ENGLog("WND EVENT");
       _updateSize();
       _processSDLWindowEvent(e.window);
       break;

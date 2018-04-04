@@ -22,6 +22,7 @@ public:
   void printStatus();
   void update(double dt);
   void renderScene(Scene &scene);
+  const Input *const input() const { return _input; }
 
   const Renderer *renderer() { return _renderer; }
 

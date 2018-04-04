@@ -11,6 +11,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_access.hpp>
 
 #define PI M_PI
 #define RAD(value) (value * (float)PI / 180)

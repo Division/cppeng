@@ -15,6 +15,8 @@ const std::unordered_map<int, int> INPUT_CONVERSION = {
     { (int)SDLK_w, (int)Key::W },
     { (int)SDLK_s, (int)Key::S },
     { (int)SDLK_d, (int)Key::D },
+    { (int)SDLK_e, (int)Key::E },
+    { (int)SDLK_q, (int)Key::Q },
     { (int)SDLK_SPACE, (int)Key::Space },
     { (int)SDLK_ESCAPE, (int)Key::Esc }
 };
@@ -27,6 +29,14 @@ void Input::updateWithSDLEvent(SDL_Event &e) {
 
     case SDL_KEYUP:
       _handleSDLKeyState(e.key, false);
+      break;
+
+    case SDL_MOUSEBUTTONDOWN:
+      _handleSDLMouseState(e.button, true);
+      break;
+
+    case SDL_MOUSEBUTTONUP:
+      _handleSDLMouseState(e.button, false);
       break;
 
     default:
@@ -42,4 +52,12 @@ void Input::_handleSDLKeyState(SDL_KeyboardEvent &e, bool isDown) {
     _keys[e.keysym.sym] = isDown;
   }
   ENGLog("KEY %i", e.keysym.sym);
+}
+
+void Input::_handleSDLMouseState(SDL_MouseButtonEvent &e, bool isDown) {
+  if (e.button == SDL_BUTTON_LEFT) {
+    _keys[(int)Key::MouseLeft] = isDown;
+  } else if (e.button == SDL_BUTTON_RIGHT) {
+    _keys[(int)Key::MouseRight] = isDown;
+  }
 }
