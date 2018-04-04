@@ -18,10 +18,11 @@ public:
   const std::unordered_map<GameObjectID, GameObjectPtr> *const gameObjectMap() const { return &_objectMap; };
   const std::vector<GameObjectPtr> *const gameObjects() const { return &_gameObjects; }
   // Temporary returns all objects. TODO: add camera parameter
-  const std::vector<GameObjectPtr> *const visibleObjects() const { return &_gameObjects; }
+  const std::vector<GameObjectPtr> *const visibleObjects(CameraPtr camera) const { return &_gameObjects; }
   void update(float dt);
 
   int cameraCount() { return (int)_cameraMap.size(); }
+  const std::unordered_map<GameObjectID, CameraPtr> *cameras() const { return &_cameraMap; }
 
 protected:
   // IGameObjectManager
@@ -36,6 +37,8 @@ protected:
 
 protected:
   std::unordered_map<GameObjectID, GameObjectPtr> _objectMap; // maps GameObject::id() to GameObject
+
+  // TODO: make cameras sorted list
   std::unordered_map<GameObjectID, CameraPtr> _cameraMap; // maps GameObject::id() to Camera
   std::vector<GameObjectPtr> _gameObjects; // Full list of scene game objects
   std::unordered_map<GameObjectID, Transform *>_rootTransformMap; // maps GameObject::id() to the top level transforms

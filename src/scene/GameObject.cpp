@@ -20,6 +20,10 @@ void GameObject::update(float dt) {
 
 }
 
+void GameObject::postUpdate() {
+
+}
+
 void GameObject::render(IRenderer &renderer) {
 
 }

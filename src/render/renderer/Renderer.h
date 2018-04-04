@@ -9,7 +9,9 @@
 #include "render/shader/Shader.h"
 #include <unordered_map>
 #include "IRenderer.h"
+#include "GlobalState.h"
 
+class Camera;
 class Scene;
 class Material;
 
@@ -17,6 +19,9 @@ class Renderer : IRenderer {
 public:
   Renderer() {};
   void setupShaders();
+
+  GlobalState state;
+
   ShaderGenerator *generator() { return &_generator; }
   ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps) const;
 
@@ -31,6 +36,8 @@ protected:
 
 protected:
   void _processRenderPipeline();
+
+  void _renderCamera(Scene &scene, std::shared_ptr<Camera> camera);
 };
 
 

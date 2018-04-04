@@ -12,6 +12,7 @@
 #include "glm/glm.hpp"
 #include "scene/Scene.h"
 #include"render/material/Material.h"
+#include "objects/Camera.h"
 
 using namespace glm;
 
@@ -41,10 +42,9 @@ ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) const {
 }
 
 void Renderer::renderMesh(Mesh &mesh, Material &material, const mat4 &transform) {
-  mat4x4 projection = glm::perspective(glm::radians(45.f), 800.0f / 600.0f, 0.1f, 1000.0f);
-
-  material.setProjection(projection);
-  material.setModelView(transform);
+  mat4 modelView = state.viewMatrix * transform;
+  material.setProjection(state.projectionMatrix);
+  material.setModelView(modelView);
 
   material.shader()->bind();
   material.uploadBindings();
@@ -54,12 +54,21 @@ void Renderer::renderMesh(Mesh &mesh, Material &material, const mat4 &transform)
 }
 
 void Renderer::renderScene(Scene &scene) {
-  auto visibleObjects = scene.visibleObjects();
-  for (auto object : *visibleObjects) {
-    object->render(*this);
+  for (auto &camera : *scene.cameras()) {
+    _renderCamera(scene, std::const_pointer_cast<Camera>(camera.second));
   }
 
   _processRenderPipeline();
+}
+
+void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
+  state.projectionMatrix = camera->projectionMatrix();
+  state.viewMatrix = camera->viewMatrix();
+
+  auto visibleObjects = scene.visibleObjects(camera);
+  for (auto &object : *visibleObjects) {
+    object->render(*this);
+  }
 }
 
 void Renderer::_processRenderPipeline() {

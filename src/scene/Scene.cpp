@@ -45,6 +45,7 @@ void Scene::_processRemovedObject(GameObjectPtr object) {
   object->_destroy();
 }
 
+// TODO: destroy out of update loop
 void Scene::destroyGameObject(GameObjectPtr object) {
   if (object->destroyed()) {
     ENGLog("ERROR: attempt to destroy already destroyed object")
@@ -96,6 +97,12 @@ void Scene::update(float dt) {
   }
 
   _updateTransforms();
+
+  for (auto &object : _gameObjects) {
+    if (object->active()) {
+      object->postUpdate();
+    }
+  }
 }
 
 void Scene::_updateTransforms() {

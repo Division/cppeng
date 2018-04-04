@@ -43,6 +43,8 @@ public:
 
   const std::vector<Transform *> * const children() const { return &_children; }
 
+  Transform *rootTransform() { if (_parent) return _parent->rootTransform(); else return this; }
+
   void setPosition(const vec3 &position) { _position = position; setDirty(); }
   void setRotation(const quat &rotation) { _rotation = rotation; setDirty(); }
   void setScale(const vec3 &scale) { _scale = scale; setDirty(); }
@@ -63,7 +65,7 @@ private:
   bool _dirty = true;
 
 private:
-  void _updateTransform(const mat4 *parentTransform, bool forceUpdate);
+  void _updateTransform(const mat4 *parentTransform, bool parentUpdated, bool skipChildren = false);
 
   void _removeChild(Transform *child);
   void _addChild(Transform *child);

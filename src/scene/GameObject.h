@@ -29,14 +29,15 @@ public:
 
   virtual ~GameObject() = default;
 
-  int id() { return _id; }
-  bool active() { return _active; }
-  bool destroyed() { return _destroyed; }
+  int id() const { return _id; }
+  bool active() const { return _active; }
+  bool destroyed() const { return _destroyed; }
 
   Transform *transform() { return &_transform; }
 
   virtual void update(float dt);
   virtual void render(IRenderer &renderer);
+  virtual void postUpdate(); // called after update() is executed on all scene objects and transforms are updated
 
 protected:
   GameObject();

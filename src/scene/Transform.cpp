@@ -5,7 +5,7 @@
 #include "Transform.h"
 #include "GameObject.h"
 
-void Transform::_updateTransform(const mat4 *parentTransform, bool parentUpdated) {
+void Transform::_updateTransform(const mat4 *parentTransform, bool parentUpdated, bool skipChildren) {
 
   // Update local transform if needed
   if (_dirty) {
@@ -23,8 +23,10 @@ void Transform::_updateTransform(const mat4 *parentTransform, bool parentUpdated
     }
   }
 
-  for (auto &childTransform : _children) {
-    childTransform->_updateTransform(&_worldMatrix, _dirty || parentUpdated);
+  if (!skipChildren) {
+    for (auto &childTransform : _children) {
+      childTransform->_updateTransform(&_worldMatrix, _dirty || parentUpdated);
+    }
   }
 
   _dirty = false;
