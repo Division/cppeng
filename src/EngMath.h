@@ -16,6 +16,7 @@
 #define PI M_PI
 #define RAD(value) (value * (float)PI / 180)
 #define DEG(value) (value / (float)PI * 180)
+#define M_TO_STRING(value) to_string(value)
 
 using namespace glm;
 

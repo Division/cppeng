@@ -22,6 +22,8 @@ const std::unordered_map<int, int> INPUT_CONVERSION = {
 };
 
 void Input::updateWithSDLEvent(SDL_Event &e) {
+  _mouseDelta = vec2(0, 0);
+
   switch (e.type) {
     case SDL_KEYDOWN:
       _handleSDLKeyState(e.key, true);
@@ -39,6 +41,10 @@ void Input::updateWithSDLEvent(SDL_Event &e) {
       _handleSDLMouseState(e.button, false);
       break;
 
+    case SDL_MOUSEMOTION:
+      _handleSDLMouseMove(e.motion, false);
+      break;
+
     default:
       // do nothing
       break;
@@ -51,7 +57,7 @@ void Input::_handleSDLKeyState(SDL_KeyboardEvent &e, bool isDown) {
   } else if (e.keysym.sym < 256) {
     _keys[e.keysym.sym] = isDown;
   }
-  ENGLog("KEY %i", e.keysym.sym);
+//  ENGLog("KEY %i", e.keysym.sym);
 }
 
 void Input::_handleSDLMouseState(SDL_MouseButtonEvent &e, bool isDown) {
@@ -60,4 +66,9 @@ void Input::_handleSDLMouseState(SDL_MouseButtonEvent &e, bool isDown) {
   } else if (e.button == SDL_BUTTON_RIGHT) {
     _keys[(int)Key::MouseRight] = isDown;
   }
+}
+
+void Input::_handleSDLMouseMove(SDL_MouseMotionEvent event, bool b) {
+  _mousePos = vec2(event.x, event.y);
+  _mouseDelta = vec2(event.xrel, event.yrel);
 }
