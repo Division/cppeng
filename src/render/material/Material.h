@@ -13,15 +13,18 @@
 class Material {
 public:
   Material();
+  virtual ~Material() = default;
+
   const ShaderPtr shader() const { return _shader; }
 
   void setModelView(const mat4 &modelView);
   void setProjection(const mat4 &projection);
-
   void uploadBindings() const;
 protected:
   int _modelViewBinding = -1;
   int _projectionBinding = -1;
+  int _normalMatrixBinding = -1;
+  int _viewMatrixBinding = -1;
 
   int _addMat4Binding(UniformName uniform);
   int _addMat3Binding(UniformName uniform);

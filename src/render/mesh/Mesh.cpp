@@ -280,6 +280,13 @@ void Mesh::_prepareVAO() {
   glEnableVertexAttribArray(attribIndex);
   glVertexAttribPointer(attribIndex, VERTEX_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
 
+  if (_hasNormals) {
+    attribIndex = (GLuint)ShaderAttrib::Normal;
+    offset = BUFFER_OFFSET(this->normalOffsetBytes());
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribPointer(attribIndex, VERTEX_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+  }
+
   if (_hasTexCoord0) {
     attribIndex = (GLuint)ShaderAttrib::TexCoord0;
     offset = BUFFER_OFFSET(this->texCoordOffsetBytes());
@@ -300,6 +307,38 @@ int Mesh::_getStrideSize() {
   if (_hasTexCoord0) result += TEXCOORD_SIZE;
   if (_hasWeights) result += JOINT_INDEX_SIZE + WEIGHT_SIZE;
   return result;
+}
+
+void Mesh::calculateNormals() {
+  _normals.resize(_vertices.size());
+  memset(&_normals[0], 0, _normals.size() * sizeof(float));
+
+  for (int i = 0; i < _faceCount; i++) {
+    int faceOffset = i * 3;
+    int indexA = _hasIndices ? _indices[faceOffset] * 3 : faceOffset * 3;
+    int indexB = _hasIndices ? _indices[faceOffset + 1] * 3 : faceOffset * 3 + 3;
+    int indexC = _hasIndices ? _indices[faceOffset + 2] * 3 : faceOffset * 3 + 6;
+
+    vec3 a(_vertices[indexA], _vertices[indexA + 1], _vertices[indexA + 2]);
+    vec3 b(_vertices[indexB], _vertices[indexB + 1], _vertices[indexB + 2]);
+    vec3 c(_vertices[indexC], _vertices[indexC + 1], _vertices[indexC + 2]);
+    b = b - a;
+    c = c - a;
+
+    vec3 normal = glm::cross(b, c);
+
+    for (int j = 0; j < 3; j++) {
+      _normals[indexA + j] += normal[j];
+      _normals[indexB + j] += normal[j];
+      _normals[indexC + j] += normal[j];
+    }
+  }
+
+  _hasNormals = true;
+}
+
+void Mesh::calculateTBN() {
+
 }
 
 

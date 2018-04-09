@@ -7,6 +7,7 @@
 
 const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
     { ShaderAttrib::Position, "aPosition" },
+    { ShaderAttrib::Normal, "aNormal" },
     { ShaderAttrib::TexCoord0, "aTexCoord0" }
 };
 

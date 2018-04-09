@@ -9,8 +9,10 @@
 #include <render/shader/Shader.h>
 #include <system/Logging.h>
 #include <loader/ShaderLoader.h>
+#include <loader/ModelLoader.h>
 
 std::map<std::string, Shader *> Resources::_shaders;
+std::unordered_map<std::string, ModelBundlePtr> Resources::_models;
 
 bool Resources::loadShader(const std::string &filename) {
   std::ifstream stream;
@@ -58,4 +60,15 @@ Shader *Resources::getShader(const std::string &name) {
   } else {
     return nullptr;
   }
+}
+
+const ModelBundlePtr Resources::loadModel(const std::string &filename) {
+  std::ifstream stream;
+  stream.open(filename, std::ios::in | std::ios::binary);
+  stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+  return Resources::loadModelFromStream(stream, filename);
+}
+
+const ModelBundlePtr Resources::loadModelFromStream(std::istream &stream, const std::string &url) {
+  return loader::loadModel(stream, url);
 }

@@ -28,6 +28,8 @@ enum class Key : int {
   MouseRight,
 };
 
+// TODO: implement SDL_SetRelativeMouseMode
+
 class Input {
 public:
   friend class Window;

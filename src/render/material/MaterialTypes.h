@@ -14,8 +14,13 @@ public:
   void color(vec4 color) { _bindings.vec4Bindings[_colorBinging].v = color; }
   vec4 color() const { return _bindings.vec4Bindings[_colorBinging].v; }
 
+protected:
   int _colorBinging = -1;
 };
 
+class MaterialLighting: public Material {
+public:
+  MaterialLighting();
+};
 
 #endif //CPPWRAPPER_MATERIALTYPES_H

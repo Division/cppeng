@@ -19,6 +19,7 @@ enum class UniformName : int {
   ProjectionMatrix,
   ModelViewMatrix,
   ViewMatrix,
+  NormalMatrix,
   Texture0,
   Texture1,
   NormalMap,

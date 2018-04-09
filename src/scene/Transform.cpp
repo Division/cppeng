@@ -102,3 +102,12 @@ const vec3 Transform::backward() const {
   }
   return vec3(_worldMatrix[2]);
 }
+
+void Transform::setMatrix(const mat4 matrix) {
+  quat r;
+  vec3 skew;
+  vec4 perspective;
+  glm::decompose(matrix, _scale, r, _position, skew, perspective);
+  _rotation = glm::conjugate(r);
+  setDirty();
+}

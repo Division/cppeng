@@ -8,18 +8,25 @@
 #include <scene/GameObject.h>
 #include <render/mesh/Mesh.h>
 #include "render/material/Material.h"
+#include <memory>
 
 class MeshObject : public GameObject {
 public:
   MeshObject();
+
   MaterialPtr material() { return _material; }
-  MeshPtr mesh() { return _mesh; }
+  void material(MaterialPtr material) { _material = material; }
+
+  MeshPtr mesh() const { return _mesh; }
+  void mesh(MeshPtr mesh) { _mesh = mesh; }
 protected:
   MeshPtr _mesh;
   MaterialPtr _material;
 
   void render(IRenderer &renderer) override;
 };
+
+typedef std::shared_ptr<MeshObject> MeshObjectPtr;
 
 
 #endif //CPPWRAPPER_MESHOBJECT_H

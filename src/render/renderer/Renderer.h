@@ -38,6 +38,8 @@ protected:
   void _processRenderPipeline();
 
   void _renderCamera(Scene &scene, std::shared_ptr<Camera> camera);
+
+  void setupMaterialBindings(Material &material, const mat4 &transform);
 };
 
 

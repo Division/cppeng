@@ -6,6 +6,9 @@
 
 void Material::setModelView(const mat4 &modelView) {
   _bindings.mat4Bindings[_modelViewBinding].matrix = modelView;
+  if (_normalMatrixBinding != -1) {
+    _bindings.mat3Bindings[_normalMatrixBinding].matrix = transpose(inverse(mat3(modelView)));
+  }
 }
 
 void Material::setProjection(const mat4 &projection) {
@@ -57,12 +60,28 @@ void Material::uploadBindings() const {
     _shader->getUniform(binding.uniform)->setMat4(binding.matrix);
   }
 
+  for (auto &binding : _bindings.mat3Bindings) {
+    _shader->getUniform(binding.uniform)->setMat3(binding.matrix);
+  }
+
   for (auto &binding : _bindings.vec4Bindings) {
     _shader->getUniform(binding.uniform)->setVec4(binding.v);
   }
 
   for (auto &binding : _bindings.vec3Bindings) {
     _shader->getUniform(binding.uniform)->setVec3(binding.v);
+  }
+
+  for (auto &binding : _bindings.vec2Bindings) {
+    _shader->getUniform(binding.uniform)->setVec2(binding.v);
+  }
+
+  for (auto &binding : _bindings.floatBindings) {
+//    _shader->getUniform(binding.uniform)->set(binding.v);
+  }
+
+  for (auto &binding : _bindings.textureBindings) {
+    _shader->getUniform(binding.uniform)->setInt(binding.texture->id());
   }
 
 }

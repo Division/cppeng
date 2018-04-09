@@ -10,6 +10,7 @@ const std::map<UniformName, std::string> UNIFORM_NAMES = {
     { UniformName::ProjectionMatrix, "uPMatrix" },
     { UniformName::ModelViewMatrix, "uMVMatrix" },
     { UniformName::ViewMatrix, "uViewMatrix" },
+    { UniformName::NormalMatrix, "uNormalMatrix" },
     { UniformName::Texture0, "uTexture0" },
     { UniformName::Texture1, "uTexture1" },
     { UniformName::NormalMap, "uNormalMap" }

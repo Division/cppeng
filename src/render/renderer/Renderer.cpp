@@ -42,15 +42,19 @@ ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) const {
 }
 
 void Renderer::renderMesh(Mesh &mesh, Material &material, const mat4 &transform) {
-  mat4 modelView = state.viewMatrix * transform;
-  material.setProjection(state.projectionMatrix);
-  material.setModelView(modelView);
+  setupMaterialBindings(material, transform);
 
   material.shader()->bind();
   material.uploadBindings();
 
   glBindVertexArray(mesh.vao());
   glDrawElements(GL_TRIANGLES, mesh.indexCount(), GL_UNSIGNED_SHORT, 0);
+}
+
+void Renderer::setupMaterialBindings(Material &material, const mat4 &transform) {
+  mat4 modelView = state.viewMatrix * transform;
+  material.setProjection(state.projectionMatrix);
+  material.setModelView(modelView);
 }
 
 void Renderer::renderScene(Scene &scene) {

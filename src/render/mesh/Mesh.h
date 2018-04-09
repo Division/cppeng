@@ -13,7 +13,7 @@ using namespace glm;
 
 class Mesh {
 public:
-  explicit Mesh(bool keepData = false, int componentCount = 3, GLenum bufferUsage = GL_STATIC_DRAW);
+  explicit Mesh(bool keepData = true, int componentCount = 3, GLenum bufferUsage = GL_STATIC_DRAW);
   virtual ~Mesh();
 
   void setVertices(const vec3 *vertices, int vertexCount);
@@ -24,6 +24,9 @@ public:
 
   void setIndices(const GLushort *indices, int indexCount);
   void setIndices(const std::vector<GLushort> &indices);
+
+  void calculateNormals();
+  void calculateTBN();
 
   void createBuffer();
 
@@ -36,6 +39,11 @@ public:
   int strideBytes() const { return _strideBytes; };
   int faceCount() const {return _faceCount; }
   int indexCount() const { return _hasIndices ? _faceCount * _componentCount : 0; }
+  vec3 getVertex(int index) const {
+    if (!_hasVertices || !_keepData) { return vec3(); }
+    else { return vec3(_vertices[index * 3], _vertices[index * 3 + 1], _vertices[index * 3 + 2]); };
+  }
+
 
   bool hasVertices() const { return _hasVertices; }
   bool hasIndices() const { return _hasIndices; }

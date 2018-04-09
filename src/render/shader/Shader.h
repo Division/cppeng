@@ -24,6 +24,8 @@ class Uniform;
 enum class ShaderCaps : int {
   Color = 0,
   Lighting,
+  Texture0,
+  Texture1,
   NormalMap
 };
 
@@ -55,6 +57,7 @@ typedef std::shared_ptr<ShaderCapsSet> ShaderCapsSetPtr;
 
 enum class ShaderAttrib : int {
   Position = 0,
+  Normal,
   TexCoord0,
   TexCoord1
 };
@@ -80,7 +83,6 @@ private:
   std::unique_ptr<Uniform> _uniforms[(int)UniformName::Count];
   GLuint _program;
   std::vector<ICleanable *> _dirtyUniforms;
-
 };
 
 typedef std::shared_ptr<Shader> ShaderPtr;

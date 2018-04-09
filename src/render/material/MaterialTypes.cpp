@@ -22,3 +22,18 @@ MaterialSingleColor::MaterialSingleColor() {
 
   color(vec4(1, 1, 1, 1));
 }
+
+MaterialLighting::MaterialLighting() {
+  auto engine = getEngine();
+
+  _normalMatrixBinding = _addMat3Binding(UniformName::NormalMatrix);
+
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Lighting);
+  _shader = engine->renderer()->getShaderWithCaps(caps);
+
+  // Manually create uniforms for now
+  _shader->addUniform(UniformName::ProjectionMatrix);
+  _shader->addUniform(UniformName::ModelViewMatrix);
+  _shader->addUniform(UniformName::NormalMatrix);
+}

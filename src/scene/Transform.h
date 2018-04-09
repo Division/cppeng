@@ -45,6 +45,7 @@ public:
   void scale(const vec3 &scale) { _scale = scale; setDirty(); }
 
   void translate(const vec3 &delta) { position(_position + delta); }
+  void setMatrix(const mat4 matrix);
 
   const mat4 &worldMatrix() const { return _worldMatrix; }
 

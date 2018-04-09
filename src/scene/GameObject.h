@@ -9,6 +9,7 @@
 #include "Transform.h"
 #include "render/renderer/IRenderer.h"
 #include "system/Logging.h"
+#include <string>
 
 class GameObject;
 typedef std::shared_ptr<GameObject> GameObjectPtr;
@@ -29,6 +30,9 @@ public:
 
   virtual ~GameObject() = default;
 
+  std::string name() const { return _name; }
+  void name(const std::string &name) { _name = name; }
+
   int id() const { return _id; }
   bool active() const { return _active; }
   bool destroyed() const { return _destroyed; }
@@ -41,6 +45,8 @@ public:
 
 protected:
   GameObject();
+
+  std::string _name;
 
   bool _active = true;
   bool _destroyed = false;

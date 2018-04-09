@@ -10,7 +10,7 @@
 
 namespace loader {
 
-  void loadShader(std::stringstream &sourceStream, std::string *outVertexSource, std::string *outFragmentSource);
+  void loadShader(std::stringstream &sourceStream, std::string *outVertexSourcne, std::string *outFragmentSource);
 
 }
 

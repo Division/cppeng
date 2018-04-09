@@ -23,7 +23,8 @@ const std::string TEMPLATE_LIST[] = {
 };
 
 const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
-    { ShaderCaps::Color, "COLOR" }
+    { ShaderCaps::Color, "COLOR" },
+    { ShaderCaps::Lighting, "LIGHTING" }
 };
 
 const auto ROOT_TEMPLATE = TEMPLATE_LIST[0];
@@ -69,15 +70,12 @@ void ShaderGenerator::setupTemplates () {
 json ShaderGenerator::_getJSONForCaps(ShaderCapsSetPtr caps) {
   json result;
 
-  for (auto cap : caps->caps()) {
-    auto scap = (ShaderCaps)cap;
-    bool hasCap = CAPS_TO_PARAM_MAP.find((ShaderCaps)cap) != CAPS_TO_PARAM_MAP.end();
-    result[CAPS_TO_PARAM_MAP.at(scap)] = hasCap;
+  for (auto cap : CAPS_TO_PARAM_MAP) {
+    auto scap = cap.first;
+    bool hasCap = caps->hasCap(scap);
+    auto key = cap.second;
+    result[key] = hasCap;
   }
-
-//  if (SET_CONTAINS_CAP(caps, ShaderCaps.ColorWrite)) {
-//
-//  }
 
   return result;
 }
