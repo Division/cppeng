@@ -16,6 +16,10 @@
 
 using namespace glm;
 
+Renderer::Renderer() {
+  _uboManager = std::make_unique<UBOManager>();
+}
+
 void Renderer::setupShaders() {
   _generator.setupTemplates();
 }
@@ -41,41 +45,83 @@ ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) const {
   return result;
 }
 
-void Renderer::renderMesh(Mesh &mesh, Material &material, const mat4 &transform) {
-  setupMaterialBindings(material, transform);
+void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform) {
+//  setupMaterialBindings(material, transform);
 
-  material.shader()->bind();
-  material.uploadBindings();
-
-  glBindVertexArray(mesh.vao());
-  glDrawElements(GL_TRIANGLES, mesh.indexCount(), GL_UNSIGNED_SHORT, 0);
+  glBindVertexArray(mesh->vao());
+  glDrawElementsInstanced(GL_TRIANGLES, mesh->indexCount(), GL_UNSIGNED_SHORT, 0, 1);
 }
 
-void Renderer::setupMaterialBindings(Material &material, const mat4 &transform) {
+void Renderer::setupMaterialBindings(MaterialPtr &material, const mat4 &transform) {
   mat4 modelView = state.viewMatrix * transform;
-  material.setProjection(state.projectionMatrix);
-  material.setModelView(modelView);
+  material->setProjection(state.projectionMatrix);
+  material->setView(state.viewMatrix);
+
+  if (material->hasTransformBlock()) {
+    TransformStruct transformStruct;
+    transformStruct.transform = transform;
+    material->setTransformBlock(transformStruct);
+  }
+
+  _uboManager->processMeterialBindings(material);
 }
 
 void Renderer::renderScene(Scene &scene) {
   for (auto &camera : *scene.cameras()) {
     _renderCamera(scene, std::const_pointer_cast<Camera>(camera.second));
   }
+}
 
-  _processRenderPipeline();
+void Renderer::_clearQueues() {
+  _ropCounter = 0;
+  for (auto &queue : _queues) {
+    queue.clear();
+  }
 }
 
 void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
   state.projectionMatrix = camera->projectionMatrix();
   state.viewMatrix = camera->viewMatrix();
 
+  _clearQueues();
+
   auto visibleObjects = scene.visibleObjects(camera);
   for (auto &object : *visibleObjects) {
     object->render(*this);
   }
+
+  _prepareQueues();
+  _processRenderPipeline();
+}
+
+void Renderer::_prepareQueues() {
+  _uboManager->swap();
+
+  // Opaque
+  auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
+  for (auto &rop : opaqueQueue) {
+    setupMaterialBindings(rop.material, rop.modelMatrix);
+  }
+
+  _uboManager->upload();
 }
 
 void Renderer::_processRenderPipeline() {
-  // Handling passes, render queues etc
+  // Opaque
+  auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
+  for (auto &rop : opaqueQueue) {
+    _uboManager->setupForRender(rop.material);
+    renderMesh(rop.mesh, rop.material, rop.modelMatrix);
+  }
 }
 
+void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) {
+  if (!rop.material || !rop.mesh) {
+    ENGLog("Trying to add non-renderable rop");
+    return;
+  }
+
+  auto &queue = _queues[(int)renderQueue];
+  rop.index = _ropCounter++;
+  queue.push_back(rop);
+}

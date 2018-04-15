@@ -15,3 +15,7 @@ const std::map<UniformName, std::string> UNIFORM_NAMES = {
     { UniformName::Texture1, "uTexture1" },
     { UniformName::NormalMap, "uNormalMap" }
 };
+
+const std::map<UniformBlockName, std::string> UNIFORM_BLOCK_NAMES = {
+    { UniformBlockName::Transform, "TransformBlock" }
+};

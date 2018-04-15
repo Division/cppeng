@@ -22,7 +22,6 @@ using namespace glm;
 #endif
 
 Engine::Engine() {
-  _renderer = new Renderer();
   _input = new Input();
   _window = new Window(_input);
 }
@@ -124,6 +123,8 @@ void Engine::update(double dt) {
 }
 
 void Engine::init() {
+  engine::GLCaps::init(); // Setup OpenGL caps
+  _renderer = new Renderer();
   _renderer->setupShaders();
   _game->init(this);
   engine::checkGLError();

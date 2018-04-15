@@ -22,6 +22,8 @@ public:
 protected:
   MeshPtr _mesh;
   MaterialPtr _material;
+  RenderQueue _renderQueue = RenderQueue::Opaque;
+  int renderOrder = 0;
 
   void render(IRenderer &renderer) override;
 };

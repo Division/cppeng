@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include "IRenderer.h"
 #include "GlobalState.h"
+#include <memory>
+#include "UBOManager.h"
 
 class Camera;
 class Scene;
@@ -17,7 +19,7 @@ class Material;
 
 class Renderer : IRenderer {
 public:
-  Renderer() {};
+  Renderer();
   void setupShaders();
 
   GlobalState state;
@@ -28,18 +30,22 @@ public:
   void renderScene(Scene &scene);
 
   // IRenderer
-  void renderMesh(Mesh &mesh, Material &material, const mat4 &transform) override;
+  void addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) override;
+  void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform) override;
 
 protected:
   mutable ShaderGenerator _generator;
   mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
+  std::unique_ptr<UBOManager> _uboManager;
+  std::vector<RenderOperation> _queues[(int)RenderQueue::Count];
+  unsigned int _ropCounter;
 
 protected:
+  void _prepareQueues();
   void _processRenderPipeline();
-
   void _renderCamera(Scene &scene, std::shared_ptr<Camera> camera);
-
-  void setupMaterialBindings(Material &material, const mat4 &transform);
+  void setupMaterialBindings(MaterialPtr &material, const mat4 &transform);
+  void _clearQueues();
 };
 
 

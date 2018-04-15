@@ -72,6 +72,9 @@ public:
 
   void bind();
 
+  UniformBlock *addUniformBlock(UniformBlockName blockName);
+  UniformBlock *getUniformBlock(UniformBlockName type);
+
   Uniform *addUniform (UniformName type);
   Uniform *getUniform(UniformName type);
 
@@ -81,8 +84,10 @@ private:
   void _setupAttribs(GLuint program);
 private:
   std::unique_ptr<Uniform> _uniforms[(int)UniformName::Count];
+  std::unique_ptr<UniformBlock> _uniformBlocks[(int)UniformBlockName::Count];
   GLuint _program;
   std::vector<ICleanable *> _dirtyUniforms;
+
 };
 
 typedef std::shared_ptr<Shader> ShaderPtr;

@@ -17,6 +17,11 @@ public:
   std::vector<Vec2Binding> vec2Bindings;
   std::vector<FloatBinding> floatBindings;
   std::vector<TextureBinding> textureBindings;
+
+  // Uniform blocks
+
+  bool hasTransform = true;
+  TransformBinding transform;
 };
 
 

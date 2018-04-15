@@ -26,7 +26,14 @@ enum class UniformName : int {
   Count
 };
 
+enum class UniformBlockName : int {
+  None = 0,
+  Transform,
+  Count
+};
+
 extern const std::map<UniformName, std::string> UNIFORM_NAMES;
+extern const std::map<UniformBlockName, std::string> UNIFORM_BLOCK_NAMES;
 
 class Uniform {
 public:
@@ -62,6 +69,17 @@ public:
 protected:
   GLint _location;
   UniformName _type = UniformName::None;
+};
+
+class UniformBlock {
+public:
+  UniformBlock(UniformBlockName name, GLuint index, int size) : _name(name), _index(index), _size(size) {};
+
+  GLint bindingPoint() { return (GLint)_name; }
+protected:
+  UniformBlockName _name = UniformBlockName::None;
+  GLuint _index = 0;
+  int _size = 0;
 };
 
 

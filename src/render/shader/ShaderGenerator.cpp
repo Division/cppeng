@@ -11,7 +11,7 @@
 const std::string GLSL_VERSION = "300 es";
 const bool PLATFORM_WEBGL = true;
 #else
-const std::string GLSL_VERSION = "150";
+const std::string GLSL_VERSION = "330";
 const bool PLATFORM_WEBGL = false;
 #endif
 

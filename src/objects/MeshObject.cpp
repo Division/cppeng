@@ -14,5 +14,11 @@ void MeshObject::render(IRenderer &renderer) {
     return;
   }
 
-  renderer.renderMesh(*_mesh, *_material, transform()->worldMatrix());
+  RenderOperation rop;
+  rop.mesh = _mesh;
+  rop.material = _material;
+  rop.modelMatrix = transform()->worldMatrix();
+  rop.renderOrder = renderOrder;
+  rop.debugInfo = name();
+  renderer.addRenderOperation(rop, _renderQueue);
 }

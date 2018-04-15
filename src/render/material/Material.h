@@ -17,7 +17,13 @@ public:
 
   const ShaderPtr shader() const { return _shader; }
 
-  void setModelView(const mat4 &modelView);
+  bool hasTransformBlock() { return _bindings.hasTransform; }
+  void setTransformBlock(TransformStruct &value) { _bindings.transform.data = value; }
+  void setTransformBlockOffset(unsigned int offset) { _bindings.transform.offset = offset; }
+  unsigned int getTransformBlockOffset() { return _bindings.transform.offset; }
+  const TransformStruct &getTransformStruct() { return _bindings.transform.data; }
+
+  void setView(const mat4 &viewMatrix);
   void setProjection(const mat4 &projection);
   void uploadBindings() const;
 protected:

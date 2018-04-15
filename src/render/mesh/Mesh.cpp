@@ -29,7 +29,6 @@ Mesh::Mesh(bool keepData, int componentCount, GLenum bufferUsage) :
   _strideBytes = 0;
   _vertexCount = 0;
   _indexBuffer = 0;
-  _vbo = 0;
   _vao = 0;
 
   _hasIndices = false;
@@ -124,9 +123,9 @@ void Mesh::setIndices(const std::vector<GLushort> &indices) {
 
 
 void Mesh::_deleteBuffer() {
-  if (_vbo) {
-    glDeleteBuffers(1, &_vbo);
-    _vbo = 0;
+  if (_vao) {
+    glDeleteVertexArrays(1, &_vao);
+    _vao = 0;
   }
 }
 
@@ -177,8 +176,10 @@ void Mesh::createBuffer() {
     currentOffset += COLOR_SIZE;
   }
 
-  std::vector<float> bufferData;
-  bufferData.resize((size_t)floor(_stride * _vertexCount));
+  // Unsafe but fast filling buffer data by working with pointer directly
+  _vbo = std::make_unique<VertexBufferObject>(GL_ARRAY_BUFFER, _bufferUsage);
+  _vbo->resize(_strideBytes * _vertexCount);
+  float *bufferData = (float *)_vbo->bufferPointer();
 
   for (int i = 0; i < _vertexCount; i++) {
     int offset = i * _stride;
@@ -235,17 +236,17 @@ void Mesh::createBuffer() {
     }
   }
 
-  glGenBuffers(1, &_vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-  glBufferData(GL_ARRAY_BUFFER, bufferData.size() * sizeof(GLfloat), &bufferData[0], _bufferUsage);
+  _vbo->upload();
+  _vbo->erase();
 
   if (_hasIndices) {
-    glGenBuffers(1, &_indexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size() * sizeof(GLushort), &_indices[0], _bufferUsage);
+    _indexBuffer = std::make_unique<VertexBufferObject>(GL_ELEMENT_ARRAY_BUFFER, _bufferUsage);
+    auto indexSize = _indices.size() * sizeof(GLushort);
+    _indexBuffer->resize(indexSize);
+    _indexBuffer->writeData((void *)&_indices[0], 0, indexSize);
+    _indexBuffer->upload();
+    _indexBuffer->erase();
   }
-
-  glBindVertexArray(0);
 
   // Free data arrays
   if (!_keepData) {
@@ -266,10 +267,10 @@ void Mesh::createBuffer() {
 void Mesh::_prepareVAO() {
   glGenVertexArrays(1, &_vao);
   glBindVertexArray(_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, this->vbo());
+  _vbo->bind();
 
   if (_hasIndices) {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
+    _indexBuffer->bind();
   }
 
   void *offset;

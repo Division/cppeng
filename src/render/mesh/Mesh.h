@@ -8,6 +8,8 @@
 #include "EngineGL.h"
 #include "EngMath.h"
 #include <vector>
+#include <memory>
+#include "render/buffer/VertexBufferObject.h"
 
 using namespace glm;
 
@@ -32,7 +34,6 @@ public:
 
   // Properties
 
-  GLuint vbo() const { return _vbo; }
   GLuint vao() const { return _vao; }
 
   int componentCount() const { return _componentCount; } // Number of vertices to complete the primitive (3 for triangle)
@@ -69,6 +70,9 @@ private:
   void _prepareVAO();
 
 private:
+  std::unique_ptr<VertexBufferObject> _vbo;
+  std::unique_ptr<VertexBufferObject> _indexBuffer;
+
   bool _keepData;
   int _componentCount;
   int _faceCount;
@@ -76,8 +80,6 @@ private:
   int _strideBytes;
   int _vertexCount;
   GLenum _bufferUsage;
-  GLuint _indexBuffer;
-  GLuint _vbo;
   GLuint _vao;
 
   // Attrib flags

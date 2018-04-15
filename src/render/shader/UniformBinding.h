@@ -8,6 +8,9 @@
 #include "EngMath.h"
 #include "render/shader/Shader.h"
 #include <render/texture/Texture.h>
+#include "UniformBufferStruct.h"
+
+using namespace UBOStruct;
 
 struct UniformBinding {
   explicit UniformBinding(UniformName name) : uniform(name) {}
@@ -47,6 +50,19 @@ struct FloatBinding: public UniformBinding {
 struct TextureBinding: public UniformBinding {
   explicit TextureBinding(UniformName name) : UniformBinding(name) {}
   TexturePtr texture;
+};
+
+// Uniform Buffer Data Bindings
+
+struct UniformBlockBinding {
+  explicit UniformBlockBinding(UniformBlockName name) : block(name) {}
+  UniformBlockName block;
+};
+
+struct TransformBinding: public UniformBlockBinding {
+  explicit TransformBinding() : UniformBlockBinding(UniformBlockName::Transform) {}
+  TransformStruct data;
+  unsigned int offset;
 };
 
 #endif //CPPWRAPPER_UNIFORMBINDING_H

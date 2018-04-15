@@ -17,8 +17,9 @@ MaterialSingleColor::MaterialSingleColor() {
 
   // Manually create uniforms for now
   _shader->addUniform(UniformName::ProjectionMatrix);
-  _shader->addUniform(UniformName::ModelViewMatrix);
+  _shader->addUniform(UniformName::ViewMatrix);
   _shader->addUniform(UniformName::Color);
+  _shader->addUniformBlock(UniformBlockName::Transform);
 
   color(vec4(1, 1, 1, 1));
 }
@@ -34,6 +35,7 @@ MaterialLighting::MaterialLighting() {
 
   // Manually create uniforms for now
   _shader->addUniform(UniformName::ProjectionMatrix);
-  _shader->addUniform(UniformName::ModelViewMatrix);
+  _shader->addUniform(UniformName::ViewMatrix);
   _shader->addUniform(UniformName::NormalMatrix);
+  _shader->addUniformBlock(UniformBlockName::Transform);
 }

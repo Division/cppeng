@@ -4,6 +4,7 @@
 
 #include "Shader.h"
 #include <system/Logging.h>
+#include <memory>
 
 const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
     { ShaderAttrib::Position, "aPosition" },
@@ -90,13 +91,38 @@ void Shader::bind() {
   glUseProgram(_program);
 }
 
+//------------------------------------------------------------------------
+// Uniform
+//------------------------------------------------------------------------
+
+UniformBlock *Shader::addUniformBlock(const UniformBlockName type) {
+  auto &blockName = UNIFORM_BLOCK_NAMES.at(type);
+
+  auto index = glGetUniformBlockIndex(_program, blockName.c_str());
+  GLint size = 0;
+  glGetActiveUniformBlockiv (_program, index, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+  _uniformBlocks[(int)type] = std::make_unique<UniformBlock>(type, index, size);
+
+  // Setting up binding point
+  auto bindingPoint = _uniformBlocks[(int)type]->bindingPoint();
+  glUniformBlockBinding(_program, index, bindingPoint);
+
+  ENGLog("Added UBO binding %s, of size %i. Binding point: %i", blockName.c_str(), size, bindingPoint);
+
+  return getUniformBlock(type);
+}
+
+UniformBlock *Shader::getUniformBlock (const UniformBlockName type) {
+  return _uniformBlocks[(int)type].get();
+}
+
 Uniform *Shader::addUniform(const UniformName type) {
   auto &uniformName = UNIFORM_NAMES.at(type);
   GLint location = glGetUniformLocation(_program, uniformName.c_str());
   if (location == -1) {
     ENGLog("Can't find uniform %s", uniformName.c_str());
   }
-  _uniforms[(int)type] = std::move(std::unique_ptr<Uniform>(new Uniform(location, type)));
+  _uniforms[(int)type] = std::make_unique<Uniform>(location, type);
   return this->getUniform(type);
 }
 

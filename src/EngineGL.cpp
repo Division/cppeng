@@ -27,3 +27,16 @@ void engine::checkGLError() {
 
   ENGLog("GL Error: %s", errorStr.c_str());
 }
+
+
+GLint engine::GLCaps::_maxUBOSize = 0;
+GLint engine::GLCaps::_uboOffsetAlignment = 0;
+void engine::GLCaps::init() {
+  glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &_maxUBOSize);
+  glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &_uboOffsetAlignment);
+
+  ENGLog("OpenGL Caps:");
+  ENGLog("    GL_MAX_UNIFORM_BLOCK_SIZE: %i", _maxUBOSize);
+  ENGLog("    GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT: %i", _uboOffsetAlignment);
+  ENGLog("");
+}

@@ -4,15 +4,12 @@
 
 #include "Material.h"
 
-void Material::setModelView(const mat4 &modelView) {
-  _bindings.mat4Bindings[_modelViewBinding].matrix = modelView;
-  if (_normalMatrixBinding != -1) {
-    _bindings.mat3Bindings[_normalMatrixBinding].matrix = transpose(inverse(mat3(modelView)));
-  }
-}
-
 void Material::setProjection(const mat4 &projection) {
   _bindings.mat4Bindings[_projectionBinding].matrix = projection;
+}
+
+void Material::setView(const mat4 &viewMatrix) {
+  _bindings.mat4Bindings[_viewMatrixBinding].matrix = viewMatrix;
 }
 
 int Material::_addMat4Binding(UniformName uniform) {
@@ -87,6 +84,7 @@ void Material::uploadBindings() const {
 }
 
 Material::Material() {
-  _modelViewBinding = _addMat4Binding(UniformName::ModelViewMatrix);
+//  _modelViewBinding = _addMat4Binding(UniformName::ModelViewMatrix);
   _projectionBinding = _addMat4Binding(UniformName::ProjectionMatrix);
+  _viewMatrixBinding = _addMat4Binding(UniformName::ViewMatrix);
 }
