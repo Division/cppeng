@@ -31,17 +31,20 @@ public:
 
   // IRenderer
   void addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) override;
-  void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform) override;
+  void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) override;
 
 protected:
   mutable ShaderGenerator _generator;
   mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
+
+  // TODO: make UBOManager per-scene instance
   std::unique_ptr<UBOManager> _uboManager;
+
   std::vector<RenderOperation> _queues[(int)RenderQueue::Count];
   unsigned int _ropCounter;
 
 protected:
-  void _prepareQueues();
+  void _prepareQueues(Scene &scene, std::shared_ptr<Camera> camera);
   void _processRenderPipeline();
   void _renderCamera(Scene &scene, std::shared_ptr<Camera> camera);
   void setupMaterialBindings(MaterialPtr &material, const mat4 &transform);

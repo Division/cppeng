@@ -18,10 +18,10 @@ public:
   const ShaderPtr shader() const { return _shader; }
 
   bool hasTransformBlock() { return _bindings.hasTransform; }
-  void setTransformBlock(TransformStruct &value) { _bindings.transform.data = value; }
+  void setTransformBlock(UBOStruct::TransformStruct &value) { _bindings.transform.data = value; }
   void setTransformBlockOffset(unsigned int offset) { _bindings.transform.offset = offset; }
   unsigned int getTransformBlockOffset() { return _bindings.transform.offset; }
-  const TransformStruct &getTransformStruct() { return _bindings.transform.data; }
+  const UBOStruct::TransformStruct &getTransformStruct() { return _bindings.transform.data; }
 
   void setView(const mat4 &viewMatrix);
   void setProjection(const mat4 &projection);

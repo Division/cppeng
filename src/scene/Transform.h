@@ -38,6 +38,7 @@ public:
   const vec3 backward() const;
 
   const vec3 &position() { return _position; }
+  const vec3 &worldPosition() const { _updateTransformUpwards(); return vec3(_worldMatrix[3]); }
   void position(const vec3 &position) { _position = position; setDirty(); }
   const quat &rotation() { return _rotation; }
   void rotation(const quat &rotation) { _rotation = rotation; setDirty(); }
@@ -76,6 +77,7 @@ private:
 
 private:
   void _updateTransform(const mat4 *parentTransform, bool parentUpdated, bool skipChildren = false) const;
+  void _updateTransformUpwards(bool skipParentUpdate = false) const;
 
   void _removeChild(Transform *child);
   void _addChild(Transform *child);

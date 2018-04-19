@@ -10,8 +10,6 @@
 #include <render/texture/Texture.h>
 #include "UniformBufferStruct.h"
 
-using namespace UBOStruct;
-
 struct UniformBinding {
   explicit UniformBinding(UniformName name) : uniform(name) {}
   UniformName uniform;
@@ -56,12 +54,13 @@ struct TextureBinding: public UniformBinding {
 
 struct UniformBlockBinding {
   explicit UniformBlockBinding(UniformBlockName name) : block(name) {}
+  bool enabled = false;
   UniformBlockName block;
 };
 
 struct TransformBinding: public UniformBlockBinding {
   explicit TransformBinding() : UniformBlockBinding(UniformBlockName::Transform) {}
-  TransformStruct data;
+  UBOStruct::TransformStruct data;
   unsigned int offset;
 };
 

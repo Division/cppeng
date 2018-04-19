@@ -39,6 +39,7 @@ public:
 private:
   bool _keys[256];
   vec2 _mousePos;
+  vec2 _prevMousePos;
   vec2 _mouseDelta;
 
 private:
@@ -46,6 +47,8 @@ private:
   void _handleSDLKeyState(SDL_KeyboardEvent &e, bool isDown);
   void _handleSDLMouseState(SDL_MouseButtonEvent &e, bool isDown);
   void _handleSDLMouseMove(SDL_MouseMotionEvent event, bool b);
+
+  void _prepareForUpdate();
 };
 
 

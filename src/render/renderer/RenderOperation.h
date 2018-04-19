@@ -7,12 +7,14 @@
 
 #include "render/mesh/Mesh.h"
 #include "EngMath.h"
+#include "EngineGL.h"
 #include "render/material/Material.h"
 
 struct RenderOperation {
   MeshPtr mesh;
   MaterialPtr material;
   mat4 modelMatrix;
+  GLenum mode = GL_TRIANGLES;
   unsigned int index;
   int renderOrder;
   std::string debugInfo;

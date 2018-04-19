@@ -39,7 +39,7 @@ public:
   int componentCount() const { return _componentCount; } // Number of vertices to complete the primitive (3 for triangle)
   int strideBytes() const { return _strideBytes; };
   int faceCount() const {return _faceCount; }
-  int indexCount() const { return _hasIndices ? _faceCount * _componentCount : 0; }
+  int indexCount() const { return _hasIndices ? _faceCount * _componentCount : (int)_vertices.size(); }
   vec3 getVertex(int index) const {
     if (!_hasVertices || !_keepData) { return vec3(); }
     else { return vec3(_vertices[index * 3], _vertices[index * 3 + 1], _vertices[index * 3 + 2]); };

@@ -8,6 +8,7 @@
 #include "render/buffer/VertexBufferObject.h"
 #include "render/material/Material.h"
 #include <memory>
+#include "objects/LightObject.h"
 
 class UBOManager {
 public:
@@ -16,8 +17,11 @@ public:
   void swap();
   void upload();
   void setupForRender(MaterialPtr material);
+  void updateLights(const std::vector<LightObjectPtr> *lights);
 private:
   SwappableVertexBufferObjectUniquePtr _transform;
+  SwappableVertexBufferObjectUniquePtr _light;
+
 };
 
 

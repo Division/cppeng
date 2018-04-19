@@ -74,9 +74,7 @@ const vec3 Transform::left() const {
 }
 
 const vec3 Transform::up() const {
-  if (_dirty) {
-    _updateTransform(&parent()->_worldMatrix, false, true);
-  }
+  _updateTransformUpwards();
   return vec3(_worldMatrix[1]);
 }
 
@@ -85,11 +83,8 @@ const vec3 Transform::forward() const {
 }
 
 const vec3 Transform::right() const {
-  if (_dirty) {
-    _updateTransform(&parent()->_worldMatrix, false, true);
-  }
+  _updateTransformUpwards();
   return vec3(_worldMatrix[0]);
-
 }
 
 const vec3 Transform::down() const {
@@ -97,9 +92,7 @@ const vec3 Transform::down() const {
 }
 
 const vec3 Transform::backward() const {
-  if (_dirty) {
-    _updateTransform(&parent()->_worldMatrix, false, true);
-  }
+  _updateTransformUpwards();
   return vec3(_worldMatrix[2]);
 }
 
@@ -110,4 +103,15 @@ void Transform::setMatrix(const mat4 matrix) {
   glm::decompose(matrix, _scale, r, _position, skew, perspective);
   _rotation = glm::conjugate(r);
   setDirty();
+}
+
+void Transform::_updateTransformUpwards(bool skipParentUpdate) const {
+  if (!skipParentUpdate && _parent) {
+    _parent->_updateTransformUpwards();
+  }
+
+  if (_dirty) {
+    mat4 *matrix = _parent ? &_parent->_worldMatrix : nullptr;
+    _updateTransform(matrix, false, true);
+  }
 }

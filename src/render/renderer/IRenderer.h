@@ -20,7 +20,7 @@ enum class RenderQueue : int {
 class IRenderer {
 public:
   virtual void addRenderOperation(RenderOperation &rop, RenderQueue queue) = 0;
-  virtual void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform) = 0;
+  virtual void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) = 0;
 };
 
 #endif //CPPWRAPPER_IRENDERER_H

@@ -37,6 +37,7 @@ public:
   bool active() const { return _active; }
   bool destroyed() const { return _destroyed; }
 
+  const Transform *transform() const { return &_transform; }
   Transform *transform() { return &_transform; }
 
   virtual void update(float dt);

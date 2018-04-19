@@ -29,6 +29,7 @@ enum class UniformName : int {
 enum class UniformBlockName : int {
   None = 0,
   Transform,
+  Light,
   Count
 };
 

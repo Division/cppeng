@@ -77,20 +77,27 @@ void Window::swapBuffers() {
 
 void Window::processEvents() {
   SDL_Event e;
-  SDL_PollEvent(&e);
 
-  switch (e.type) {
-    case SDL_QUIT:
-      _quitTriggered = true;
-      break;
+  _input->_prepareForUpdate();
 
-    case SDL_WINDOWEVENT:
-      _updateSize();
-      _processSDLWindowEvent(e.window);
-      break;
-  }
+  int hasPendingEvents;
+  do {
+    hasPendingEvents = SDL_PollEvent(&e);
 
-  _input->updateWithSDLEvent(e);
+    switch (e.type) {
+      case SDL_QUIT:
+        _quitTriggered = true;
+        break;
+
+      case SDL_WINDOWEVENT:
+        _updateSize();
+        _processSDLWindowEvent(e.window);
+        break;
+    }
+
+    _input->updateWithSDLEvent(e);
+  } while (hasPendingEvents);
+
 }
 
 void Window::_processSDLWindowEvent(SDL_WindowEvent &e) {

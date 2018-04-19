@@ -9,6 +9,14 @@ namespace UBOStruct {
 
   struct TransformStruct {
     mat4 transform;
+    mat4 normalMatrix;
+  };
+
+  struct Light {
+    vec3 position;
+    float padding1;
+    float attenuation;
+    vec3 color;
   };
 
 }

@@ -45,11 +45,14 @@ ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) const {
   return result;
 }
 
-void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform) {
-//  setupMaterialBindings(material, transform);
-
+void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) {
   glBindVertexArray(mesh->vao());
-  glDrawElementsInstanced(GL_TRIANGLES, mesh->indexCount(), GL_UNSIGNED_SHORT, 0, 1);
+
+  if (mesh->hasIndices()) {
+    glDrawElementsInstanced(mode, mesh->indexCount(), GL_UNSIGNED_SHORT, 0, 1);
+  } else {
+    glDrawArrays(mode, 0, mesh->indexCount());
+  }
 }
 
 void Renderer::setupMaterialBindings(MaterialPtr &material, const mat4 &transform) {
@@ -58,8 +61,9 @@ void Renderer::setupMaterialBindings(MaterialPtr &material, const mat4 &transfor
   material->setView(state.viewMatrix);
 
   if (material->hasTransformBlock()) {
-    TransformStruct transformStruct;
+    UBOStruct::TransformStruct transformStruct;
     transformStruct.transform = transform;
+    transformStruct.normalMatrix = glm::inverseTranspose(transform);
     material->setTransformBlock(transformStruct);
   }
 
@@ -90,11 +94,11 @@ void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
     object->render(*this);
   }
 
-  _prepareQueues();
+  _prepareQueues(scene, camera);
   _processRenderPipeline();
 }
 
-void Renderer::_prepareQueues() {
+void Renderer::_prepareQueues(Scene &scene, CameraPtr camera) {
   _uboManager->swap();
 
   // Opaque
@@ -102,6 +106,9 @@ void Renderer::_prepareQueues() {
   for (auto &rop : opaqueQueue) {
     setupMaterialBindings(rop.material, rop.modelMatrix);
   }
+
+  auto lights = scene.visibleLights(camera);
+  _uboManager->updateLights(lights);
 
   _uboManager->upload();
 }
@@ -111,7 +118,7 @@ void Renderer::_processRenderPipeline() {
   auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
   for (auto &rop : opaqueQueue) {
     _uboManager->setupForRender(rop.material);
-    renderMesh(rop.mesh, rop.material, rop.modelMatrix);
+    renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
   }
 }
 

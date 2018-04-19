@@ -5,6 +5,7 @@
 #include "Input.h"
 #include "Logging.h"
 #include <unordered_map>
+#include "EngMath.h"
 
 const std::unordered_map<int, int> INPUT_CONVERSION = {
     { (int)SDLK_LEFT, (int)Key::Left },
@@ -22,7 +23,6 @@ const std::unordered_map<int, int> INPUT_CONVERSION = {
 };
 
 void Input::updateWithSDLEvent(SDL_Event &e) {
-  _mouseDelta = vec2(0, 0);
 
   switch (e.type) {
     case SDL_KEYDOWN:
@@ -51,6 +51,10 @@ void Input::updateWithSDLEvent(SDL_Event &e) {
   }
 }
 
+void Input::_prepareForUpdate() {
+  _mouseDelta = vec2(0, 0);
+}
+
 void Input::_handleSDLKeyState(SDL_KeyboardEvent &e, bool isDown) {
   if (INPUT_CONVERSION.find(e.keysym.sym) != INPUT_CONVERSION.end()) {
     _keys[INPUT_CONVERSION.at(e.keysym.sym)] = isDown;
@@ -69,6 +73,7 @@ void Input::_handleSDLMouseState(SDL_MouseButtonEvent &e, bool isDown) {
 }
 
 void Input::_handleSDLMouseMove(SDL_MouseMotionEvent event, bool b) {
+  _prevMousePos = _mousePos;
   _mousePos = vec2(event.x, event.y);
-  _mouseDelta = vec2(event.xrel, event.yrel);
+  _mouseDelta = _mousePos - _prevMousePos;
 }

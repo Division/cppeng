@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "GameObject.h"
 #include "objects/Camera.h"
+#include "objects/LightObject.h"
 
 class Scene : public IGameObjectManager {
 public:
@@ -17,8 +18,9 @@ public:
 
   const std::unordered_map<GameObjectID, GameObjectPtr> *const gameObjectMap() const { return &_objectMap; };
   const std::vector<GameObjectPtr> *const gameObjects() const { return &_gameObjects; }
-  // Temporary returns all objects. TODO: add camera parameter
+  // Temporary returns all objects.
   const std::vector<GameObjectPtr> *const visibleObjects(CameraPtr camera) const { return &_gameObjects; }
+  const std::vector<LightObjectPtr> *const visibleLights(CameraPtr camera) const { return &_lights; }
   void update(float dt);
 
   int cameraCount() { return (int)_cameraMap.size(); }
@@ -36,10 +38,13 @@ protected:
   void _updateTransforms();
 
 protected:
+  unsigned int _lightCount = 0;
+
   std::unordered_map<GameObjectID, GameObjectPtr> _objectMap; // maps GameObject::id() to GameObject
 
   // TODO: make cameras sorted list
   std::unordered_map<GameObjectID, CameraPtr> _cameraMap; // maps GameObject::id() to Camera
+  std::vector<LightObjectPtr> _lights; // Array of scene lights
   std::vector<GameObjectPtr> _gameObjects; // Full list of scene game objects
   std::unordered_map<GameObjectID, Transform *>_rootTransformMap; // maps GameObject::id() to the top level transforms
 

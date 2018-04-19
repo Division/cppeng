@@ -17,5 +17,6 @@ const std::map<UniformName, std::string> UNIFORM_NAMES = {
 };
 
 const std::map<UniformBlockName, std::string> UNIFORM_BLOCK_NAMES = {
-    { UniformBlockName::Transform, "TransformBlock" }
+    { UniformBlockName::Transform, "TransformBlock" },
+    { UniformBlockName::Light, "LightBlock" }
 };

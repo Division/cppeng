@@ -4,7 +4,8 @@
 
 #include "Scene.h"
 
-#define IS_CAMERA(object) (bool)dynamic_cast<Camera *>((object).get())
+#define IS_CAMERA(object) (bool)(dynamic_cast<Camera *>((object).get()))
+#define IS_LIGHT(object) (bool)(dynamic_cast<LightObject *>((object).get()))
 
 void Scene::setAsDefault() {
   GameObject::_defaultManager = this;
@@ -34,12 +35,30 @@ void Scene::_processAddedObject(GameObjectPtr object) {
     CameraPtr camera = std::dynamic_pointer_cast<Camera>(object);
     _cameraMap[object->id()] = camera;
   }
+
+  // Object is light
+  else if (IS_LIGHT(object)) {
+    LightObjectPtr light = std::dynamic_pointer_cast<LightObject>(object);
+    _lights.push_back(light); // TODO: try to find free empty index
+    light->_index = _lights.size() - 1;
+    _lightCount += 1;
+  }
 }
 
 void Scene::_processRemovedObject(GameObjectPtr object) {
   // Object is camera
   if (IS_CAMERA(object)) {
     _cameraMap.erase(object->id());
+  }
+
+  else if (IS_LIGHT(object)) {
+    for (auto &light : _lights) {
+      if (light->id() == object->id()) {
+        light = nullptr; // just set to null for future reuse
+        _lightCount -= 1;
+        break;
+      }
+    }
   }
 
   object->_destroy();

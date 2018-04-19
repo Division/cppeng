@@ -18,6 +18,8 @@ protected:
   int _colorBinging = -1;
 };
 
+typedef std::shared_ptr<MaterialSingleColor> MaterialSingleColorPtr;
+
 class MaterialLighting: public Material {
 public:
   MaterialLighting();
