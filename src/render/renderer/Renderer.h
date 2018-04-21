@@ -37,7 +37,7 @@ protected:
   mutable ShaderGenerator _generator;
   mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
 
-  // TODO: make UBOManager per-scene instance
+  // TODO: make UBOManager per-scene instance?
   std::unique_ptr<UBOManager> _uboManager;
 
   std::vector<RenderOperation> _queues[(int)RenderQueue::Count];

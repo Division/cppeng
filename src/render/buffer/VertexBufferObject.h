@@ -8,47 +8,40 @@
 #include "EngineGL.h"
 #include <vector>
 #include <memory>
+#include "MemoryBuffer.h"
 
-class VertexBufferObject {
+class VertexBufferObject : public MemoryBuffer {
 public:
-  explicit VertexBufferObject(GLenum target, GLenum usage);
-  ~VertexBufferObject();
+  VertexBufferObject(GLenum target, GLenum usage);
+  ~VertexBufferObject() override;
 
-  void bind();
-  void resize(unsigned int size);
-  int writeData(void *data, unsigned int offset, unsigned int size);
-  int appendData(void *data, unsigned int size, unsigned int alignBytes = 0);
-  void align(unsigned int bytes);
-  void upload();
-  void erase();
-  void setDirty() { _dirty = true; };
-  char *bufferPointer() { return &_data[0]; };
+  virtual void bind();
+  void upload() override;
   GLuint vbo() { return _vbo; }
 
-private:
-  unsigned int _size = 0;
+protected:
   unsigned int _bufferAllocatedSize = 0;
-  bool _dirty;
+  GLuint _vbo = 0;
   GLenum _target;
   GLenum _usage;
-  GLuint _vbo = 0;
-  std::vector<char> _data;
-
   void _recreateBuffer();
 };
 
 typedef std::shared_ptr<VertexBufferObject> VertexBufferObjectPtr;
 
-class SwappableVertexBufferObject {
+class SwappableVertexBufferObject : public SwappableBufferObject<VertexBufferObject> {
 public:
-  SwappableVertexBufferObject(GLenum target, GLenum usage, int count = 2);
-  void swap();
-  VertexBufferObjectPtr current() { return _buffers[_currentIndex]; }
-private:
-  int _currentIndex = 0;
-  std::vector<VertexBufferObjectPtr> _buffers;
-};
+  SwappableVertexBufferObject(GLenum target, GLenum usage, unsigned int count = 2)
+      : SwappableBufferObject<VertexBufferObject>(count), _target(target), _usage(usage) {
+    _createBuffers();
+  }
 
-typedef std::unique_ptr<SwappableVertexBufferObject> SwappableVertexBufferObjectUniquePtr;
+protected:
+  std::shared_ptr<VertexBufferObject> createBuffer() override;
+
+private:
+  GLenum _target;
+  GLenum _usage;
+};
 
 #endif //CPPWRAPPER_VERTEXBUFFEROBJECT_H

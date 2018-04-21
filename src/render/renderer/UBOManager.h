@@ -5,10 +5,13 @@
 #ifndef CPPWRAPPER_UBOMANAGER_H
 #define CPPWRAPPER_UBOMANAGER_H
 
-#include "render/buffer/VertexBufferObject.h"
-#include "render/material/Material.h"
 #include <memory>
+#include "render/material/Material.h"
 #include "objects/LightObject.h"
+#include "EngTypes.h"
+
+class SwappableTextureBufferObject;
+class SwappableVertexBufferObject;
 
 class UBOManager {
 public:
@@ -19,9 +22,10 @@ public:
   void setupForRender(MaterialPtr material);
   void updateLights(const std::vector<LightObjectPtr> *lights);
 private:
-  SwappableVertexBufferObjectUniquePtr _transform;
-  SwappableVertexBufferObjectUniquePtr _light;
-
+  std::shared_ptr<SwappableVertexBufferObject> _transform;
+  std::shared_ptr<SwappableVertexBufferObject> _light;
+  std::shared_ptr<SwappableTextureBufferObject> _lightIndex;
+  std::shared_ptr<SwappableTextureBufferObject> _lightGrid;
 };
 
 

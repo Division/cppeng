@@ -38,7 +38,7 @@ public:
   const vec3 backward() const;
 
   const vec3 &position() { return _position; }
-  const vec3 &worldPosition() const { _updateTransformUpwards(); return vec3(_worldMatrix[3]); }
+  const vec3 worldPosition() const { _updateTransformUpwards(); return vec3(_worldMatrix[3]); }
   void position(const vec3 &position) { _position = position; setDirty(); }
   const quat &rotation() { return _rotation; }
   void rotation(const quat &rotation) { _rotation = rotation; setDirty(); }
