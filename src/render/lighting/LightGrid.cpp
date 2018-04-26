@@ -17,7 +17,7 @@ struct LightGridStruct {
 
 LightGrid::LightGrid(unsigned int cellSize) : _cellSize(cellSize) {
   _lightGrid = std::make_unique<SwappableTextureBufferObject>(GL_RG32UI, GL_DYNAMIC_DRAW);
-  _lightIndex = std::make_unique<SwappableTextureBufferObject>(GL_R16, GL_DYNAMIC_DRAW);
+  _lightIndex = std::make_unique<SwappableTextureBufferObject>(GL_R16UI, GL_DYNAMIC_DRAW);
 
   _lightGridBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::LightGrid);
   _lightIndexBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::LightIndices);
@@ -55,14 +55,23 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
   vec3 position = light->transform()->worldPosition();
   float radius = light->radius();
 
-  AABB lightBounds = AABB::fromSphere(
-      position, radius).project(camera->viewMatrix(), camera->projectionMatrix(), camera->viewport()
-  );
+  vec3 lightExtremums[4] = {
+      position + camera->transform()->left() * radius,
+      position + camera->transform()->right() * radius,
+      position + camera->transform()->up() * radius,
+      position + camera->transform()->down() * radius
+  };
 
   AABB bounds;
-  bounds.min = lightBounds.min;
-  bounds.max = lightBounds.min;
-  bounds.expand(lightBounds.max);
+  for (int i = 0; i < 4; i++) {
+    lightExtremums[i] = glm::project(lightExtremums[i], camera->viewMatrix(), camera->projectionMatrix(), camera->viewport());
+    if (i == 0) {
+      bounds.min = lightExtremums[i];
+      bounds.max= lightExtremums[i];
+    } else {
+      bounds.expand(lightExtremums[i]);
+    }
+  }
 
   auto startX = (int)floorf(fmaxf(bounds.min.x / _cellSize, 0));
   auto startY = (int)floorf(fmaxf(bounds.min.y / _cellSize, 0));
@@ -80,7 +89,7 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
     }
   }
 
-//  ENGLog("Light grid %i %i %i %i", startX, startY, endX, endY);
+  ENGLog("Light grid (%i, %i) (%i, %i)", startX, startY, endX, endY);
 }
 
 void LightGrid::appendLights(const LightList *lights, const CameraPtr camera) {
@@ -104,10 +113,6 @@ void LightGrid::upload() {
     auto &cell = _cells[i];
     gridBufferPointer[i].offset = currentOffset;
     gridBufferPointer[i].pointLightCount = (unsigned int)cell.pointLights.size();
-//    gridBufferPointer[i].offset = 1;
-//    gridBufferPointer[i].pointLightCount = 1;
-//    continue;
-
 
     int indexDataSize = gridBufferPointer[i].pointLightCount /* + gridBufferPointer[i].spotLightCount */;
     indexBuffer->resize((indexDataSize + currentOffset) * sizeof(unsigned short));

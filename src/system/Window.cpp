@@ -54,7 +54,7 @@ void Window::initOpenGLWindow(int width, int height) {
   SDL_SetWindowResizable(_window, SDL_FALSE);
 
   _context = SDL_GL_CreateContext(_window);
-  SDL_GL_SetSwapInterval(0);
+  SDL_GL_SetSwapInterval(1);
 
   _updateSize();
   ENGLog("Window created with resolution %ix%i", _width, _height);
