@@ -80,6 +80,8 @@ void Window::processEvents() {
 
   _input->_prepareForUpdate();
 
+  auto prevSize = size();
+
   int hasPendingEvents;
   do {
     hasPendingEvents = SDL_PollEvent(&e);
@@ -98,6 +100,8 @@ void Window::processEvents() {
     _input->updateWithSDLEvent(e);
   } while (hasPendingEvents);
 
+
+  _sizeChangedLastFrame = prevSize != size();
 }
 
 void Window::_processSDLWindowEvent(SDL_WindowEvent &e) {

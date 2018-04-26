@@ -9,17 +9,22 @@
 TextureBufferObject::TextureBufferObject(GLenum format, GLenum usage)
     : VertexBufferObject(GL_TEXTURE_BUFFER, usage), _format(format) {
   glGenTextures(1, &_texture);
+  bindTexture();
+  bind();
+  glTexBuffer(GL_TEXTURE_BUFFER, _format, _vbo);
 }
 
 TextureBufferObject::~TextureBufferObject() {
   glDeleteTextures(1, &_texture);
 }
 
-inline void TextureBufferObject::bindTexture(TextureSlot slot) {
-  if (slot != TextureSlot::None) {
-    glActiveTexture(GL_TEXTURE0 + (unsigned int)slot);
+void TextureBufferObject::bindTexture(int textureUnit) {
+  if (textureUnit >= 0) {
+    glActiveTexture(GL_TEXTURE0 + (unsigned int)textureUnit);
   }
   glBindTexture(GL_TEXTURE_BUFFER, _texture);
+  bind();
+  glTexBuffer(GL_TEXTURE_BUFFER, _format, _vbo);
 }
 
 std::shared_ptr<TextureBufferObject> SwappableTextureBufferObject::createBuffer() {

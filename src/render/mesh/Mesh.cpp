@@ -6,6 +6,7 @@
 #include <iostream>
 #include "system/Logging.h"
 #include "render/shader/Shader.h"
+#include "render/buffer/VertexBufferObject.h"
 
 const int JOINT_PER_VERTEX_MAX = 3;
 const int JOINTS_MAX = 30;

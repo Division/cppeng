@@ -5,6 +5,8 @@
 #ifndef CPPWRAPPER_ENGTYPES_H
 #define CPPWRAPPER_ENGTYPES_H
 
+class LightObject;
+typedef std::shared_ptr<LightObject> LightObjectPtr;
 
 #endif //CPPWRAPPER_ENGTYPES_H
 

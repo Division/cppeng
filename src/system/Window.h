@@ -6,6 +6,7 @@
 #define CPPWRAPPER_WINDOW_H
 
 #include "SDL.h"
+#include "EngMath.h"
 
 class Input;
 
@@ -17,8 +18,12 @@ public:
   void processEvents();
   void quit();
 
-  int width() { return _width; }
-  int height() { return _height; }
+  bool sizeChangedLastFrame() { return _sizeChangedLastFrame; }
+  ivec2 size() {}
+  const vec4 viewport() const { return vec4(0, 0, _width, _height); }
+
+  unsigned int width() { return (unsigned)_width; }
+  unsigned int height() { return (unsigned)_height; }
   float aspect() { return (float)_width / (float)_height; }
 
   bool quitTriggered() { return _quitTriggered; }
@@ -30,6 +35,7 @@ private:
 
   int _width;
   int _height;
+  bool _sizeChangedLastFrame = true;
 
   bool _quitTriggered = false;
 

@@ -14,7 +14,7 @@ class TextureBufferObject : public VertexBufferObject {
 public:
   TextureBufferObject(GLenum format, GLenum usage);
   ~TextureBufferObject() override;
-  void bindTexture(TextureSlot slot = TextureSlot::None);
+  void bindTexture(int textureUnit = -1);
   GLenum textureID() { return _texture; }
 
 private:

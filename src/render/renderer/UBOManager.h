@@ -10,7 +10,6 @@
 #include "objects/LightObject.h"
 #include "EngTypes.h"
 
-class SwappableTextureBufferObject;
 class SwappableVertexBufferObject;
 
 class UBOManager {
@@ -24,8 +23,6 @@ public:
 private:
   std::shared_ptr<SwappableVertexBufferObject> _transform;
   std::shared_ptr<SwappableVertexBufferObject> _light;
-  std::shared_ptr<SwappableTextureBufferObject> _lightIndex;
-  std::shared_ptr<SwappableTextureBufferObject> _lightGrid;
 };
 
 

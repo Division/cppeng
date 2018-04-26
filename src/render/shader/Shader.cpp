@@ -16,8 +16,8 @@ const std::string VERTEX_STR = "vertex";
 const std::string FRAGMENT_STR = "fragment";
 
 Shader::Shader(const std::string &vertexSource, const std::string &fragmentSource) {
-  ENGLog("VERTEX SHADER SRC: %s", vertexSource.c_str());
-  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
+//  ENGLog("VERTEX SHADER SRC: %s", vertexSource.c_str());
+//  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
   GLuint program = this->_compileShader(vertexSource, fragmentSource);
   if (program) {
     this->_program = program;
@@ -107,7 +107,7 @@ UniformBlock *Shader::addUniformBlock(const UniformBlockName type) {
   auto bindingPoint = _uniformBlocks[(int)type]->bindingPoint();
   glUniformBlockBinding(_program, index, bindingPoint);
 
-  ENGLog("Added UBO binding %s, of size %i. Binding point: %i", blockName.c_str(), size, bindingPoint);
+//  ENGLog("Added UBO binding %s, of size %i. Binding point: %i", blockName.c_str(), size, bindingPoint);
 
   return getUniformBlock(type);
 }
@@ -123,7 +123,15 @@ Uniform *Shader::addUniform(const UniformName type) {
     ENGLog("Can't find uniform %s", uniformName.c_str());
   }
   _uniforms[(int)type] = std::make_unique<Uniform>(location, type);
-  return this->getUniform(type);
+  auto result = this->getUniform(type);
+
+  if (UNIFORM_TEXTURE_BLOCKS.find(type) != UNIFORM_TEXTURE_BLOCKS.end()) {
+    ENGLog("Added default uniform texture value for %s", uniformName.c_str());
+    bind();
+    result->setInt(UNIFORM_TEXTURE_BLOCKS.at(type));
+  }
+
+  return result;
 }
 
 Uniform *Shader::getUniform (const UniformName type) {

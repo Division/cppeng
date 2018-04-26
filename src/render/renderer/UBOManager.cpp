@@ -7,14 +7,11 @@
 #include "system/Logging.h"
 #include <memory>
 #include <vector>
-#include "render/buffer/TextureBufferObject.h"
 #include "render/buffer/VertexBufferObject.h"
 
 UBOManager::UBOManager() {
   _transform = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
   _light = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
-  _lightIndex = std::make_shared<SwappableTextureBufferObject>(GL_R16, GL_DYNAMIC_DRAW);
-  _lightGrid = std::make_shared<SwappableTextureBufferObject>(GL_RG32UI, GL_DYNAMIC_DRAW);
 }
 
 void UBOManager::updateLights(const std::vector<LightObjectPtr> *lights) {
@@ -59,6 +56,7 @@ void UBOManager::upload() {
 void UBOManager::setupForRender(MaterialPtr material) {
   material->shader()->bind();
   material->uploadBindings();
+  material->activateTextures();
 
   if (material->hasTransformBlock()) {
     auto offset = material->getTransformBlockOffset();

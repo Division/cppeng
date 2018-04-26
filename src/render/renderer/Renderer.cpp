@@ -2,6 +2,7 @@
 // Created by Sidorenko Nikita on 2/18/18.
 //
 
+#include <system/Window.h>
 #include "Renderer.h"
 #include "loader/ShaderLoader.h"
 
@@ -13,11 +14,18 @@
 #include "scene/Scene.h"
 #include"render/material/Material.h"
 #include "objects/Camera.h"
+#include "render/lighting/LightGrid.h"
 
 using namespace glm;
 
-Renderer::Renderer() {
+Renderer::Renderer(Window *window) {
   _uboManager = std::make_unique<UBOManager>();
+  _lightGrid = std::make_unique<LightGrid>();
+  _window = window;
+}
+
+Renderer::~Renderer() {
+  // requires non-inline destructor to make unique_ptr forward declaration work
 }
 
 void Renderer::setupShaders() {
@@ -95,6 +103,15 @@ void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
   }
 
   _prepareQueues(scene, camera);
+
+  auto lights = scene.visibleLights(camera);
+  _lightGrid->appendLights(lights, camera);
+  _lightGrid->upload();
+  _lightGrid->bindBufferTextures();
+
+  _uboManager->updateLights(lights);
+  _uboManager->upload();
+
   _processRenderPipeline();
 }
 
@@ -106,11 +123,6 @@ void Renderer::_prepareQueues(Scene &scene, CameraPtr camera) {
   for (auto &rop : opaqueQueue) {
     setupMaterialBindings(rop.material, rop.modelMatrix);
   }
-
-  auto lights = scene.visibleLights(camera);
-  _uboManager->updateLights(lights);
-
-  _uboManager->upload();
 }
 
 void Renderer::_processRenderPipeline() {
@@ -131,4 +143,8 @@ void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue)
   auto &queue = _queues[(int)renderQueue];
   rop.index = _ropCounter++;
   queue.push_back(rop);
+}
+
+void Renderer::postUpdate(float dt) {
+  _lightGrid->update(_window->width(), _window->height());
 }

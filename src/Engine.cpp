@@ -58,11 +58,12 @@ void mainLoop(void *arg) {
   engine->_currentTime = currentTime;
 
   // Update
+  if (engine->_window->sizeChangedLastFrame()) {
+
+  }
   engine->update(dt);
   engine->_window->swapBuffers();
   engine->_window->processEvents();
-
-//  ENGLog("TIME: %f", engine->_currentTime);
 
   if (engine->_window->quitTriggered()) {
     engine->quit();
@@ -118,13 +119,14 @@ void Engine::update(double dt) {
   glCullFace(GL_BACK);
 
   _game->update((float)dt);
+  _renderer->postUpdate((float) dt);
 
   engine::checkGLError();
 }
 
 void Engine::init() {
   engine::GLCaps::init(); // Setup OpenGL caps
-  _renderer = new Renderer();
+  _renderer = new Renderer(_window);
   _renderer->setupShaders();
   _game->init(this);
   engine::checkGLError();

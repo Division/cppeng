@@ -9,9 +9,10 @@
 #include "EngMath.h"
 #include <vector>
 #include <memory>
-#include "render/buffer/VertexBufferObject.h"
 
 using namespace glm;
+
+class VertexBufferObject;
 
 class Mesh {
 public:

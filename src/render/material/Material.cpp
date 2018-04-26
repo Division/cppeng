@@ -42,8 +42,21 @@ int Material::_addFloatBinding(UniformName uniform) {
   return (int)(_bindings.floatBindings.size() - 1);
 }
 
+int Material::_addIntBinding(UniformName uniform) {
+  _bindings.intBindings.emplace_back(IntBinding(uniform));
+  return (int)(_bindings.intBindings.size() - 1);
+}
+
+
 int Material::_addTextureBinding(UniformName uniform) {
   _bindings.textureBindings.emplace_back(TextureBinding(uniform));
+
+  if (UNIFORM_TEXTURE_BLOCKS.find(uniform) != UNIFORM_TEXTURE_BLOCKS.end()) {
+    _bindings.textureBindings[_bindings.textureBindings.size() - 1].textureUnit = UNIFORM_TEXTURE_BLOCKS.at(uniform);
+  } else {
+    throw std::runtime_error("UNIFORM_TEXTURE_BLOCKS lookup failed. No texture for uniform.");
+  }
+
   return (int)(_bindings.textureBindings.size() - 1);
 }
 
@@ -77,8 +90,8 @@ void Material::uploadBindings() const {
 //    _shader->getUniform(binding.uniform)->set(binding.v);
   }
 
-  for (auto &binding : _bindings.textureBindings) {
-    _shader->getUniform(binding.uniform)->setInt(binding.texture->id());
+  for (auto &binding : _bindings.intBindings) {
+    _shader->getUniform(binding.uniform)->setInt(binding.value);
   }
 
 }
@@ -87,4 +100,11 @@ Material::Material() {
 //  _modelViewBinding = _addMat4Binding(UniformName::ModelViewMatrix);
   _projectionBinding = _addMat4Binding(UniformName::ProjectionMatrix);
   _viewMatrixBinding = _addMat4Binding(UniformName::ViewMatrix);
+}
+
+void Material::activateTextures() const {
+  for (auto &binding : _bindings.textureBindings) {
+    glActiveTexture(GL_TEXTURE0 + binding.textureUnit);
+    glBindTexture(GL_TEXTURE_2D, binding.texture->id());
+  }
 }

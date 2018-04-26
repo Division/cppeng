@@ -45,9 +45,15 @@ struct FloatBinding: public UniformBinding {
   float value = 0;
 };
 
+struct IntBinding: public UniformBinding {
+  explicit IntBinding(UniformName name) : UniformBinding(name) {}
+  int value = 3;
+};
+
 struct TextureBinding: public UniformBinding {
   explicit TextureBinding(UniformName name) : UniformBinding(name) {}
   TexturePtr texture;
+  unsigned int textureUnit;
 };
 
 // Uniform Buffer Data Bindings
