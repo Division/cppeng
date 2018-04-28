@@ -20,9 +20,12 @@ public:
   void upload();
   void setupForRender(MaterialPtr material);
   void updateLights(const std::vector<LightObjectPtr> *lights);
+  void setCamera(CameraPtr camera);
 private:
   std::shared_ptr<SwappableVertexBufferObject> _transform;
   std::shared_ptr<SwappableVertexBufferObject> _light;
+  std::shared_ptr<SwappableVertexBufferObject> _camera;
+
 };
 
 

@@ -8,15 +8,21 @@
 namespace UBOStruct {
 
   struct TransformStruct {
-    mat4 transform;
-    mat4 normalMatrix;
+    mat4 transform; // offset = 0, size = 64
+    mat4 normalMatrix; // offset = 64, alignment = 16, size = 64
   };
 
   struct Light {
-    vec3 position;
+    vec3 position; // offset = 0, size = 12
+    float attenuation = 0; // offset = 12, alignment = 4, size = 4
+    vec3 color; // offset = 16, alignment = 16, size = 12
     float padding1;
-    float attenuation;
-    vec3 color;
+  };
+
+  struct Camera {
+    vec3 position; // offset = 0, size = 12
+    float padding1;
+    uvec2 screenSize;
   };
 
 }

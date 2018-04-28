@@ -32,6 +32,7 @@ enum class UniformBlockName : int {
   None = 0,
   Transform,
   Light,
+  Camera,
   Count
 };
 

@@ -109,6 +109,7 @@ void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
   _lightGrid->upload();
   _lightGrid->bindBufferTextures();
 
+  _uboManager->setCamera(camera);
   _uboManager->updateLights(lights);
   _uboManager->upload();
 

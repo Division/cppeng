@@ -45,6 +45,7 @@ void LightObject::render(IRenderer &renderer) {
     return;
   }
 
+  _debugMaterial->color(vec4(color(), 1));
   RenderOperation rop;
   rop.mesh = _debugMesh;
   rop.material = _debugMaterial;

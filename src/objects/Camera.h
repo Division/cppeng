@@ -14,6 +14,7 @@ public:
   const mat4 &viewMatrix() const { return _viewMatrix; }
   const mat4 viewProjectionMatrix() const { return _projectionMatrix * _viewMatrix; }
   const vec4 viewport() const { return _viewport; }
+  const uvec2 screenSize() const { return uvec2(_viewport.z, _viewport.w); }
   void postUpdate() override;
 
 protected:

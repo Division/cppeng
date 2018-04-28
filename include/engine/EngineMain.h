@@ -6,6 +6,7 @@
 #define TESTLIBRARY_ENGINEMAIN_H
 
 #include "Engine.h"
+#include "EngMath.h"
 #include "scene/Scene.h"
 #include "scene/Transform.h"
 #include "Resources.h"

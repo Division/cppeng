@@ -67,16 +67,16 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
     lightExtremums[i] = glm::project(lightExtremums[i], camera->viewMatrix(), camera->projectionMatrix(), camera->viewport());
     if (i == 0) {
       bounds.min = lightExtremums[i];
-      bounds.max= lightExtremums[i];
+      bounds.max = lightExtremums[i];
     } else {
       bounds.expand(lightExtremums[i]);
     }
   }
 
-  auto startX = (int)floorf(fmaxf(bounds.min.x / _cellSize, 0));
-  auto startY = (int)floorf(fmaxf(bounds.min.y / _cellSize, 0));
-  auto endX = (int)floorf(fminf(bounds.max.x / _cellSize, _cellsX - 1));
-  auto endY = (int)floorf(fminf(bounds.max.y / _cellSize, _cellsY - 1));
+  auto startX = (int)floorf(fminf(fmaxf(bounds.min.x / _cellSize, 0), _cellsX - 1));
+  auto startY = (int)floorf(fminf(fmaxf(bounds.min.y / _cellSize, 0), _cellsY - 1));
+  auto endX = (int)floorf(fmaxf(fminf(bounds.max.x / _cellSize, _cellsX - 1), 0));
+  auto endY = (int)floorf(fmaxf(fminf(bounds.max.y / _cellSize, _cellsY - 1), 0));
 
   if ((endX < 0) || (startX >= (int)_cellsX) || (endY < 0) || (startY >= (int)_cellsY)) {
     return; // light out of grid bounds
@@ -89,7 +89,7 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
     }
   }
 
-  ENGLog("Light grid (%i, %i) (%i, %i)", startX, startY, endX, endY);
+//  ENGLog("Light grid (%i, %i) (%i, %i)", startX, startY, endX, endY);
 }
 
 void LightGrid::appendLights(const LightList *lights, const CameraPtr camera) {

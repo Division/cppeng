@@ -23,8 +23,6 @@ void TextureBufferObject::bindTexture(int textureUnit) {
     glActiveTexture(GL_TEXTURE0 + (unsigned int)textureUnit);
   }
   glBindTexture(GL_TEXTURE_BUFFER, _texture);
-  bind();
-  glTexBuffer(GL_TEXTURE_BUFFER, _format, _vbo);
 }
 
 std::shared_ptr<TextureBufferObject> SwappableTextureBufferObject::createBuffer() {
