@@ -33,7 +33,7 @@ void LightObject::enableDebug() {
   }
 
   _debugMesh = std::make_shared<Mesh>();
-//  MeshGeneration::generateSphere(_debugMesh, 10, 10);
+//  MeshGeneration::generateSphere(_debugMesh, 10, 10, 0.5);
   MeshGeneration::generateBox(_debugMesh, 0.5, 0.5, 0.5);
   _debugMesh->createBuffer();
 
