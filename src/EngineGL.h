@@ -22,6 +22,10 @@ namespace engine {
     // UBO
     static GLint _maxUBOSize;
     static GLint _uboOffsetAlignment;
+    static GLint _maxUBOBindings;
+
+    // Texture
+    static GLint _maxTextureSize;
   };
 
 }

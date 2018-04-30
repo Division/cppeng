@@ -11,6 +11,7 @@
 #include <memory>
 
 class SwappableTextureBufferObject;
+class SwappableTexture2DBuffer;
 
 struct LightGridCell {
   int offset;
@@ -30,8 +31,11 @@ public:
   void bindBufferTextures();
 
 private:
-  std::unique_ptr<SwappableTextureBufferObject> _lightIndex;
-  std::unique_ptr<SwappableTextureBufferObject> _lightGrid;
+//  std::unique_ptr<SwappableTextureBufferObject> _lightIndex;
+//  std::unique_ptr<SwappableTextureBufferObject> _lightGrid;
+
+  std::unique_ptr<SwappableTexture2DBuffer> _lightIndex;
+  std::unique_ptr<SwappableTexture2DBuffer> _lightGrid;
 
   unsigned int _cellSize;
   unsigned int _cellsX = 0;

@@ -9,14 +9,20 @@
 #include <vector>
 #include "render/buffer/VertexBufferObject.h"
 #include "objects/Camera.h"
+#include "EngineGL.h"
+
+const unsigned int MAX_LIGHTS = 1000;
 
 UBOManager::UBOManager() {
+  unsigned int lightMaxSize = sizeof(UBOStruct::Light) * MAX_LIGHTS;
+
   _transform = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
-  _light = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
+  _light = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, lightMaxSize);
   _camera = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
 }
 
 void UBOManager::updateLights(const std::vector<LightObjectPtr> *lights) {
+
   auto alignBytes = 0;
   auto buffer = _light->current();
 
@@ -81,5 +87,7 @@ void UBOManager::setupForRender(MaterialPtr material) {
     auto slot = (GLuint)UniformBlockName::Transform;
     auto vbo = _transform->current()->vbo();
     glBindBufferRange(GL_UNIFORM_BUFFER, slot, vbo, offset, size);
+  } else {
+    ENGLog("No transform");
   }
 }

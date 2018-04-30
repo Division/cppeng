@@ -40,8 +40,7 @@ MaterialPtr loader::MaterialPicker::getMaterial(const HierarchyData *hierarchy) 
   MaterialPtr result;
 
   if (hierarchy->hasMaterial) {
-    //
-//    result = std::make_shared<MaterialSingleColor>();
+    result = std::make_shared<MaterialSingleColor>();
   } else {
 //    result = std::make_shared<MaterialSingleColor>();
     result = std::make_shared<MaterialLighting>();

@@ -57,9 +57,9 @@ void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transf
   glBindVertexArray(mesh->vao());
 
   if (mesh->hasIndices()) {
-    glDrawElementsInstanced(mode, mesh->indexCount(), GL_UNSIGNED_SHORT, 0, 1);
+    glDrawElements(mode, mesh->indexCount(), GL_UNSIGNED_SHORT, 0);
   } else {
-    glDrawArrays(mode, 0, mesh->indexCount());
+//    glDrawArrays(mode, 0, mesh->indexCount());
   }
 }
 

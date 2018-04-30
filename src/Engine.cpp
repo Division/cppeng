@@ -114,12 +114,13 @@ void Engine::update(double dt) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+//  glEnable(GL_TEXTURE_2D);
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glCullFace(GL_BACK);
 
+  _lastDt = (float)dt;
   _game->update((float)dt);
-  _renderer->postUpdate((float) dt);
 
   engine::checkGLError();
 }
@@ -133,6 +134,7 @@ void Engine::init() {
 }
 
 void Engine::renderScene(Scene &scene) {
+  _renderer->postUpdate(_lastDt);
   _renderer->renderScene(scene);
 }
 

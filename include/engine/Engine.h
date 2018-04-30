@@ -41,6 +41,7 @@ private:
   Input *_input;
   IGame *_game;
 
+  float _lastDt;
   bool _shouldQuit;
   double _currentTime = 0;
   double _startTime = 0;

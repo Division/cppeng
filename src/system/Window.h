@@ -19,7 +19,7 @@ public:
   void quit();
 
   bool sizeChangedLastFrame() { return _sizeChangedLastFrame; }
-  ivec2 size() {}
+  ivec2 size() { return vec2(_width, _height); }
   const vec4 viewport() const { return vec4(0, 0, _width, _height); }
 
   unsigned int width() { return (unsigned)_width; }

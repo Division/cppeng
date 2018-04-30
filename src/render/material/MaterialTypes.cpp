@@ -27,7 +27,12 @@ MaterialSingleColor::MaterialSingleColor() {
 MaterialLighting::MaterialLighting() {
   auto engine = getEngine();
 
+//  auto colorBinding = _addVec4Binding(UniformName::Color);
+//  _bindings.vec4Bindings[colorBinding].v = vec4(1,1, 0,1);
+
+
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+//  caps->addCap(ShaderCaps::Color);
   caps->addCap(ShaderCaps::Lighting);
   _shader = engine->renderer()->getShaderWithCaps(caps);
 

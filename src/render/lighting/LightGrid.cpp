@@ -16,8 +16,11 @@ struct LightGridStruct {
 };
 
 LightGrid::LightGrid(unsigned int cellSize) : _cellSize(cellSize) {
-  _lightGrid = std::make_unique<SwappableTextureBufferObject>(GL_RG32UI, GL_DYNAMIC_DRAW);
-  _lightIndex = std::make_unique<SwappableTextureBufferObject>(GL_R16UI, GL_DYNAMIC_DRAW);
+//  _lightGrid = std::make_unique<SwappableTextureBufferObject>(GL_RG32UI, GL_DYNAMIC_DRAW);
+//  _lightIndex = std::make_unique<SwappableTextureBufferObject>(GL_R16UI, GL_DYNAMIC_DRAW);
+
+  _lightGrid = std::make_unique<SwappableTexture2DBuffer>(0, GL_RG32UI);
+  _lightIndex = std::make_unique<SwappableTexture2DBuffer>(4096, GL_R16UI);
 
   _lightGridBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::LightGrid);
   _lightIndexBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::LightIndices);
@@ -105,12 +108,14 @@ void LightGrid::upload() {
   auto gridBuffer = _lightGrid->current();
   auto indexBuffer = _lightIndex->current();
 
+  gridBuffer->targetWidth(_cellsX);
   gridBuffer->resize((unsigned int)_cells.size() * sizeof(LightGridStruct));
   auto gridBufferPointer = (LightGridStruct *)gridBuffer->bufferPointer();
 
   unsigned int currentOffset = 0;
   for (int i = 0; i < _cells.size(); i++) {
     auto &cell = _cells[i];
+
     gridBufferPointer[i].offset = currentOffset;
     gridBufferPointer[i].pointLightCount = (unsigned int)cell.pointLights.size();
 
