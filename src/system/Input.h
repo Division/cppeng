@@ -43,10 +43,12 @@ private:
   vec2 _mouseDelta;
 
 private:
+#ifndef __EMSCRIPTEN__
   void updateWithSDLEvent(SDL_Event &e);
   void _handleSDLKeyState(SDL_KeyboardEvent &e, bool isDown);
   void _handleSDLMouseState(SDL_MouseButtonEvent &e, bool isDown);
   void _handleSDLMouseMove(SDL_MouseMotionEvent event, bool b);
+#endif
 
   void _prepareForUpdate();
 };

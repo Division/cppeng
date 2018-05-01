@@ -11,11 +11,13 @@ add_library(cppeng ${ENGINE_SOURCES})
 target_compile_definitions(cppeng PUBLIC GL_GLEXT_PROTOTYPES=1)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 #
 # When building on Mac OS, SDL2.framework and SDL2_image.framework should exist in the /Library/Frameworks/ directory
 #
 
+IF(NOT EMSCRIPTEN)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
 target_link_libraries(cppeng ${SDL2_LIBRARY})
@@ -23,8 +25,8 @@ target_link_libraries(cppeng ${SDL2_LIBRARY})
 find_package(SDL2_image REQUIRED)
 include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 target_link_libraries(cppeng ${SDL2_IMAGE_LIBRARY})
-
-#target_include_directories(cppeng PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+list(APPEND INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
+ENDIF(NOT EMSCRIPTEN)
 
 find_package(OpenGL REQUIRED)
 target_link_libraries(cppeng ${OPENGL_gl_LIBRARY})
@@ -46,10 +48,7 @@ ENDIF(NOT EMSCRIPTEN)
 
 target_include_directories(cppeng PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-        ${SDL2_INCLUDE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+        ${INCLUDE_DIRS})
 
 enable_testing(true)
 

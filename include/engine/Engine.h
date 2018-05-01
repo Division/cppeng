@@ -25,6 +25,7 @@ public:
   const Input *const input() const { return _input; }
 
   const Renderer *renderer() { return _renderer; }
+  const Window *window() { return _window; }
 
   friend void mainLoop(void *arg);
 

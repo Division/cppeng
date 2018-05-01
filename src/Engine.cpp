@@ -74,7 +74,6 @@ void mainLoop(void *arg) {
 void Engine::printStatus() {
 //  shouldPrint = true;
 //  printf("STATUS PRINTED\n");
-//  SDL_Log("STATUS PRINTED\n");
 //  glClearColor(0, 0, 0, 1);
 //  glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -88,7 +87,7 @@ void Engine::startEngineLoop() {
 #ifdef __EMSCRIPTEN__
 void Engine::startEmscriptenLoop() {
     ENGLog("Starting EMSCRIPTEN loop");
-    emscripten_set_main_loop_arg(mainLoop, this, -1, 0);
+    emscripten_set_main_loop_arg(mainLoop, this, -1, 1);
 }
 #endif
 

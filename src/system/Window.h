@@ -5,7 +5,12 @@
 #ifndef CPPWRAPPER_WINDOW_H
 #define CPPWRAPPER_WINDOW_H
 
+#ifndef __EMSCRIPTEN__
 #include "SDL.h"
+#else
+#include <emscripten.h>
+#endif
+
 #include "EngMath.h"
 
 class Input;
@@ -22,17 +27,22 @@ public:
   ivec2 size() { return vec2(_width, _height); }
   const vec4 viewport() const { return vec4(0, 0, _width, _height); }
 
-  unsigned int width() { return (unsigned)_width; }
-  unsigned int height() { return (unsigned)_height; }
-  float aspect() { return (float)_width / (float)_height; }
+  unsigned int width() const { return (unsigned)_width; }
+  unsigned int height() const { return (unsigned)_height; }
+  float aspect() const { return (float)_width / (float)_height; }
 
   bool quitTriggered() { return _quitTriggered; }
 
 private:
+#ifndef __EMSCRIPTEN__
   SDL_Window* _window = nullptr;
-  Input *_input = nullptr;
   SDL_GLContext _context;
+  void _processSDLWindowEvent(SDL_WindowEvent &e);
+#else
+  int _context;
+#endif
 
+  Input *_input = nullptr;
   int _width;
   int _height;
   bool _sizeChangedLastFrame = true;
@@ -41,7 +51,6 @@ private:
 
   void _updateSize();
 
-  void _processSDLWindowEvent(SDL_WindowEvent &e);
 };
 
 

@@ -5,7 +5,15 @@
 #ifndef CPPWRAPPER_ENGINEGL_JS_H
 #define CPPWRAPPER_ENGINEGL_JS_H
 
+#ifndef __EMSCRIPTEN__
 #include "SDL_opengl.h"
+#else
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
+#endif
 
 namespace engine {
 
