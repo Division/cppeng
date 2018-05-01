@@ -25,6 +25,7 @@ public:
   const Input *const input() const { return _input; }
 
   const Renderer *renderer() { return _renderer; }
+  const Window *window() { return _window; }
 
   friend void mainLoop(void *arg);
 
@@ -41,6 +42,7 @@ private:
   Input *_input;
   IGame *_game;
 
+  float _lastDt;
   bool _shouldQuit;
   double _currentTime = 0;
   double _startTime = 0;

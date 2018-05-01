@@ -31,12 +31,19 @@ void engine::checkGLError() {
 
 GLint engine::GLCaps::_maxUBOSize = 0;
 GLint engine::GLCaps::_uboOffsetAlignment = 0;
+GLint engine::GLCaps::_maxTextureSize = 0;
+GLint engine::GLCaps::_maxUBOBindings = 0;
+
 void engine::GLCaps::init() {
   glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &_maxUBOSize);
   glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &_uboOffsetAlignment);
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
+  glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &_maxUBOBindings);
 
   ENGLog("OpenGL Caps:");
   ENGLog("    GL_MAX_UNIFORM_BLOCK_SIZE: %i", _maxUBOSize);
   ENGLog("    GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT: %i", _uboOffsetAlignment);
+  ENGLog("    GL_MAX_UNIFORM_BUFFER_BINDINGS: %i", _maxUBOBindings);
+  ENGLog("    GL_MAX_TEXTURE_SIZE: %i", _maxTextureSize);
   ENGLog("");
 }

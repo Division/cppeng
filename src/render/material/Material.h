@@ -26,6 +26,7 @@ public:
   void setView(const mat4 &viewMatrix);
   void setProjection(const mat4 &projection);
   void uploadBindings() const;
+  void activateTextures() const;
 protected:
   int _modelViewBinding = -1;
   int _projectionBinding = -1;
@@ -38,6 +39,7 @@ protected:
   int _addVec3Binding(UniformName uniform);
   int _addVec2Binding(UniformName uniform);
   int _addFloatBinding(UniformName uniform);
+  int _addIntBinding(UniformName uniform);
   int _addTextureBinding(UniformName uniform);
 
   MaterialBingings _bindings;

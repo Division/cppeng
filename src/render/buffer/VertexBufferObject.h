@@ -12,7 +12,7 @@
 
 class VertexBufferObject : public MemoryBuffer {
 public:
-  VertexBufferObject(GLenum target, GLenum usage);
+  VertexBufferObject(GLenum target, GLenum usage, unsigned int fixedSize = 0);
   ~VertexBufferObject() override;
 
   virtual void bind();
@@ -24,6 +24,7 @@ protected:
   GLuint _vbo = 0;
   GLenum _target;
   GLenum _usage;
+  unsigned int _fixedSize;
   void _recreateBuffer();
 };
 
@@ -31,8 +32,8 @@ typedef std::shared_ptr<VertexBufferObject> VertexBufferObjectPtr;
 
 class SwappableVertexBufferObject : public SwappableBufferObject<VertexBufferObject> {
 public:
-  SwappableVertexBufferObject(GLenum target, GLenum usage, unsigned int count = 2)
-      : SwappableBufferObject<VertexBufferObject>(count), _target(target), _usage(usage) {
+  SwappableVertexBufferObject(GLenum target, GLenum usage, unsigned int fixedSize = 0, unsigned int count = 2)
+      : SwappableBufferObject<VertexBufferObject>(count), _target(target), _usage(usage), _fixedSize(fixedSize) {
     _createBuffers();
   }
 
@@ -42,6 +43,7 @@ protected:
 private:
   GLenum _target;
   GLenum _usage;
+  unsigned int _fixedSize;
 };
 
 #endif //CPPWRAPPER_VERTEXBUFFEROBJECT_H

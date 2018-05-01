@@ -14,6 +14,7 @@ void Texture::_genID() const {
   glGenTextures(1, &_id);
 }
 
+#ifndef __EMSCRIPTEN__
 void Texture::initWithSDLSurface(SDL_Surface *surface) {
   glBindTexture(GL_TEXTURE_2D, id());
 
@@ -35,3 +36,4 @@ void Texture::initWithSDLSurface(SDL_Surface *surface) {
 
   glBindTexture(GL_TEXTURE_2D, 0);
 }
+#endif

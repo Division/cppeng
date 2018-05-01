@@ -58,11 +58,12 @@ void mainLoop(void *arg) {
   engine->_currentTime = currentTime;
 
   // Update
+  if (engine->_window->sizeChangedLastFrame()) {
+
+  }
   engine->update(dt);
   engine->_window->swapBuffers();
   engine->_window->processEvents();
-
-//  ENGLog("TIME: %f", engine->_currentTime);
 
   if (engine->_window->quitTriggered()) {
     engine->quit();
@@ -73,7 +74,6 @@ void mainLoop(void *arg) {
 void Engine::printStatus() {
 //  shouldPrint = true;
 //  printf("STATUS PRINTED\n");
-//  SDL_Log("STATUS PRINTED\n");
 //  glClearColor(0, 0, 0, 1);
 //  glClear(GL_COLOR_BUFFER_BIT);
 }
@@ -87,7 +87,7 @@ void Engine::startEngineLoop() {
 #ifdef __EMSCRIPTEN__
 void Engine::startEmscriptenLoop() {
     ENGLog("Starting EMSCRIPTEN loop");
-    emscripten_set_main_loop_arg(mainLoop, this, -1, 0);
+    emscripten_set_main_loop_arg(mainLoop, this, -1, 1);
 }
 #endif
 
@@ -113,10 +113,12 @@ void Engine::update(double dt) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+//  glEnable(GL_TEXTURE_2D);
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glCullFace(GL_BACK);
 
+  _lastDt = (float)dt;
   _game->update((float)dt);
 
   engine::checkGLError();
@@ -124,13 +126,14 @@ void Engine::update(double dt) {
 
 void Engine::init() {
   engine::GLCaps::init(); // Setup OpenGL caps
-  _renderer = new Renderer();
+  _renderer = new Renderer(_window);
   _renderer->setupShaders();
   _game->init(this);
   engine::checkGLError();
 }
 
 void Engine::renderScene(Scene &scene) {
+  _renderer->postUpdate(_lastDt);
   _renderer->renderScene(scene);
 }
 

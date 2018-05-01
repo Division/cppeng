@@ -27,16 +27,22 @@ MaterialSingleColor::MaterialSingleColor() {
 MaterialLighting::MaterialLighting() {
   auto engine = getEngine();
 
-//  _normalMatrixBinding = _addMat3Binding(UniformName::NormalMatrix);
+//  auto colorBinding = _addVec4Binding(UniformName::Color);
+//  _bindings.vec4Bindings[colorBinding].v = vec4(1,1, 0,1);
+
 
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+//  caps->addCap(ShaderCaps::Color);
   caps->addCap(ShaderCaps::Lighting);
   _shader = engine->renderer()->getShaderWithCaps(caps);
 
   // Manually create uniforms for now
   _shader->addUniform(UniformName::ProjectionMatrix);
   _shader->addUniform(UniformName::ViewMatrix);
-//  _shader->addUniform(UniformName::NormalMatrix);
+  _shader->addUniform(UniformName::LightGrid);
+  _shader->addUniform(UniformName::LightIndices);
+
   _shader->addUniformBlock(UniformBlockName::Transform);
   _shader->addUniformBlock(UniformBlockName::Light);
+  _shader->addUniformBlock(UniformBlockName::Camera);
 }

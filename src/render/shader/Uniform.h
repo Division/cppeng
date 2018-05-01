@@ -23,6 +23,8 @@ enum class UniformName : int {
   Texture0,
   Texture1,
   NormalMap,
+  LightGrid,
+  LightIndices,
   Count
 };
 
@@ -30,10 +32,12 @@ enum class UniformBlockName : int {
   None = 0,
   Transform,
   Light,
+  Camera,
   Count
 };
 
 extern const std::map<UniformName, std::string> UNIFORM_NAMES;
+extern const std::map<UniformName, unsigned int> UNIFORM_TEXTURE_BLOCKS;
 extern const std::map<UniformBlockName, std::string> UNIFORM_BLOCK_NAMES;
 
 class Uniform {

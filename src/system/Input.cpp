@@ -7,6 +7,11 @@
 #include <unordered_map>
 #include "EngMath.h"
 
+void Input::_prepareForUpdate() {
+  _mouseDelta = vec2(0, 0);
+}
+
+#ifndef __EMSCRIPTEN__
 const std::unordered_map<int, int> INPUT_CONVERSION = {
     { (int)SDLK_LEFT, (int)Key::Left },
     { (int)SDLK_RIGHT, (int)Key::Right },
@@ -51,9 +56,7 @@ void Input::updateWithSDLEvent(SDL_Event &e) {
   }
 }
 
-void Input::_prepareForUpdate() {
-  _mouseDelta = vec2(0, 0);
-}
+
 
 void Input::_handleSDLKeyState(SDL_KeyboardEvent &e, bool isDown) {
   if (INPUT_CONVERSION.find(e.keysym.sym) != INPUT_CONVERSION.end()) {
@@ -77,3 +80,5 @@ void Input::_handleSDLMouseMove(SDL_MouseMotionEvent event, bool b) {
   _mousePos = vec2(event.x, event.y);
   _mouseDelta = _mousePos - _prevMousePos;
 }
+
+#endif

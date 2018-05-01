@@ -16,6 +16,7 @@ public:
   std::vector<Vec3Binding> vec3Bindings;
   std::vector<Vec2Binding> vec2Bindings;
   std::vector<FloatBinding> floatBindings;
+  std::vector<IntBinding> intBindings;
   std::vector<TextureBinding> textureBindings;
 
   // Uniform blocks

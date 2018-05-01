@@ -11,15 +11,20 @@
 #include "IRenderer.h"
 #include "GlobalState.h"
 #include <memory>
+#include <system/Window.h>
 #include "UBOManager.h"
+#include "EngMath.h"
 
 class Camera;
 class Scene;
 class Material;
+class LightGrid;
+class Window;
 
 class Renderer : IRenderer {
 public:
-  Renderer();
+  Renderer(Window *window);
+  ~Renderer();
   void setupShaders();
 
   GlobalState state;
@@ -28,22 +33,27 @@ public:
   ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps) const;
 
   void renderScene(Scene &scene);
+  void postUpdate(float dt);
+  const vec4 viewport() const { return _window->viewport(); }
 
   // IRenderer
   void addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) override;
   void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) override;
 
-protected:
+private:
   mutable ShaderGenerator _generator;
   mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
 
+  Window *_window;
+
   // TODO: make UBOManager per-scene instance?
   std::unique_ptr<UBOManager> _uboManager;
+  std::unique_ptr<LightGrid> _lightGrid;
 
   std::vector<RenderOperation> _queues[(int)RenderQueue::Count];
   unsigned int _ropCounter;
 
-protected:
+private:
   void _prepareQueues(Scene &scene, std::shared_ptr<Camera> camera);
   void _processRenderPipeline();
   void _renderCamera(Scene &scene, std::shared_ptr<Camera> camera);

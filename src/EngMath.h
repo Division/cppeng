@@ -2,8 +2,8 @@
 // Created by Sidorenko Nikita on 3/28/18.
 //
 
-#ifndef CPPWRAPPER_MATH_H
-#define CPPWRAPPER_MATH_H
+#ifndef CPPWRAPPER_ENGMATH_H
+#define CPPWRAPPER_ENGMATH_H
 
 #include <math.h>
 #include <glm/glm.hpp>
@@ -14,6 +14,7 @@
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include "utils/Math.h"
 
 #define PI M_PI
 #define RAD(value) (value * (float)PI / 180)
@@ -29,4 +30,4 @@ extern const vec3 VectorDown;
 extern const vec3 VectorForward;
 extern const vec3 VectorBack;
 
-#endif //CPPWRAPPER_MATH_H
+#endif //CPPWRAPPER_ENGMATH_H

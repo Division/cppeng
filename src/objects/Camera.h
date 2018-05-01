@@ -12,11 +12,15 @@ class Camera : public GameObject {
 public:
   const mat4 &projectionMatrix() const { return _projectionMatrix; }
   const mat4 &viewMatrix() const { return _viewMatrix; }
+  const mat4 viewProjectionMatrix() const { return _projectionMatrix * _viewMatrix; }
+  const vec4 viewport() const { return _viewport; }
+  const uvec2 screenSize() const { return uvec2(_viewport.z, _viewport.w); }
   void postUpdate() override;
 
 protected:
   mat4 _projectionMatrix;
   mat4 _viewMatrix;
+  vec4 _viewport;
 
   float _fow;
   float _aspect; // screen aspect
@@ -25,6 +29,8 @@ protected:
 protected:
   inline void _updateProjection();
   inline void _updateView();
+
+  void _updateViewport();
 };
 
 typedef std::shared_ptr<Camera> CameraPtr;
