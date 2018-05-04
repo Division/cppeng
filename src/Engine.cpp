@@ -22,8 +22,8 @@ using namespace glm;
 #endif
 
 Engine::Engine() {
-  _input = new Input();
-  _window = new Window(_input);
+  _window = new Window();
+  _input = new Input(_window);
 }
 
 Engine::~Engine() {
@@ -58,12 +58,9 @@ void mainLoop(void *arg) {
   engine->_currentTime = currentTime;
 
   // Update
-  if (engine->_window->sizeChangedLastFrame()) {
-
-  }
+  engine->_window->processEvents();
   engine->update(dt);
   engine->_window->swapBuffers();
-  engine->_window->processEvents();
 
   if (engine->_window->quitTriggered()) {
     engine->quit();
@@ -113,12 +110,12 @@ void Engine::update(double dt) {
   glClearColor(0, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//  glEnable(GL_TEXTURE_2D);
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
   glCullFace(GL_BACK);
 
   _lastDt = (float)dt;
+  _input->_update();
   _game->update((float)dt);
 
   engine::checkGLError();

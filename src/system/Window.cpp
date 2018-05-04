@@ -5,7 +5,6 @@
 #include "Window.h"
 #include "Logging.h"
 #include "EngineGL.h"
-#include "Input.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -24,51 +23,30 @@ void Window::quit() {
   emscripten_log(EM_LOG_NO_PATHS, "Print a log message: int: %d, string: %s.", 42, "hello");
   emscripten_cancel_main_loop();
 #else
-  SDL_DestroyWindow(_window);
-  SDL_Quit();
+  glfwDestroyWindow(_window);
+  glfwTerminate();
+  exit(EXIT_SUCCESS);
 #endif
 }
 
 void Window::initOpenGLWindow(int width, int height) {
-  ENGLog("INIT Window called");
-// breaks webgl build
+  glfwInit();
+
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 #ifndef __EMSCRIPTEN__
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    ENGLog("Error init sdl\n");
-  };
-
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-  _window = SDL_CreateWindow("engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
-  if (!_window) {
-    printf("Error creating window\n");
-  }
-
-  SDL_SetWindowResizable(_window, SDL_FALSE);
-
-  _context = SDL_GL_CreateContext(_window);
-  SDL_GL_SetSwapInterval(1);
-  SDL_GL_GetDrawableSize(_window, &_width, &_height);
-#else
-  EmscriptenWebGLContextAttributes attrs;
-  emscripten_webgl_init_context_attributes(&attrs);
-  attrs.majorVersion = 2;
-  attrs.minorVersion = 0;
-  attrs.enableExtensionsByDefault = true;
-  int result = 0;
-
-  _context = emscripten_webgl_create_context(0, &attrs);
-
-  if (_context) {
-    EMSCRIPTEN_RESULT res = emscripten_webgl_make_context_current(_context);
-    assert(res == EMSCRIPTEN_RESULT_SUCCESS);
-    assert(emscripten_webgl_get_current_context() == _context);
-  }
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
+
+  _window = glfwCreateWindow(800, 600, "My Title", NULL, NULL);
+  glfwMakeContextCurrent(_window);
+
+#ifndef __EMSCRIPTEN__
+  gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+#endif
+//  glfwSetWindowSizeCallback(_window, window_size_callback);
 
   _updateSize();
   ENGLog("Window created with resolution %ix%i", _width, _height);
@@ -76,54 +54,15 @@ void Window::initOpenGLWindow(int width, int height) {
 }
 
 void Window::_updateSize () {
-#ifdef __EMSCRIPTEN__
-  double w, h;
-  emscripten_get_element_css_size(nullptr, &w, &h);
-  _width = w;
-  _height = h;
-  ENGLog("Window resize %fx%f", w, h);
-#endif
-
+  glfwGetFramebufferSize(_window, &_width, &_height);
 }
 
 void Window::swapBuffers() {
-#ifndef __EMSCRIPTEN__
-  SDL_GL_SwapWindow(_window);
-#endif
+  glfwSwapBuffers(_window);
 }
 
 void Window::processEvents() {
-  _input->_prepareForUpdate();
   auto prevSize = size();
-
-#ifndef __EMSCRIPTEN__
-  int hasPendingEvents;
-  do {
-    SDL_Event e;
-    hasPendingEvents = SDL_PollEvent(&e);
-
-    switch (e.type) {
-      case SDL_QUIT:
-        _quitTriggered = true;
-        break;
-
-      case SDL_WINDOWEVENT:
-        _updateSize();
-        _processSDLWindowEvent(e.window);
-        break;
-    }
-
-    _input->updateWithSDLEvent(e);
-  } while (hasPendingEvents);
-#endif
-
-  _sizeChangedLastFrame = prevSize != size();
+  glfwPollEvents();
+  _updateSize();
 }
-
-#ifndef __EMSCRIPTEN__
-void Window::_processSDLWindowEvent(SDL_WindowEvent &e) {
-  if (e.event == SDL_WINDOWEVENT_SIZE_CHANGED || e.event == SDL_WINDOWEVENT_RESIZED) {
-    _updateSize();
-  }
-}
-#endif

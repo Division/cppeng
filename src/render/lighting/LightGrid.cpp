@@ -16,11 +16,13 @@ struct LightGridStruct {
 };
 
 LightGrid::LightGrid(unsigned int cellSize) : _cellSize(cellSize) {
-//  _lightGrid = std::make_unique<SwappableTextureBufferObject>(GL_RG32UI, GL_DYNAMIC_DRAW);
-//  _lightIndex = std::make_unique<SwappableTextureBufferObject>(GL_R16UI, GL_DYNAMIC_DRAW);
-
+#if ENGINE_USE_BUFFER_TEXTURE
+  _lightGrid = std::make_unique<SwappableTextureBufferObject>(GL_RG32UI, GL_DYNAMIC_DRAW);
+  _lightIndex = std::make_unique<SwappableTextureBufferObject>(GL_R16UI, GL_DYNAMIC_DRAW);
+#else
   _lightGrid = std::make_unique<SwappableTexture2DBuffer>(0, GL_RG32UI);
   _lightIndex = std::make_unique<SwappableTexture2DBuffer>(4096, GL_R16UI);
+#endif
 
   _lightGridBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::LightGrid);
   _lightIndexBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::LightIndices);
@@ -108,7 +110,10 @@ void LightGrid::upload() {
   auto gridBuffer = _lightGrid->current();
   auto indexBuffer = _lightIndex->current();
 
+#if not ENGINE_USE_BUFFER_TEXTURE
   gridBuffer->targetWidth(_cellsX);
+#endif
+
   gridBuffer->resize((unsigned int)_cells.size() * sizeof(LightGridStruct));
   auto gridBufferPointer = (LightGridStruct *)gridBuffer->bufferPointer();
 

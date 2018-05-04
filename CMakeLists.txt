@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9)
 project(cppeng)
 
+set(EXPORT_TARGETS cppeng)
+
 message("CXX COMP " $ENV{CXX})
 
 set(CMAKE_CXX_STANDARD 14)
@@ -13,19 +15,13 @@ target_compile_definitions(cppeng PUBLIC GL_GLEXT_PROTOTYPES=1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
-#
-# When building on Mac OS, SDL2.framework and SDL2_image.framework should exist in the /Library/Frameworks/ directory
-#
-
 IF(NOT EMSCRIPTEN)
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIR})
-target_link_libraries(cppeng ${SDL2_LIBRARY})
-
-find_package(SDL2_image REQUIRED)
-include_directories(${SDL2_IMAGE_INCLUDE_DIR})
-target_link_libraries(cppeng ${SDL2_IMAGE_LIBRARY})
-list(APPEND INCLUDE_DIRS ${SDL2_INCLUDE_DIR})
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    add_subdirectory(lib/glfw)
+    target_link_libraries(cppeng glfw)
+    set(EXPORT_TARGETS ${EXPORT_TARGETS} glfw)
 ENDIF(NOT EMSCRIPTEN)
 
 find_package(OpenGL REQUIRED)
@@ -46,11 +42,19 @@ IF(NOT EMSCRIPTEN)
     target_link_libraries(tests cppeng)
 ENDIF(NOT EMSCRIPTEN)
 
+# glad
+set(GLAD_DIR "lib/glad")
+add_library("glad" "${GLAD_DIR}/src/glad.c")
+target_include_directories("glad" PUBLIC "${GLAD_DIR}/include")
+target_include_directories(cppeng PUBLIC "${GLAD_DIR}/include")
+target_link_libraries(cppeng "glad" "${CMAKE_DL_LIBS}")
+set(EXPORT_TARGETS ${EXPORT_TARGETS} glad)
+
 target_include_directories(cppeng PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         ${INCLUDE_DIRS})
 
 enable_testing(true)
 
-export(TARGETS cppeng FILE EngineConfig.cmake)
+export(TARGETS ${EXPORT_TARGETS} FILE EngineConfig.cmake)
 

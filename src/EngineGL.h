@@ -6,14 +6,13 @@
 #define CPPWRAPPER_ENGINEGL_JS_H
 
 #ifndef __EMSCRIPTEN__
-#include "SDL_opengl.h"
+#include <glad/glad.h>
+#define ENGINE_USE_BUFFER_TEXTURE true
 #else
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
+#define ENGINE_USE_BUFFER_TEXTURE false
 #endif
-#endif
+#define GLFW_INCLUDE_GLEXT
+#include <GLFW/glfw3.h>
 
 namespace engine {
 

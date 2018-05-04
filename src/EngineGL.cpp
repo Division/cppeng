@@ -19,8 +19,6 @@ void engine::checkGLError() {
     case GL_INVALID_ENUM:      errorStr = "Invalid enum"; break;
     case GL_INVALID_VALUE:     errorStr = "Invalid value"; break;
     case GL_INVALID_OPERATION: errorStr = "Invalid operation"; break;
-    case GL_STACK_OVERFLOW:    errorStr = "Stack overflow"; break;
-    case GL_STACK_UNDERFLOW:   errorStr = "Stack underflow"; break;
     case GL_OUT_OF_MEMORY:     errorStr = "Out of memory"; break;
     default:                   errorStr = "Unknown error"; break;
   }

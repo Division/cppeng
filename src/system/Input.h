@@ -5,8 +5,9 @@
 #ifndef CPPWRAPPER_INPUT_H
 #define CPPWRAPPER_INPUT_H
 
-#import "SDL.h"
-#import "glm/glm.hpp"
+#include "glm/glm.hpp"
+#include "EngineGL.h"
+#include "Window.h"
 
 using namespace glm;
 
@@ -30,27 +31,27 @@ enum class Key : int {
 
 // TODO: implement SDL_SetRelativeMouseMode
 
+class Window;
+
 class Input {
 public:
-  friend class Window;
-  bool keyDown(Key key) const { return _keys[(int)key]; }
+  friend class Engine;
+
+  explicit Input(Window *window): _window(window) {}
+  int keyDown(Key key) const;
+  int keyDown(int key) const { return glfwGetKey(_window->glfwID(), key); }
+  int mouseDown(int key) const { return glfwGetMouseButton(_window->glfwID(), key); }
   const vec2 mousePosition() const { return _mousePos; }
   const vec2 mouseDelta() const { return _mouseDelta; }
 private:
-  bool _keys[256];
+  void _update();
+  Window *_window;
   vec2 _mousePos;
   vec2 _prevMousePos;
   vec2 _mouseDelta;
 
 private:
-#ifndef __EMSCRIPTEN__
-  void updateWithSDLEvent(SDL_Event &e);
-  void _handleSDLKeyState(SDL_KeyboardEvent &e, bool isDown);
-  void _handleSDLMouseState(SDL_MouseButtonEvent &e, bool isDown);
-  void _handleSDLMouseMove(SDL_MouseMotionEvent event, bool b);
-#endif
 
-  void _prepareForUpdate();
 };
 
 

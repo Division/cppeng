@@ -31,11 +31,13 @@ public:
   void bindBufferTextures();
 
 private:
-//  std::unique_ptr<SwappableTextureBufferObject> _lightIndex;
-//  std::unique_ptr<SwappableTextureBufferObject> _lightGrid;
-
+#if ENGINE_USE_BUFFER_TEXTURE
+  std::unique_ptr<SwappableTextureBufferObject> _lightIndex;
+  std::unique_ptr<SwappableTextureBufferObject> _lightGrid;
+#else
   std::unique_ptr<SwappableTexture2DBuffer> _lightIndex;
   std::unique_ptr<SwappableTexture2DBuffer> _lightGrid;
+#endif
 
   unsigned int _cellSize;
   unsigned int _cellsX = 0;

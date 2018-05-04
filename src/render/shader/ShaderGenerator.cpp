@@ -55,6 +55,7 @@ std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) {
   json data = this->_getJSONForCaps(caps);
   data["version"] = GLSL_VERSION;
   data["WEBGL"] = PLATFORM_WEBGL;
+  data["USE_BUFFER_TEXTURE"] = ENGINE_USE_BUFFER_TEXTURE;
 
   return _env.render_template(_templateMap[ROOT_TEMPLATE], data);
 }

@@ -7,10 +7,6 @@
 
 #include "EngineGL.h"
 
-#ifndef __EMSCRIPTEN__
-#include "SDL.h"
-#endif
-
 #include <memory>
 
 struct TextureParams {
@@ -20,10 +16,6 @@ struct TextureParams {
 class Texture {
 public:
   GLuint id() const { if (!_id) { _genID(); } return _id; }
-
-#ifndef __EMSCRIPTEN__
-  void initWithSDLSurface(SDL_Surface *surface);
-#endif
 
 private:
   mutable GLuint _id = 0;
