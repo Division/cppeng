@@ -24,7 +24,8 @@ const std::string TEMPLATE_LIST[] = {
 
 const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
     { ShaderCaps::Color, "COLOR" },
-    { ShaderCaps::Lighting, "LIGHTING" }
+    { ShaderCaps::Lighting, "LIGHTING" },
+    { ShaderCaps::Texture0, "TEXTURE0" },
 };
 
 const auto ROOT_TEMPLATE = TEMPLATE_LIST[0];

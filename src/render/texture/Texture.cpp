@@ -14,25 +14,35 @@ void Texture::_genID() const {
   glGenTextures(1, &_id);
 }
 
-//void Texture::initWithSDLSurface(SDL_Surface *surface) {
-//  glBindTexture(GL_TEXTURE_2D, id());
-//
-//  GLenum mode = GL_RGB;
-//
-//  if(surface->format->BytesPerPixel == 4) {
-//    mode = GL_RGBA;
-//  }
-//
-//  glTexImage2D(GL_TEXTURE_2D, 0, mode, surface->w, surface->h, 0, mode, GL_UNSIGNED_BYTE, surface->pixels);
-//
-//  ENGLog("TEX LOADED, %i/%i", surface->w, surface->h);
-//
-////  glGenerateMipmap(GL_TEXTURE_2D);
-//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-////  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//
-//  glBindTexture(GL_TEXTURE_2D, 0);
-//}
+void Texture::initTexture2D(int width, int height, int channels, void *data) {
+
+  GLenum mode;
+  switch (channels) {
+    case 4:
+      mode = GL_RGBA;
+      break;
+
+    case 3:
+      mode = GL_RGB;
+      break;
+
+    default:
+      ENGLog("Invalid channel number");
+      return;
+  }
+
+  glBindTexture(GL_TEXTURE_2D, id());
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // required for proper loading
+  glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode, GL_UNSIGNED_BYTE, data);
+
+  ENGLog("TEXTURE 2D LOADED, %ix%i", width, height);
+
+//  glGenerateMipmap(GL_TEXTURE_2D);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
 

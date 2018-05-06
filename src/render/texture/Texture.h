@@ -15,7 +15,10 @@ struct TextureParams {
 
 class Texture {
 public:
+  Texture() = default;
+  explicit Texture(GLuint id): _id(id) {}
   GLuint id() const { if (!_id) { _genID(); } return _id; }
+  void initTexture2D(int width, int height, int channels, void *data);
 
 private:
   mutable GLuint _id = 0;
@@ -23,6 +26,7 @@ private:
 private:
   void _genID() const;
   void _uploadData();
+
 };
 
 typedef std::shared_ptr<Texture> TexturePtr;

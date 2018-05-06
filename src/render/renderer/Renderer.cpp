@@ -64,7 +64,6 @@ void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transf
 }
 
 void Renderer::setupMaterialBindings(MaterialPtr &material, const mat4 &transform) {
-  mat4 modelView = state.viewMatrix * transform;
   material->setProjection(state.projectionMatrix);
   material->setView(state.viewMatrix);
 

@@ -20,6 +20,17 @@ protected:
 
 typedef std::shared_ptr<MaterialSingleColor> MaterialSingleColorPtr;
 
+class MaterialTexture: public Material {
+public:
+  MaterialTexture();
+  void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
+  TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
+
+protected:
+  int _texture0Binding = -1;
+};
+
+
 class MaterialLighting: public Material {
 public:
   MaterialLighting();
