@@ -96,8 +96,14 @@ void Mesh::setVertices(const std::vector<vec3> &vertices) {
 
 void Mesh::setTexCoord0(const float *components, int count) {
   _texCoord0.resize(count * 2);
-  _vertexCount = count;
   memcpy(&_texCoord0[0], components, sizeof(vec2) * count);
+
+  _hasTexCoord0 = true;
+}
+
+void Mesh::setTexCoord0(const std::vector<vec2> &texcoords) {
+  _texCoord0.resize(texcoords.size() * 2);
+  memcpy(&_texCoord0[0], &texcoords[0], sizeof(vec2) * texcoords.size());
 
   _hasTexCoord0 = true;
 }
@@ -118,8 +124,9 @@ void Mesh::setIndices(const GLushort *indices, int indexCount) {
 }
 
 void Mesh::setIndices(const std::vector<GLushort> &indices) {
-  _indices = indices; // will be copied
+  _indices.assign(indices.begin(), indices.end()); // will be copied
   _hasIndices = true;
+  _updateFaceCount();
 }
 
 
@@ -289,6 +296,18 @@ void Mesh::_prepareVAO() {
     glVertexAttribPointer(attribIndex, VERTEX_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
   }
 
+  if (_hasTBN) {
+    attribIndex = (GLuint)ShaderAttrib::Tangent;
+    offset = BUFFER_OFFSET(this->tangentOffsetBytes());
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribPointer(attribIndex, VERTEX_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+
+    attribIndex = (GLuint)ShaderAttrib::Bitangent;
+    offset = BUFFER_OFFSET(this->bitangentOffsetBytes());
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribPointer(attribIndex, VERTEX_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+  }
+
   if (_hasTexCoord0) {
     attribIndex = (GLuint)ShaderAttrib::TexCoord0;
     offset = BUFFER_OFFSET(this->texCoordOffsetBytes());
@@ -336,11 +355,87 @@ void Mesh::calculateNormals() {
     }
   }
 
+  for (int i = 0; i < _vertexCount; i++) {
+    auto *normal = (vec3 *)&_normals[i * 3];
+    *normal = glm::normalize(*normal);
+  }
+
   _hasNormals = true;
 }
 
 void Mesh::calculateTBN() {
+  if (!this->_hasTexCoord0) {
+    throw std::runtime_error("Can't calculate tangent space without TexCoord0");
+  }
 
+  _tangents.resize(_vertices.size());
+  _bitangents.resize(_vertices.size());
+  memset(&_tangents[0], 0, _tangents.size() * sizeof(float));
+  memset(&_bitangents[0], 0, _bitangents.size() * sizeof(float));
+
+  for (int i = 0; i < _faceCount; i++) {
+    int faceOffset = i * 3;
+    int indexA = _hasIndices ? _indices[faceOffset] * 3 : faceOffset * 3;
+    int indexB = _hasIndices ? _indices[faceOffset + 1] * 3 : faceOffset * 3 + 3;
+    int indexC = _hasIndices ? _indices[faceOffset + 2] * 3 : faceOffset * 3 + 6;
+
+    int indexUVA = _hasIndices ? _indices[faceOffset] * 2 : faceOffset * 2;
+    int indexUVB = _hasIndices ? _indices[faceOffset + 1] * 2 : faceOffset * 2 + 2;
+    int indexUVC = _hasIndices ? _indices[faceOffset + 2] * 2 : faceOffset * 2 + 4;
+
+    vec3 a(_vertices[indexA], _vertices[indexA + 1], _vertices[indexA + 2]);
+    vec3 b(_vertices[indexB], _vertices[indexB + 1], _vertices[indexB + 2]);
+    vec3 c(_vertices[indexC], _vertices[indexC + 1], _vertices[indexC + 2]);
+
+    vec2 uvA(_texCoord0[indexUVA], _texCoord0[indexUVA + 1]);
+    vec2 uvB(_texCoord0[indexUVB], _texCoord0[indexUVB + 1]);
+    vec2 uvC(_texCoord0[indexUVC], _texCoord0[indexUVC + 1]);
+
+    vec3 deltaPos1 = b - a;
+    vec3 deltaPos2 = c - a;
+
+    vec2 deltaUV1 = uvB - uvA;
+    vec2 deltaUV2 = uvC - uvA;
+
+    float r = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV1[1] * deltaUV2[0]);
+    a = deltaPos1 * (deltaUV2[1] * r);
+    b = deltaPos2 * (deltaUV1[1] * r);
+    vec3 tangent = a - b;
+
+    a = deltaPos2 * (deltaUV1[0] * r);
+    b = deltaPos1 * (deltaUV2[0] * r);
+    vec3 bitangent = a - b;
+
+    for (int j = 0; j < 3; j++) {
+      _tangents[indexA + j] += tangent[j];
+      _tangents[indexB + j] += tangent[j];
+      _tangents[indexC + j] += tangent[j];
+      _bitangents[indexA + j] += bitangent[j];
+      _bitangents[indexB + j] += bitangent[j];
+      _bitangents[indexC + j] += bitangent[j];
+    }
+  }
+
+  for (int i = 0; i < _vertexCount; i++) {
+    vec3 *a = (vec3 *)&_tangents[i * 3];
+    vec3 *b = (vec3 *)&_bitangents[i * 3];
+    vec3 *c = (vec3 *)&_normals[i * 3];
+
+    // Orthonormalize matrix. Since it's almost orthonormal we can just correct tangent a little.
+    // t = normalize(t - n * dot(n, t));
+    *a = *a - *c * glm::dotf(*c, *a);
+
+    // Check the tangent direction
+    if (glm::dotf(glm::cross(*c, *a), *b) < 0) {
+      *a = -*a; // invert tangent
+    }
+
+    *a = glm::normalize(*a);
+    *b = glm::normalize(*b);
+  }
+
+  _hasTBN = true;
 }
+
 
 

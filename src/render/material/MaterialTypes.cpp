@@ -43,15 +43,67 @@ MaterialTexture::MaterialTexture() {
 MaterialLighting::MaterialLighting() {
   auto engine = getEngine();
 
-//  auto colorBinding = _addVec4Binding(UniformName::Color);
-//  _bindings.vec4Bindings[colorBinding].v = vec4(1,1, 0,1);
-
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
-//  caps->addCap(ShaderCaps::Color);
   caps->addCap(ShaderCaps::Lighting);
   _shader = engine->renderer()->getShaderWithCaps(caps);
 
   // Manually create uniforms for now
+  _shader->addUniform(UniformName::ProjectionMatrix);
+  _shader->addUniform(UniformName::ViewMatrix);
+  _shader->addUniform(UniformName::LightGrid);
+  _shader->addUniform(UniformName::LightIndices);
+
+  _shader->addUniformBlock(UniformBlockName::Transform);
+  _shader->addUniformBlock(UniformBlockName::Light);
+  _shader->addUniformBlock(UniformBlockName::Camera);
+}
+
+MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
+  auto engine = getEngine();
+
+  _diffuseBindings.resize(layerCount);
+  _normalMapBindings.resize(layerCount);
+
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Lighting);
+  caps->addCap(ShaderCaps::NormalMap);
+
+  if (specularmap) {
+    caps->addCap(ShaderCaps::SpecularMap);
+    _specularmapBinging = _addTextureBinding(UniformName::SpecularMap);
+  }
+
+  for (int i = 0; i < layerCount; i++) {
+    auto capsOffset = (int)ShaderCaps::TerrainLayer0 + i;
+    caps->addCap((ShaderCaps)capsOffset);
+
+    auto diffuseOffset = (int)UniformName::TerrainDiffuse0 + i;
+    _diffuseBindings[i] = _addTextureBinding((UniformName)diffuseOffset);
+
+    auto normalMapOffset = (int)UniformName::TerrainNormal0 + i;
+    _normalMapBindings[i] = _addTextureBinding((UniformName)normalMapOffset);
+  }
+
+
+  _shader = engine->renderer()->getShaderWithCaps(caps);
+
+  if (specularmap) {
+    _shader->addUniform(UniformName::SpecularMap);
+  }
+
+  for (int i = 0; i < layerCount; i++) {
+    auto diffuseOffset = (int)UniformName::TerrainDiffuse0 + i;
+    _shader->addUniform((UniformName)diffuseOffset);
+
+    auto normalMapOffset = (int)UniformName::TerrainNormal0 + i;
+    _shader->addUniform((UniformName)normalMapOffset);
+  }
+
+  if (layerCount > 1) {
+    _splatmapBinging = _addTextureBinding(UniformName::TerrainSplatmap);
+    _shader->addUniform(UniformName::TerrainSplatmap);
+  }
+
   _shader->addUniform(UniformName::ProjectionMatrix);
   _shader->addUniform(UniformName::ViewMatrix);
   _shader->addUniform(UniformName::LightGrid);

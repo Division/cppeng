@@ -9,6 +9,8 @@
 const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
     { ShaderAttrib::Position, "aPosition" },
     { ShaderAttrib::Normal, "aNormal" },
+    { ShaderAttrib::Tangent, "aTangent" },
+    { ShaderAttrib::Bitangent, "aBitangent" },
     { ShaderAttrib::TexCoord0, "aTexCoord0" }
 };
 
@@ -17,7 +19,7 @@ const std::string FRAGMENT_STR = "fragment";
 
 Shader::Shader(const std::string &vertexSource, const std::string &fragmentSource) {
 //  ENGLog("VERTEX SHADER SRC: %s", vertexSource.c_str());
-  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
+//  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
   GLuint program = this->_compileShader(vertexSource, fragmentSource);
   if (program) {
     this->_program = program;

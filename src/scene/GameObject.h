@@ -35,6 +35,7 @@ public:
 
   int id() const { return _id; }
   bool active() const { return _active; }
+  void active(const bool active) { _active = active; }
   bool destroyed() const { return _destroyed; }
 
   const Transform *transform() const { return &_transform; }

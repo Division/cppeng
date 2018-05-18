@@ -23,6 +23,7 @@ public:
   void setVertices(const float *vertexComponents, int vertexCount);
   void setVertices(const std::vector<vec3> &vertices);
 
+  void setTexCoord0(const std::vector<vec2> &texcoords);
   void setTexCoord0(const float *texcoordComponents, int count);
 
   void setIndices(const GLushort *indices, int indexCount);

@@ -19,13 +19,19 @@ const std::string TEMPLATE_ROOT = "resources/shaderTpl/";
 
 const std::string TEMPLATE_LIST[] = {
     "root", // First goes the root template
-    "uniforms_vs"
+    "terrain",
+    "lighting"
 };
 
 const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
     { ShaderCaps::Color, "COLOR" },
     { ShaderCaps::Lighting, "LIGHTING" },
+    { ShaderCaps::NormalMap, "NORMAL_MAP" },
+    { ShaderCaps::SpecularMap, "SPECULAR_MAP" },
     { ShaderCaps::Texture0, "TEXTURE0" },
+    { ShaderCaps::TerrainLayer0, "TERRAIN_LAYER0" },
+    { ShaderCaps::TerrainLayer1, "TERRAIN_LAYER1" },
+    { ShaderCaps::TerrainLayer2, "TERRAIN_LAYER2" },
 };
 
 const auto ROOT_TEMPLATE = TEMPLATE_LIST[0];
@@ -46,7 +52,9 @@ void ShaderGenerator::_addTemplateCallback(std::string tplName) {
   auto env = _env;
   const auto &templateMap = _templateMap;
   auto name = tplName;
-  _env.add_callback(tplName, 0, [&env, name, templateMap](inja::Parsed::Arguments args, json data) {
+  _env.add_callback(tplName, 1, [&env, name, templateMap](inja::Parsed::Arguments args, json data) {
+    auto param = env.get_argument<std::string>(args, 0, data);
+    data["MODE"] = param;
     std::string res = env.render_template(templateMap.at(name), data);
     return res;
   });

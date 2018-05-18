@@ -7,6 +7,7 @@
 
 #include "Material.h"
 #include "EngMath.h"
+#include <vector>
 
 class MaterialSingleColor: public Material {
 public:
@@ -34,6 +35,26 @@ protected:
 class MaterialLighting: public Material {
 public:
   MaterialLighting();
+};
+
+
+class MaterialTerrain: public Material {
+public:
+  explicit MaterialTerrain(int layerCount, bool specularmap = false);
+  void diffuse(TexturePtr texture, int layer) { _bindings.textureBindings[_diffuseBindings[layer]].texture = texture; }
+  TexturePtr diffuse(int layer) const { return _bindings.textureBindings[_diffuseBindings[layer]].texture; }
+  void normalMap(TexturePtr texture, int layer) { if (!_normalMapBindings.size()) return; _bindings.textureBindings[_normalMapBindings[layer]].texture = texture; }
+  TexturePtr normalMap(int layer) const { return _bindings.textureBindings[_normalMapBindings[layer]].texture; }
+  void splatmap(TexturePtr texture) { _bindings.textureBindings[_splatmapBinging].texture = texture; }
+  TexturePtr splatmap() const { return _bindings.textureBindings[_splatmapBinging].texture; }
+  void specularmap(TexturePtr texture) { _bindings.textureBindings[_specularmapBinging].texture = texture; }
+  TexturePtr specularmap() const { return _bindings.textureBindings[_specularmapBinging].texture; }
+
+protected:
+  std::vector<int> _diffuseBindings;
+  std::vector<int> _normalMapBindings;
+  int _splatmapBinging;
+  int _specularmapBinging;
 };
 
 #endif //CPPWRAPPER_MATERIALTYPES_H

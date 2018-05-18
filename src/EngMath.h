@@ -30,4 +30,10 @@ extern const vec3 VectorDown;
 extern const vec3 VectorForward;
 extern const vec3 VectorBack;
 
+namespace glm {
+  float dotf(const vec2 &a, const vec3 &b);
+  float dotf(const vec3 &a, const vec3 &b);
+  float dotf(const vec4 &a, const vec4 &b);
+}
+
 #endif //CPPWRAPPER_ENGMATH_H

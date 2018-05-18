@@ -20,13 +20,16 @@ class Uniform;
 //---------------------
 // Shader Caps
 
-
 enum class ShaderCaps : int {
   Color = 0,
   Lighting,
   Texture0,
   Texture1,
-  NormalMap
+  NormalMap,
+  SpecularMap,
+  TerrainLayer0,
+  TerrainLayer1,
+  TerrainLayer2
 };
 
 class ShaderCapsSet {
@@ -54,10 +57,11 @@ typedef std::shared_ptr<ShaderCapsSet> ShaderCapsSetPtr;
 //---------------------
 // Shader
 
-
 enum class ShaderAttrib : int {
   Position = 0,
   Normal,
+  Bitangent,
+  Tangent,
   TexCoord0,
   TexCoord1
 };
