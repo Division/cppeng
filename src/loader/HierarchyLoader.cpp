@@ -5,7 +5,8 @@
 #include "HierarchyLoader.h"
 #include <system/Logging.h>
 
-GameObjectPtr loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy) {
+GameObjectPtr
+loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy, const MaterialPicker *materialPicker) {
   if (!hierarchy) {
     hierarchy = &bundle->hierarchy();
   }
@@ -17,8 +18,12 @@ GameObjectPtr loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *
     meshObject->mesh(bundle->getMesh(hierarchy->geometry));
     object = meshObject;
 
-    MaterialPicker picker;
-    meshObject->material(picker.getMaterial(hierarchy));
+    if (materialPicker) {
+      meshObject->material(materialPicker->getMaterial(hierarchy));
+    } else{
+      MaterialPicker picker;
+      meshObject->material(picker.getMaterial(hierarchy));
+    };
   } else {
     object = CreateGameObject<GameObject>();
   }
@@ -29,22 +34,21 @@ GameObjectPtr loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *
 //  ENGLog("Added object with name %s", object->name().c_str());
 
   for (auto &childHierarchy : hierarchy->children) {
-    auto child = loadHierarchy(bundle, &childHierarchy);
+    auto child = loadHierarchy(bundle, &childHierarchy, materialPicker);
     child->transform()->parent(object->transform());
   }
 
   return object;
 }
 
-MaterialPtr loader::MaterialPicker::getMaterial(const HierarchyData *hierarchy) {
-  MaterialPtr result;
+MaterialPtr loader::MaterialPicker::getMaterial(const HierarchyData *hierarchy) const {
+  return _defaultMaterial;
+}
 
-  if (hierarchy->hasMaterial) {
-    result = std::make_shared<MaterialSingleColor>();
-  } else {
-//    result = std::make_shared<MaterialSingleColor>();
-    result = std::make_shared<MaterialLighting>();
-  }
+loader::MaterialPicker::MaterialPicker() {
+  _defaultMaterial = std::make_shared<MaterialLighting>();
+}
 
-  return result;
+loader::MaterialPicker::MaterialPicker(MaterialPtr material) {
+  _defaultMaterial = material;
 }

@@ -23,6 +23,9 @@ namespace UBOStruct {
     vec3 position; // offset = 0, size = 12
     float padding1;
     uvec2 screenSize;
+    vec2 padding23;
+    mat4 viewMatrix;
+    mat4 projectionMatrix;
   };
 
 }

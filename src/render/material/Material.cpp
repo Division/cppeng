@@ -97,9 +97,6 @@ void Material::uploadBindings() const {
 }
 
 Material::Material() {
-//  _modelViewBinding = _addMat4Binding(UniformName::ModelViewMatrix);
-  _projectionBinding = _addMat4Binding(UniformName::ProjectionMatrix);
-  _viewMatrixBinding = _addMat4Binding(UniformName::ViewMatrix);
 }
 
 void Material::activateTextures() const {

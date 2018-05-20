@@ -20,7 +20,8 @@ const std::string TEMPLATE_ROOT = "resources/shaderTpl/";
 const std::string TEMPLATE_LIST[] = {
     "root", // First goes the root template
     "terrain",
-    "lighting"
+    "lighting",
+    "projectedTexture",
 };
 
 const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
@@ -32,6 +33,7 @@ const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
     { ShaderCaps::TerrainLayer0, "TERRAIN_LAYER0" },
     { ShaderCaps::TerrainLayer1, "TERRAIN_LAYER1" },
     { ShaderCaps::TerrainLayer2, "TERRAIN_LAYER2" },
+    { ShaderCaps::ProjectedTexture, "PROJECTED_TEXTURE" },
 };
 
 const auto ROOT_TEMPLATE = TEMPLATE_LIST[0];

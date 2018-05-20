@@ -14,6 +14,9 @@ typedef std::shared_ptr<Camera> CameraPtr;
 //class MaterialTexutre;
 //typedef std::shared_ptr<MaterialTexutre> MaterialTexutrePtr;
 
+class MaterialTextureProjection;
+typedef std::shared_ptr<MaterialTextureProjection> MaterialTextureProjectionPtr;
+
 class Terrain;
 typedef std::shared_ptr<Terrain> TerrainPtr;
 

@@ -40,20 +40,23 @@ void UBOManager::setCamera(CameraPtr camera) {
   UBOStruct::Camera cameraData;
   cameraData.position = camera->transform()->worldPosition();
   cameraData.screenSize = camera->screenSize();
+  cameraData.viewMatrix = camera->viewMatrix();
+  cameraData.projectionMatrix = camera->projectionMatrix();
 
   auto alignBytes = (unsigned int)engine::GLCaps::uboOffsetAlignment();
   auto buffer = _camera->current();
   buffer->appendData((void *) &cameraData, sizeof(cameraData), alignBytes);
 }
 
-void UBOManager::processMeterialBindings(MaterialPtr material) {
+void UBOManager::processMeterialBindings(RenderOperation *rop) {
+  MaterialPtr material = rop->material;
   auto buffer = _transform->current();
 
   if (material->hasTransformBlock()) {
     auto &transformStruct = material->getTransformStruct();
     auto alignBytes = (unsigned int)engine::GLCaps::uboOffsetAlignment();
     auto offset = (unsigned int)buffer->appendData((void *) &transformStruct, sizeof(transformStruct), alignBytes);
-    material->setTransformBlockOffset(offset);
+    rop->transformBlockOffset = offset;
   }
 }
 
@@ -76,13 +79,14 @@ void UBOManager::upload() {
   _camera->current()->upload();
 }
 
-void UBOManager::setupForRender(MaterialPtr material) {
+void UBOManager::setupForRender(RenderOperation *rop) {
+  MaterialPtr material = rop->material;
   material->shader()->bind();
   material->uploadBindings();
   material->activateTextures();
 
   if (material->hasTransformBlock()) {
-    auto offset = material->getTransformBlockOffset();
+    auto offset = rop->transformBlockOffset;
     auto size = sizeof(UBOStruct::TransformStruct);
     auto slot = (GLuint)UniformBlockName::Transform;
     auto vbo = _transform->current()->vbo();

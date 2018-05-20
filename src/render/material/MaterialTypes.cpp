@@ -16,10 +16,9 @@ MaterialSingleColor::MaterialSingleColor() {
   _shader = engine->renderer()->getShaderWithCaps(caps);
 
   // Manually create uniforms for now
-  _shader->addUniform(UniformName::ProjectionMatrix);
-  _shader->addUniform(UniformName::ViewMatrix);
   _shader->addUniform(UniformName::Color);
   _shader->addUniformBlock(UniformBlockName::Transform);
+  _shader->addUniformBlock(UniformBlockName::Camera);
 
   color(vec4(1, 1, 1, 1));
 }
@@ -34,10 +33,9 @@ MaterialTexture::MaterialTexture() {
   _shader = engine->renderer()->getShaderWithCaps(caps);
 
   // Manually create uniforms for now
-  _shader->addUniform(UniformName::ProjectionMatrix);
-  _shader->addUniform(UniformName::ViewMatrix);
   _shader->addUniform(UniformName::Texture0);
   _shader->addUniformBlock(UniformBlockName::Transform);
+  _shader->addUniformBlock(UniformBlockName::Camera);
 }
 
 MaterialLighting::MaterialLighting() {
@@ -48,8 +46,6 @@ MaterialLighting::MaterialLighting() {
   _shader = engine->renderer()->getShaderWithCaps(caps);
 
   // Manually create uniforms for now
-  _shader->addUniform(UniformName::ProjectionMatrix);
-  _shader->addUniform(UniformName::ViewMatrix);
   _shader->addUniform(UniformName::LightGrid);
   _shader->addUniform(UniformName::LightIndices);
 
@@ -104,10 +100,30 @@ MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
     _shader->addUniform(UniformName::TerrainSplatmap);
   }
 
-  _shader->addUniform(UniformName::ProjectionMatrix);
-  _shader->addUniform(UniformName::ViewMatrix);
   _shader->addUniform(UniformName::LightGrid);
   _shader->addUniform(UniformName::LightIndices);
+
+  _shader->addUniformBlock(UniformBlockName::Transform);
+  _shader->addUniformBlock(UniformBlockName::Light);
+  _shader->addUniformBlock(UniformBlockName::Camera);
+}
+
+MaterialTextureProjection::MaterialTextureProjection() {
+  auto engine = getEngine();
+
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Lighting);
+  caps->addCap(ShaderCaps::ProjectedTexture);
+  _shader = engine->renderer()->getShaderWithCaps(caps);
+
+  _projectedTextureBinding = _addTextureBinding(UniformName::ProjectedTexture);
+  _projectedTextureMatrixBinding= _addMat4Binding(UniformName::ProjectedTextureMatrix);
+
+  // Manually create uniforms for now
+  _shader->addUniform(UniformName::LightGrid);
+  _shader->addUniform(UniformName::LightIndices);
+  _shader->addUniform(UniformName::ProjectedTexture);
+  _shader->addUniform(UniformName::ProjectedTextureMatrix);
 
   _shader->addUniformBlock(UniformBlockName::Transform);
   _shader->addUniformBlock(UniformBlockName::Light);

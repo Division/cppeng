@@ -24,6 +24,7 @@ void engine::checkGLError() {
   }
 
   ENGLog("GL Error: %s", errorStr.c_str());
+  throw std::runtime_error(errorStr);
 }
 
 

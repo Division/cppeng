@@ -33,6 +33,8 @@ enum class UniformName : int {
   SpecularMap,
   LightGrid,
   LightIndices,
+  ProjectedTexture,
+  ProjectedTextureMatrix,
   Count
 };
 

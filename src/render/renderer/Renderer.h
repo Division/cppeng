@@ -57,7 +57,7 @@ private:
   void _prepareQueues(Scene &scene, std::shared_ptr<Camera> camera);
   void _processRenderPipeline();
   void _renderCamera(Scene &scene, std::shared_ptr<Camera> camera);
-  void setupMaterialBindings(MaterialPtr &material, const mat4 &transform);
+  void setupMaterialBindings(RenderOperation *rop);
   void _clearQueues();
 };
 

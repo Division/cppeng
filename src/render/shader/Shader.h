@@ -29,7 +29,8 @@ enum class ShaderCaps : int {
   SpecularMap,
   TerrainLayer0,
   TerrainLayer1,
-  TerrainLayer2
+  TerrainLayer2,
+  ProjectedTexture,
 };
 
 class ShaderCapsSet {

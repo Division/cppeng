@@ -63,18 +63,18 @@ void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transf
   }
 }
 
-void Renderer::setupMaterialBindings(MaterialPtr &material, const mat4 &transform) {
-  material->setProjection(state.projectionMatrix);
-  material->setView(state.viewMatrix);
+void Renderer::setupMaterialBindings(RenderOperation *rop) {
+//  material->setProjection(state.projectionMatrix);
+//  material->setView(state.viewMatrix);
 
-  if (material->hasTransformBlock()) {
+  if (rop->material->hasTransformBlock()) {
     UBOStruct::TransformStruct transformStruct;
-    transformStruct.transform = transform;
-    transformStruct.normalMatrix = glm::inverseTranspose(transform);
-    material->setTransformBlock(transformStruct);
+    transformStruct.transform = rop->modelMatrix;
+    transformStruct.normalMatrix = glm::inverseTranspose(rop->modelMatrix);
+    rop->material->setTransformBlock(transformStruct);
   }
 
-  _uboManager->processMeterialBindings(material);
+  _uboManager->processMeterialBindings(rop);
 }
 
 void Renderer::renderScene(Scene &scene) {
@@ -121,7 +121,7 @@ void Renderer::_prepareQueues(Scene &scene, CameraPtr camera) {
   // Opaque
   auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
   for (auto &rop : opaqueQueue) {
-    setupMaterialBindings(rop.material, rop.modelMatrix);
+    setupMaterialBindings(&rop);
   }
 }
 
@@ -129,7 +129,7 @@ void Renderer::_processRenderPipeline() {
   // Opaque
   auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
   for (auto &rop : opaqueQueue) {
-    _uboManager->setupForRender(rop.material);
+    _uboManager->setupForRender(&rop);
     renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
   }
 }

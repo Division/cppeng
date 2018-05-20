@@ -67,7 +67,6 @@ struct UniformBlockBinding {
 struct TransformBinding: public UniformBlockBinding {
   explicit TransformBinding() : UniformBlockBinding(UniformBlockName::Transform) {}
   UBOStruct::TransformStruct data;
-  unsigned int offset;
 };
 
 #endif //CPPWRAPPER_UNIFORMBINDING_H

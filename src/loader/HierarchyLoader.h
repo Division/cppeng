@@ -13,10 +13,16 @@ namespace loader {
 
   class MaterialPicker {
   public:
-    virtual MaterialPtr getMaterial(const HierarchyData *hierarchy);
+    MaterialPicker();
+    explicit MaterialPicker(MaterialPtr material);
+    virtual MaterialPtr getMaterial(const HierarchyData *hierarchy) const;
+
+  protected:
+    MaterialPtr _defaultMaterial;
   };
 
-  GameObjectPtr loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy = nullptr);
+  GameObjectPtr loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy,
+                              const MaterialPicker *materialPicker = nullptr);
 
 }
 

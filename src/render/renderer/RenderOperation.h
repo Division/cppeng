@@ -16,6 +16,7 @@ struct RenderOperation {
   mat4 modelMatrix;
   GLenum mode = GL_TRIANGLES;
   unsigned int index;
+  unsigned int transformBlockOffset;
   int renderOrder;
   std::string debugInfo;
 

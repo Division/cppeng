@@ -43,7 +43,7 @@ public:
   explicit MaterialTerrain(int layerCount, bool specularmap = false);
   void diffuse(TexturePtr texture, int layer) { _bindings.textureBindings[_diffuseBindings[layer]].texture = texture; }
   TexturePtr diffuse(int layer) const { return _bindings.textureBindings[_diffuseBindings[layer]].texture; }
-  void normalMap(TexturePtr texture, int layer) { if (!_normalMapBindings.size()) return; _bindings.textureBindings[_normalMapBindings[layer]].texture = texture; }
+  void normalMap(TexturePtr texture, int layer) { if (_normalMapBindings.empty()) return; _bindings.textureBindings[_normalMapBindings[layer]].texture = texture; }
   TexturePtr normalMap(int layer) const { return _bindings.textureBindings[_normalMapBindings[layer]].texture; }
   void splatmap(TexturePtr texture) { _bindings.textureBindings[_splatmapBinging].texture = texture; }
   TexturePtr splatmap() const { return _bindings.textureBindings[_splatmapBinging].texture; }
@@ -56,5 +56,22 @@ protected:
   int _splatmapBinging;
   int _specularmapBinging;
 };
+
+class MaterialTextureProjection: public Material {
+public:
+  MaterialTextureProjection();
+  void projectedTexture(TexturePtr texture) {
+    _bindings.textureBindings[_projectedTextureBinding].texture = texture;
+  }
+  TexturePtr projectedTexture() const { return _bindings.textureBindings[_projectedTextureBinding].texture; }
+  void projectedTextureMatrix(mat4 matrix) {
+    _bindings.mat4Bindings[_projectedTextureMatrixBinding].matrix = matrix;
+  }
+  mat4 projectedTextureMatrix() const { return _bindings.mat4Bindings[_projectedTextureMatrixBinding].matrix; }
+protected:
+  int _projectedTextureBinding = -1;
+  int _projectedTextureMatrixBinding = -1;
+};
+
 
 #endif //CPPWRAPPER_MATERIALTYPES_H

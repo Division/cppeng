@@ -19,8 +19,6 @@ public:
 
   bool hasTransformBlock() { return _bindings.hasTransform; }
   void setTransformBlock(UBOStruct::TransformStruct &value) { _bindings.transform.data = value; }
-  void setTransformBlockOffset(unsigned int offset) { _bindings.transform.offset = offset; }
-  unsigned int getTransformBlockOffset() { return _bindings.transform.offset; }
   const UBOStruct::TransformStruct &getTransformStruct() { return _bindings.transform.data; }
 
   void setView(const mat4 &viewMatrix);

@@ -15,10 +15,10 @@ class SwappableVertexBufferObject;
 class UBOManager {
 public:
   UBOManager();
-  void processMeterialBindings(MaterialPtr material);
+  void processMeterialBindings(RenderOperation *rop);
   void swap();
   void upload();
-  void setupForRender(MaterialPtr material);
+  void setupForRender(RenderOperation *rop);
   void updateLights(const std::vector<LightObjectPtr> *lights);
   void setCamera(CameraPtr camera);
 private:

@@ -18,8 +18,8 @@ const std::string VERTEX_STR = "vertex";
 const std::string FRAGMENT_STR = "fragment";
 
 Shader::Shader(const std::string &vertexSource, const std::string &fragmentSource) {
-//  ENGLog("VERTEX SHADER SRC: %s", vertexSource.c_str());
-//  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
+  ENGLog("VERTEX SHADER SRC: %s", vertexSource.c_str());
+  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
   GLuint program = this->_compileShader(vertexSource, fragmentSource);
   if (program) {
     this->_program = program;
