@@ -22,6 +22,8 @@ class Uniform;
 
 enum class ShaderCaps : int {
   Color = 0,
+  VertexColor,
+  PointSize,
   Lighting,
   Texture0,
   Texture1,
@@ -64,6 +66,7 @@ enum class ShaderAttrib : int {
   Bitangent,
   Tangent,
   TexCoord0,
+  VertexColor,
   TexCoord1
 };
 

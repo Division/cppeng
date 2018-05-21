@@ -125,6 +125,7 @@ void Engine::init() {
   engine::GLCaps::init(); // Setup OpenGL caps
   _renderer = new Renderer(_window);
   _renderer->setupShaders();
+
   _game->init(this);
   engine::checkGLError();
 }
@@ -132,6 +133,10 @@ void Engine::init() {
 void Engine::renderScene(Scene &scene) {
   _renderer->postUpdate(_lastDt);
   _renderer->renderScene(scene);
+}
+
+std::shared_ptr<DebugDraw> Engine::debugDraw() const {
+  return _renderer->debugDraw();
 }
 
 // JS Bindings

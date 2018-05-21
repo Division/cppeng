@@ -23,6 +23,10 @@ public:
   void setVertices(const float *vertexComponents, int vertexCount);
   void setVertices(const std::vector<vec3> &vertices);
 
+  void setColors(const vec4 *colors, int colorCount);
+  void setColors(const float *colorComponents, int colorCount);
+  void setColors(const std::vector<vec4> &colors);
+
   void setTexCoord0(const std::vector<vec2> &texcoords);
   void setTexCoord0(const float *texcoordComponents, int count);
 
@@ -37,6 +41,7 @@ public:
   // Properties
 
   GLuint vao() const { return _vao; }
+  std::shared_ptr<VertexBufferObject> vbo() { return _vbo; }
 
   int componentCount() const { return _componentCount; } // Number of vertices to complete the primitive (3 for triangle)
   int strideBytes() const { return _strideBytes; };
@@ -72,8 +77,8 @@ private:
   void _prepareVAO();
 
 private:
-  std::unique_ptr<VertexBufferObject> _vbo;
-  std::unique_ptr<VertexBufferObject> _indexBuffer;
+  std::shared_ptr<VertexBufferObject> _vbo;
+  std::shared_ptr<VertexBufferObject> _indexBuffer;
 
   bool _keepData;
   int _componentCount;

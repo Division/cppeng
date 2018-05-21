@@ -35,9 +35,9 @@ void VertexBufferObject::_recreateBuffer() {
     return;
   }
 
-  if (_target == GL_UNIFORM_BUFFER) {
-    ENGLog("ubo resize %i ", targetSize);
-  }
+//  if (_target == GL_UNIFORM_BUFFER) {
+//    ENGLog("ubo resize %i ", targetSize);
+//  }
 
   _bufferAllocatedSize = (unsigned)targetSize;
   glBufferData(_target, targetSize, nullptr, _usage);

@@ -23,6 +23,18 @@ MaterialSingleColor::MaterialSingleColor() {
   color(vec4(1, 1, 1, 1));
 }
 
+MaterialDebug::MaterialDebug() {
+  auto engine = getEngine();
+
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::PointSize);
+  caps->addCap(ShaderCaps::VertexColor);
+  _shader = engine->renderer()->getShaderWithCaps(caps);
+
+  _shader->addUniformBlock(UniformBlockName::Transform);
+  _shader->addUniformBlock(UniformBlockName::Camera);
+}
+
 MaterialTexture::MaterialTexture() {
   auto engine = getEngine();
 

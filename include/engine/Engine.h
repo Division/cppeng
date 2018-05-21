@@ -6,11 +6,13 @@
 #define TESTLIBRARY_ENGINE_H
 
 #include <IGame.h>
+#include <memory>
 
 class Window;
 class Renderer;
 class Input;
 class Scene;
+class DebugDraw;
 
 class Engine {
 public:
@@ -22,6 +24,8 @@ public:
   void printStatus();
   void update(double dt);
   void renderScene(Scene &scene);
+  std::shared_ptr<DebugDraw> debugDraw() const;
+
   const Input *const input() const { return _input; }
 
   const Renderer *renderer() { return _renderer; }

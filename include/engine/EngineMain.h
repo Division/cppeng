@@ -14,6 +14,7 @@
 #include "system/Input.h"
 #include "Objects.h"
 #include "render/shader/Shader.h"
+#include "render/debug/DebugDraw.h"
 #include "render/material/Material.h"
 #include "render/material/MaterialTypes.h"
 

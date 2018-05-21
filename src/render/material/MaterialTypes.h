@@ -19,6 +19,12 @@ protected:
   int _colorBinging = -1;
 };
 
+class MaterialDebug: public Material {
+public:
+  MaterialDebug();
+};
+
+
 typedef std::shared_ptr<MaterialSingleColor> MaterialSingleColorPtr;
 
 class MaterialTexture: public Material {

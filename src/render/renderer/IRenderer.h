@@ -14,6 +14,7 @@ class Material;
 enum class RenderQueue : int {
   Opaque = 0,
   Translucent,
+  Debug,
   Count
 };
 

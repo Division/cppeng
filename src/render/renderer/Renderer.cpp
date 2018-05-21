@@ -15,12 +15,14 @@
 #include"render/material/Material.h"
 #include "objects/Camera.h"
 #include "render/lighting/LightGrid.h"
+#include "render/debug/DebugDraw.h"
 
 using namespace glm;
 
 Renderer::Renderer(Window *window) {
   _uboManager = std::make_unique<UBOManager>();
   _lightGrid = std::make_unique<LightGrid>();
+  _debugDraw = std::make_shared<DebugDraw>();
   _window = window;
 }
 
@@ -101,6 +103,8 @@ void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
     object->render(*this);
   }
 
+  _debugDraw->render(*this);
+
   _prepareQueues(scene, camera);
 
   auto lights = scene.visibleLights(camera);
@@ -118,10 +122,10 @@ void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
 void Renderer::_prepareQueues(Scene &scene, CameraPtr camera) {
   _uboManager->swap();
 
-  // Opaque
-  auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
-  for (auto &rop : opaqueQueue) {
-    setupMaterialBindings(&rop);
+  for (auto &queue : _queues) {
+    for (auto &rop : queue) {
+      setupMaterialBindings(&rop);
+    }
   }
 }
 
@@ -132,6 +136,17 @@ void Renderer::_processRenderPipeline() {
     _uboManager->setupForRender(&rop);
     renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
   }
+
+  // Debug
+  glEnable(GL_PROGRAM_POINT_SIZE);
+//  glDisable(GL_DEPTH_TEST);
+  auto &debugQueue = _queues[(int)RenderQueue::Debug];
+  for (auto &rop : debugQueue) {
+    _uboManager->setupForRender(&rop);
+    renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
+  }
+  glDisable(GL_PROGRAM_POINT_SIZE);
+//  glEnable(GL_DEPTH_TEST);
 }
 
 void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) {

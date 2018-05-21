@@ -22,10 +22,13 @@ const std::string TEMPLATE_LIST[] = {
     "terrain",
     "lighting",
     "projectedTexture",
+    "vertexColor",
 };
 
 const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
     { ShaderCaps::Color, "COLOR" },
+    { ShaderCaps::VertexColor, "VERTEX_COLOR" },
+    { ShaderCaps::PointSize, "POINT_SIZE" },
     { ShaderCaps::Lighting, "LIGHTING" },
     { ShaderCaps::NormalMap, "NORMAL_MAP" },
     { ShaderCaps::SpecularMap, "SPECULAR_MAP" },

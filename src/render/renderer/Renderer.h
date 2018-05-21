@@ -20,6 +20,7 @@ class Scene;
 class Material;
 class LightGrid;
 class Window;
+class DebugDraw;
 
 class Renderer : IRenderer {
 public:
@@ -31,6 +32,8 @@ public:
 
   ShaderGenerator *generator() { return &_generator; }
   ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps) const;
+  std::shared_ptr<DebugDraw> debugDraw() const { return _debugDraw; }
+
 
   void renderScene(Scene &scene);
   void postUpdate(float dt);
@@ -43,6 +46,7 @@ public:
 private:
   mutable ShaderGenerator _generator;
   mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
+  std::shared_ptr<DebugDraw> _debugDraw;
 
   Window *_window;
 

@@ -94,6 +94,27 @@ void Mesh::setVertices(const std::vector<vec3> &vertices) {
   _updateFaceCount();
 }
 
+void Mesh::setColors(const vec4 *colors, int colorCount) {
+  _colors.resize(colorCount * 4);
+  memcpy(&_colors[0], colors, sizeof(vec4) * colorCount);
+
+  _hasColors = true;
+}
+
+void Mesh::setColors(const float *colorComponents, int colorCount) {
+  _colors.resize(colorCount * 4);
+  memcpy(&_colors[0], colorComponents, sizeof(vec4) * colorCount);
+
+  _hasColors = true;
+}
+
+void Mesh::setColors(const std::vector<vec4> &colors) {
+  _colors.resize(colors.size() * 4);
+  memcpy(&_colors[0], &colors[0], sizeof(vec4) * colors.size());
+
+  _hasColors = true;
+}
+
 void Mesh::setTexCoord0(const float *components, int count) {
   _texCoord0.resize(count * 2);
   memcpy(&_texCoord0[0], components, sizeof(vec2) * count);
@@ -185,7 +206,7 @@ void Mesh::createBuffer() {
   }
 
   // Unsafe but fast filling buffer data by working with pointer directly
-  _vbo = std::make_unique<VertexBufferObject>(GL_ARRAY_BUFFER, _bufferUsage);
+  _vbo = std::make_shared<VertexBufferObject>(GL_ARRAY_BUFFER, _bufferUsage);
   _vbo->resize(_strideBytes * _vertexCount);
   float *bufferData = (float *)_vbo->bufferPointer();
 
@@ -248,12 +269,16 @@ void Mesh::createBuffer() {
   _vbo->erase();
 
   if (_hasIndices) {
-    _indexBuffer = std::make_unique<VertexBufferObject>(GL_ELEMENT_ARRAY_BUFFER, _bufferUsage);
+    _indexBuffer = std::make_shared<VertexBufferObject>(GL_ELEMENT_ARRAY_BUFFER, _bufferUsage);
     auto indexSize = _indices.size() * sizeof(GLushort);
     _indexBuffer->resize(indexSize);
     _indexBuffer->writeData((void *)&_indices[0], 0, indexSize);
     _indexBuffer->upload();
     _indexBuffer->erase();
+  }
+
+  if (!_vao) {
+    this->_prepareVAO();
   }
 
   // Free data arrays
@@ -268,8 +293,6 @@ void Mesh::createBuffer() {
     std::vector<GLfloat>().swap(_colors);
     std::vector<GLushort>().swap(_indices);
   }
-
-  this->_prepareVAO();
 }
 
 void Mesh::_prepareVAO() {
@@ -288,6 +311,14 @@ void Mesh::_prepareVAO() {
   attribIndex = (GLuint)ShaderAttrib::Position;
   glEnableVertexAttribArray(attribIndex);
   glVertexAttribPointer(attribIndex, VERTEX_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+
+  if (_hasColors) {
+    attribIndex = (GLuint)ShaderAttrib::VertexColor;
+    offset = BUFFER_OFFSET(this->colorOffsetBytes());
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribPointer(attribIndex, COLOR_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+  }
+
 
   if (_hasNormals) {
     attribIndex = (GLuint)ShaderAttrib::Normal;
@@ -436,6 +467,3 @@ void Mesh::calculateTBN() {
 
   _hasTBN = true;
 }
-
-
-

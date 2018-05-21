@@ -11,15 +11,16 @@ const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
     { ShaderAttrib::Normal, "aNormal" },
     { ShaderAttrib::Tangent, "aTangent" },
     { ShaderAttrib::Bitangent, "aBitangent" },
-    { ShaderAttrib::TexCoord0, "aTexCoord0" }
+    { ShaderAttrib::TexCoord0, "aTexCoord0" },
+    { ShaderAttrib::VertexColor, "aVertexColor" },
 };
 
 const std::string VERTEX_STR = "vertex";
 const std::string FRAGMENT_STR = "fragment";
 
 Shader::Shader(const std::string &vertexSource, const std::string &fragmentSource) {
-  ENGLog("VERTEX SHADER SRC: %s", vertexSource.c_str());
-  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
+//  ENGLog("VERTEX SHADER SRC: %s", vertexSource.c_str());
+//  ENGLog("FRAGMENT SHADER SRC: %s", fragmentSource.c_str());
   GLuint program = this->_compileShader(vertexSource, fragmentSource);
   if (program) {
     this->_program = program;
@@ -128,7 +129,7 @@ Uniform *Shader::addUniform(const UniformName type) {
   auto result = this->getUniform(type);
 
   if (UNIFORM_TEXTURE_BLOCKS.find(type) != UNIFORM_TEXTURE_BLOCKS.end()) {
-    ENGLog("Added default uniform texture value for %s", uniformName.c_str());
+//    ENGLog("Added default uniform texture value for %s", uniformName.c_str());
     bind();
     result->setInt(UNIFORM_TEXTURE_BLOCKS.at(type));
   }
