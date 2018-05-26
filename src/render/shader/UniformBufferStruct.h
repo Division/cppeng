@@ -16,7 +16,9 @@ namespace UBOStruct {
     vec3 position; // offset = 0, size = 12
     float attenuation = 0; // offset = 12, alignment = 4, size = 4
     vec3 color; // offset = 16, alignment = 16, size = 12
-    float padding1;
+    float padding1 = 0;
+    vec3 direction;
+    float coneAngle = 0;
   };
 
   struct Camera {

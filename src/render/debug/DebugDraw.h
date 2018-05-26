@@ -19,6 +19,9 @@ public:
   void drawLine(const vec3 &p1, const vec3 &p2, const vec4 &color);
   void drawPoint(const vec3 &p, const vec3 &color, float size = 5.0f);
   void drawFrustum(mat4 viewProjection);
+  void drawAABB(const vec3 &min, const  vec3 &max, const vec4 &color);
+  void drawAABB(const AABB &bounds, const vec4 &color);
+  void drawOBB(const OBB &bounds, const vec4 &color);
 
   void render(IRenderer &renderer);
 private:
@@ -30,7 +33,6 @@ private:
   std::shared_ptr<Mesh> _lineMeshes[2]; // two meshes to swap
   std::shared_ptr<Mesh> _pointMeshes[2];
   std::shared_ptr<MaterialDebug> _material;
-
 };
 
 

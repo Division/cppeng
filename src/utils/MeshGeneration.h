@@ -14,6 +14,7 @@ namespace MeshGeneration {
 
   void generateSphere(MeshPtr mesh, int parallelCount, int meridianCount, float radius = 1.0f);
   void generateBox(MeshPtr mesh, float sizeX, float sizeY, float sizeZ);
+  void generateCone(MeshPtr mesh, float height, float radius, int segments = 12);
 };
 
 

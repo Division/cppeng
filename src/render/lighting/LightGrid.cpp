@@ -9,10 +9,12 @@
 #include "system/Logging.h"
 #include "render/buffer/TextureBufferObject.h"
 #include "render/shader/Uniform.h"
+#include "render/debug/DebugDraw.h"
 
 struct LightGridStruct {
   unsigned int offset;
-  unsigned int pointLightCount;
+  unsigned short pointLightCount;
+  unsigned short spotLightCount;
 };
 
 LightGrid::LightGrid(unsigned int cellSize) : _cellSize(cellSize) {
@@ -67,7 +69,12 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
       position + camera->transform()->down() * radius
   };
 
-  AABB bounds;
+
+  AABB bounds = light->bounds();
+  if (_debugDraw && light->debugEnabled()) {
+    _debugDraw->drawAABB(bounds, vec4(light->color(), 1));
+  }
+
   for (int i = 0; i < 4; i++) {
     lightExtremums[i] = glm::project(lightExtremums[i], camera->viewMatrix(), camera->projectionMatrix(), camera->viewport());
     if (i == 0) {
@@ -77,6 +84,7 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
       bounds.expand(lightExtremums[i]);
     }
   }
+
 
   auto startX = (int)floorf(fminf(fmaxf(bounds.min.x / _cellSize, 0), _cellsX - 1));
   auto startY = (int)floorf(fminf(fmaxf(bounds.min.y / _cellSize, 0), _cellsY - 1));
@@ -90,7 +98,14 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
   for (int i = startX; i <= endX; i++ ) {
     for (int j = startY; j <= endY; j++) {
       auto cell = _getCellByXY(i, j);
-      cell->pointLights.push_back(light);
+      switch(light->type()) {
+        case LightObjectType::Spot:
+          cell->spotLights.push_back(light);
+          break;
+        case LightObjectType::Point:
+          cell->pointLights.push_back(light);
+          break;
+      }
     }
   }
 
@@ -122,9 +137,10 @@ void LightGrid::upload() {
     auto &cell = _cells[i];
 
     gridBufferPointer[i].offset = currentOffset;
-    gridBufferPointer[i].pointLightCount = (unsigned int)cell.pointLights.size();
+    gridBufferPointer[i].pointLightCount = (unsigned short)cell.pointLights.size();
+    gridBufferPointer[i].spotLightCount = (unsigned short)cell.spotLights.size();
 
-    int indexDataSize = gridBufferPointer[i].pointLightCount /* + gridBufferPointer[i].spotLightCount */;
+    int indexDataSize = gridBufferPointer[i].pointLightCount + gridBufferPointer[i].spotLightCount;
     indexBuffer->resize((indexDataSize + currentOffset) * sizeof(unsigned short));
     // pointer should be obtained after resize() since resize may reallocate the data
     auto indexBufferPointer = (unsigned short *)indexBuffer->bufferPointer();
@@ -135,12 +151,11 @@ void LightGrid::upload() {
 
     currentOffset += gridBufferPointer[i].pointLightCount;
 
-    /*
     for (int j = 0; j < gridBufferPointer[i].spotLightCount; j++) {
       indexBufferPointer[currentOffset + j] = (unsigned short)cell.spotLights[j]->index();
     }
 
-    currentOffset += gridBufferPointer[i].spotLightCount; */
+    currentOffset += gridBufferPointer[i].spotLightCount;
   }
 
   gridBuffer->setDirty();
@@ -152,6 +167,10 @@ void LightGrid::upload() {
 void LightGrid::bindBufferTextures() {
   _lightGrid->current()->bindTexture(_lightGridBlock);
   _lightIndex->current()->bindTexture(_lightIndexBlock);
+}
+
+void LightGrid::setDebugDraw(std::shared_ptr<DebugDraw> debugDraw) {
+  _debugDraw = debugDraw;
 }
 
 

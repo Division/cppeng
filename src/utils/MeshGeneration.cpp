@@ -3,6 +3,7 @@
 //
 
 #include "MeshGeneration.h"
+#include <vector>
 
 void MeshGeneration::generateSphere(MeshPtr mesh, int parallelCount, int meridianCount, float radius) {
   std::vector<vec3> vertices;
@@ -66,6 +67,28 @@ void MeshGeneration::generateBox(MeshPtr mesh, float sizeX, float sizeY, float s
     vertices.emplace_back(vec3(srcVertices[srcIndices[i] * 3],
                             srcVertices[srcIndices[i] * 3 + 1],
                             srcVertices[srcIndices[i] * 3 + 2]));
+  }
+
+  mesh->setVertices(vertices);
+}
+
+void MeshGeneration::generateCone(MeshPtr mesh, float height, float radius, int segments) {
+  vec3 origin = vec3(0,0,0);
+  vec3 baseCenter = vec3(0, 0, -height);
+
+  std::vector<vec3> vertices;
+  for (int i = 0; i < segments; i++) {
+    float angle = (float)i / (segments - 1) * (float)M_PI * 2.0f;
+    float nextAngle = (float)((i + 1) % segments) / (float)(segments - 1) * (float)M_PI * 2.0f;
+    vec3 point(cosf(angle) * radius, sinf(angle) * radius, -height);
+    vec3 nextPoint(cosf(nextAngle) * radius, sinf(nextAngle) * radius, -height);
+    vertices.push_back(origin);
+    vertices.push_back(point);
+    vertices.push_back(nextPoint);
+
+    vertices.push_back(point);
+    vertices.push_back(baseCenter);
+    vertices.push_back(nextPoint);
   }
 
   mesh->setVertices(vertices);

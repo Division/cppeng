@@ -24,6 +24,17 @@ UBOStruct::Light LightObject::getLightStruct() const {
   result.attenuation = squareAttenuation();
   result.color = color();
 
+  switch (_type) {
+    case LightObjectType::Point:
+      result.coneAngle = 0;
+      break;
+
+    case LightObjectType::Spot:
+      result.coneAngle = RAD(_coneAngle) / 2.0f;
+      result.direction = glm::normalize(transform()->forward());
+      break;
+  }
+
   return result;
 }
 
@@ -33,7 +44,15 @@ void LightObject::enableDebug() {
   }
 
   _debugMesh = std::make_shared<Mesh>();
-  MeshGeneration::generateSphere(_debugMesh, 10, 10, 0.2);
+  switch (_type) {
+    case LightObjectType::Point:
+      MeshGeneration::generateSphere(_debugMesh, 10, 10, 0.2);
+      break;
+
+    case LightObjectType::Spot:
+      float spotRadius = getSpotRadius(1);
+      MeshGeneration::generateCone(_debugMesh, 1, spotRadius);
+  }
   _debugMesh->createBuffer();
 
   _debugMaterial = std::make_shared<MaterialSingleColor>();
@@ -51,4 +70,17 @@ void LightObject::render(IRenderer &renderer) {
   rop.modelMatrix = transform()->worldMatrix();
   rop.debugInfo = name();
   renderer.addRenderOperation(rop, RenderQueue::Opaque);
+}
+
+float LightObject::getSpotRadius(float height) {
+  if (_type == LightObjectType::Spot) {
+    return tanf(_coneAngle / 2.0f * (float)M_PI / 180) * height;
+  }
+
+  return 0;
+}
+
+AABB LightObject::bounds() {
+  auto position = transform()->worldPosition();
+  return AABB::fromSphere(position, _radius);
 }

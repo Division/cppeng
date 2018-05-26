@@ -12,6 +12,7 @@
 
 class SwappableTextureBufferObject;
 class SwappableTexture2DBuffer;
+class DebugDraw;
 
 struct LightGridCell {
   int offset;
@@ -29,6 +30,7 @@ public:
   void appendLights(const LightList *lights, const CameraPtr camera);
   void upload();
   void bindBufferTextures();
+  void setDebugDraw(std::shared_ptr<DebugDraw> debugDraw);
 
 private:
 #if ENGINE_USE_BUFFER_TEXTURE
@@ -45,12 +47,12 @@ private:
   std::vector<LightGridCell> _cells;
   unsigned int _lightGridBlock;
   unsigned int _lightIndexBlock;
+  std::shared_ptr<DebugDraw> _debugDraw;
 
 private:
   LightGridCell *_getCellByXY(int x, int y) { return &_cells[x + y * _cellsX]; };
   void _clearCells();
   void _appendLight(const LightObjectPtr light, const CameraPtr camera);
-
 };
 
 

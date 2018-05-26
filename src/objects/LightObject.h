@@ -12,7 +12,7 @@
 #include "render/material/MaterialTypes.h"
 
 enum class LightObjectType : int {
-  Point,
+  Point = 0,
   Spot
 };
 
@@ -24,6 +24,7 @@ public:
 
   float radius() const { return _radius; }
   void radius(float value) { _radius = value; _updateAttenuation(); }
+  AABB bounds();
 
   float squareAttenuation() const { return _squareAttenuation; }
   void squareAttenuation(float value) { _squareAttenuation = value; _updateRadius(); }
@@ -34,9 +35,15 @@ public:
   vec3 color() const { return _color; }
   void color(vec3 value) { _color = value; }
 
+  float coneAngle() const { return _coneAngle; }
+  void coneAngle(float value) { _coneAngle = value; }
+
+  float getSpotRadius(float height);
+
   unsigned int index() const { return _index; }
 
   void enableDebug();
+  bool debugEnabled() { return _debugMesh && _debugMaterial; }
 
   UBOStruct::Light getLightStruct() const;
 
@@ -44,6 +51,7 @@ public:
 
 private:
   float _radius;
+  float _coneAngle = 30;
   float _squareAttenuation;
   vec3 _color = vec3(1, 1, 1);
   float _lightCutoff = 0.02;
@@ -52,7 +60,7 @@ private:
   void _updateRadius();
 
   unsigned int _index; // index in scene array
-  LightObjectType _type;
+  LightObjectType _type = LightObjectType::Point;
 
   MeshPtr _debugMesh;
   MaterialSingleColorPtr _debugMaterial;

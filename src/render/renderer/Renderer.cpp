@@ -23,6 +23,7 @@ Renderer::Renderer(Window *window) {
   _uboManager = std::make_unique<UBOManager>();
   _lightGrid = std::make_unique<LightGrid>();
   _debugDraw = std::make_shared<DebugDraw>();
+  _lightGrid->setDebugDraw(_debugDraw);
   _window = window;
 }
 

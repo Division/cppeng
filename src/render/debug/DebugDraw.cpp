@@ -45,15 +45,64 @@ void DebugDraw::drawFrustum(mat4 viewProjection) {
 
   for (int i = 0; i < 4; i++) {
     drawPoint(quad1[i], vec3(1, 0, 0), 10);
-//    drawPoint(quad2[i], vec3(1, 0, 1), 10);
     drawLine(quad1[i], quad1[(i + 1) % 4], vec4(1, 0, 0, 1));
     drawLine(quad2[i], quad2[(i + 1) % 4], vec4(1, 0, 0, 1));
     drawLine(quad1[i], quad2[i], vec4(1, 0, 0, 1));
   }
 }
 
+void DebugDraw::drawAABB(const vec3 &min, const  vec3 &max, const vec4 &color) {
+  vec3 size = max - min;
+  const vec3 vertices[] = {
+      min,
+      min + size * vec3(0, 0, 1),
+      min + size * vec3(1, 0, 1),
+      min + size * vec3(1, 0, 0),
+      max - size * vec3(1, 0, 1),
+      max - size * vec3(1, 0, 0),
+      max,
+      max - size * vec3(0, 0, 1),
+  };
+
+  for (int i = 0; i < 4; i++) {
+    drawLine(vertices[i], vertices[(i + 1) % 4], color);
+    drawLine(vertices[i + 4], vertices[(i + 1) % 4 + 4], color);
+    drawLine(vertices[i], vertices[i + 4], color);
+  }
+}
+
+void DebugDraw::drawAABB(const AABB &bounds, const vec4 &color) {
+  drawAABB(bounds.min, bounds.max, color);
+}
+
+void DebugDraw::drawOBB(const OBB &bounds, const vec4 &color) {
+  vec3 size = bounds.size;
+  vec3 min = -size / 2.0f;
+  vec3 max = size / 2.0f;
+  vec3 vertices[] = {
+      min,
+      min + size * vec3(0, 0, 1),
+      min + size * vec3(1, 0, 1),
+      min + size * vec3(1, 0, 0),
+      max - size * vec3(1, 0, 1),
+      max - size * vec3(1, 0, 0),
+      max,
+      max - size * vec3(0, 0, 1),
+  };
+
+  for (vec3 &v : vertices) {
+    v = vec3(bounds.rotation * vec4(v, 1)) + bounds.position;
+  }
+
+  for (int i = 0; i < 4; i++) {
+    drawLine(vertices[i], vertices[(i + 1) % 4], color);
+    drawLine(vertices[i + 4], vertices[(i + 1) % 4 + 4], color);
+    drawLine(vertices[i], vertices[i + 4], color);
+  }
+}
+
 void DebugDraw::render(IRenderer &renderer) {
-  if (!_material) { // need move material creation out from constructor since because renderer isn't fully created yet
+  if (!_material) { // needed to move material creation out from constructor since because renderer isn't fully created yet
     _material = std::make_shared<MaterialDebug>();
   }
 
@@ -89,5 +138,8 @@ void DebugDraw::render(IRenderer &renderer) {
 
   _lines.resize(0);
   _points.resize(0);
+  _lineColors.resize(0);
+  _pointColors.resize(0);
+
 }
 

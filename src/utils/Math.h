@@ -12,6 +12,19 @@ struct Sphere {
   float radius;
 };
 
+struct OBB {
+  vec3 position;
+  vec3 size;
+  quat rotation;
+
+  OBB() = default;
+  OBB(const vec3 &position, const vec3 &size, const quat &rotation = quat()) {
+    this->position = position;
+    this->rotation = rotation;
+    this->size = size;
+  }
+};
+
 struct AABB {
   vec3 min;
   vec3 max;
@@ -22,6 +35,8 @@ struct AABB {
     min = vmin;
     max = vmax;
   }
+
+  vec3 size() { return max - min; }
 
   void expand(const vec3 &point) {
     min = glm::min(point, min);
@@ -43,22 +58,46 @@ struct AABB {
     return true;
   }
 
-  AABB multMatrix(const mat4 &projectionMatrix) {
-    AABB result;
+  AABB multMatrix(const mat4 &matrix) {
+//    vec3 s = size();
 
-    vec4 projMin = projectionMatrix * vec4(min, 1);
-    result.min = vec3(projMin) / projMin.w;
-    vec4 projMax = projectionMatrix * vec4(max, 1);
-    result.max = vec3(projMax) / projMax.w;
+//    const vec3 vertices[] = {
+//      matrix * min,
+//      matrix * vec4((min + s * vec3(0, 0, 1)),
+//      matrix * (min + s * vec3(1, 0, 1)),
+//      matrix * (min + s * vec3(1, 0, 0)),
+//      matrix * (max - s * vec3(1, 0, 1)),
+//      matrix * (max - s * vec3(1, 0, 0)),
+//      matrix * (max),
+//      matrix * (max - s * vec3(0, 0, 1)),
+//    };
 
-    return result;
+//    AABB result (vertices[0], vertices[0]);
+//    for (int i = 1; i < 8; i++) {
+//      result.expand(vertices[i]);
+//    }
+
+//    return result;
   }
 
   AABB project(const mat4 &modelMatrix, const mat4 &projectionMatrix, const vec4 &viewport) {
-    AABB result;
+    vec3 s = size();
 
-    result.min = glm::project(min, modelMatrix, projectionMatrix, viewport);
-    result.max = glm::project(max, modelMatrix, projectionMatrix, viewport);
+    const vec3 vertices[] = {
+        glm::project(min, modelMatrix, projectionMatrix, viewport),
+        glm::project(min + s * vec3(0, 0, 1), modelMatrix, projectionMatrix, viewport),
+        glm::project(min + s * vec3(1, 0, 1), modelMatrix, projectionMatrix, viewport),
+        glm::project(min + s * vec3(1, 0, 0), modelMatrix, projectionMatrix, viewport),
+        glm::project(max - s * vec3(1, 0, 1), modelMatrix, projectionMatrix, viewport),
+        glm::project(max - s * vec3(1, 0, 0), modelMatrix, projectionMatrix, viewport),
+        glm::project(max, modelMatrix, projectionMatrix, viewport),
+        glm::project(max - s * vec3(0, 0, 1), modelMatrix, projectionMatrix, viewport),
+    };
+
+    AABB result (vertices[0], vertices[0]);
+    for (int i = 1; i < 8; i++) {
+      result.expand(vertices[i]);
+    }
 
     return result;
   }
