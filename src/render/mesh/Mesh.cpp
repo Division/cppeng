@@ -462,7 +462,7 @@ void Mesh::calculateTBN() {
     }
 
     *a = glm::normalize(*a);
-    *b = glm::normalize(*b);
+    *b = -glm::normalize(*b); // have no idea why it should be inverted to look visually correct
   }
 
   _hasTBN = true;

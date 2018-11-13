@@ -18,6 +18,9 @@ struct LightGridStruct {
 };
 
 LightGrid::LightGrid(unsigned int cellSize) : _cellSize(cellSize) {
+
+  // WebGL build doesn't allow to use texture buffer object, so conditionally fallback here
+  // to use simple 2D texture as a buffer
 #if ENGINE_USE_BUFFER_TEXTURE
   _lightGrid = std::make_unique<SwappableTextureBufferObject>(GL_RG32UI, GL_DYNAMIC_DRAW);
   _lightIndex = std::make_unique<SwappableTextureBufferObject>(GL_R16UI, GL_DYNAMIC_DRAW);
@@ -126,6 +129,7 @@ void LightGrid::upload() {
   auto indexBuffer = _lightIndex->current();
 
 #if not ENGINE_USE_BUFFER_TEXTURE
+  // texture 2D buffer stores data line-by-line so need to specify the line size
   gridBuffer->targetWidth(_cellsX);
 #endif
 

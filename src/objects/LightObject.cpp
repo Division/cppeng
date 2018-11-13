@@ -81,6 +81,11 @@ float LightObject::getSpotRadius(float height) {
 }
 
 AABB LightObject::bounds() {
-  auto position = transform()->worldPosition();
-  return AABB::fromSphere(position, _radius);
+  if (_type == LightObjectType::Spot) {
+    float spotRadius = getSpotRadius(_radius);
+    vec3 left = transform()->left();
+  } else {
+    auto position = transform()->worldPosition();
+    return AABB::fromSphere(position, _radius);
+  };
 }

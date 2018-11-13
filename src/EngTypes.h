@@ -5,6 +5,8 @@
 #ifndef CPPWRAPPER_ENGTYPES_H
 #define CPPWRAPPER_ENGTYPES_H
 
+#include <memory>
+
 class LightObject;
 typedef std::shared_ptr<LightObject> LightObjectPtr;
 
@@ -19,6 +21,9 @@ typedef std::shared_ptr<MaterialTextureProjection> MaterialTextureProjectionPtr;
 
 class Terrain;
 typedef std::shared_ptr<Terrain> TerrainPtr;
+
+class SpriteSheet;
+typedef std::shared_ptr<SpriteSheet> SpriteSheetPtr;
 
 #endif //CPPWRAPPER_ENGTYPES_H
 
