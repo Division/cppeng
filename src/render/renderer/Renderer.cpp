@@ -139,14 +139,14 @@ void Renderer::_processRenderPipeline() {
   }
 
   // Debug
-  glEnable(GL_PROGRAM_POINT_SIZE);
+//  glEnable(GL_PROGRAM_POINT_SIZE);
 //  glDisable(GL_DEPTH_TEST);
   auto &debugQueue = _queues[(int)RenderQueue::Debug];
   for (auto &rop : debugQueue) {
     _uboManager->setupForRender(&rop);
     renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
   }
-  glDisable(GL_PROGRAM_POINT_SIZE);
+//  glDisable(GL_PROGRAM_POINT_SIZE);
 //  glEnable(GL_DEPTH_TEST);
 }
 

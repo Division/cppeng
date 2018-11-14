@@ -88,6 +88,11 @@ void Texture2DBuffer::bindTexture(int textureUnit) {
 
 void Texture2DBuffer::upload() {
   bindTexture();
+
+  if (!_size) {
+    return;
+  }
+
   align((unsigned)_targetWidth * _pixelSizeBytes);
   auto targetHeight = (int)ceilf((float)_size / (float)_pixelSizeBytes / (float)_targetWidth); // pixel count / width = height
   if (_dimensions.x != _targetWidth || _dimensions.y < targetHeight) {
@@ -105,6 +110,8 @@ void Texture2DBuffer::upload() {
     glPixelStorei(GL_UNPACK_ROW_LENGTH, _targetWidth);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, _targetWidth, targetHeight, _format, _type, bufferPointer());
   }
+
+  engine::checkGLError();
 }
 
 // SwappableTextureBufferObject

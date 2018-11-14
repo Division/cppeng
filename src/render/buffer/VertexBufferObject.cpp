@@ -44,7 +44,7 @@ void VertexBufferObject::_recreateBuffer() {
 }
 
 void VertexBufferObject::upload() {
-  if (!_dirty) {
+  if (!_dirty || !_size) {
     return;
   }
 
@@ -55,7 +55,10 @@ void VertexBufferObject::upload() {
   }
 
   glBufferSubData(_target, 0, _size, &_data[0]);
+  engine::checkGLError();
+
   _dirty = false;
+  this->erase();
 }
 
 

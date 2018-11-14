@@ -50,7 +50,6 @@ private:
 
   Window *_window;
 
-  // TODO: make UBOManager per-scene instance?
   std::unique_ptr<UBOManager> _uboManager;
   std::unique_ptr<LightGrid> _lightGrid;
 

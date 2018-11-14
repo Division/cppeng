@@ -102,7 +102,7 @@ void DebugDraw::drawOBB(const OBB &bounds, const vec4 &color) {
 }
 
 void DebugDraw::render(IRenderer &renderer) {
-  if (!_material) { // needed to move material creation out from constructor since because renderer isn't fully created yet
+  if (!_material) { // needed to move material creation out from constructor because renderer isn't fully created yet
     _material = std::make_shared<MaterialDebug>();
   }
 
@@ -140,6 +140,5 @@ void DebugDraw::render(IRenderer &renderer) {
   _points.resize(0);
   _lineColors.resize(0);
   _pointColors.resize(0);
-
 }
 
