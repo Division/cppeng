@@ -19,8 +19,7 @@ public:
   std::vector<IntBinding> intBindings;
   std::vector<TextureBinding> textureBindings;
 
-  // Uniform blocks
-
+  // Transform uniform block
   bool hasTransform = true;
   TransformBinding transform;
 };

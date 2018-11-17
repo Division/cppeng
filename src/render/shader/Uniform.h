@@ -31,6 +31,7 @@ enum class UniformName : int {
   TerrainSplatmap,
   NormalMap,
   SpecularMap,
+  ProjectorTexture,
   LightGrid,
   LightIndices,
   ProjectedTexture,
@@ -43,6 +44,7 @@ enum class UniformBlockName : int {
   Transform,
   Light,
   Camera,
+  Projector,
   Count
 };
 

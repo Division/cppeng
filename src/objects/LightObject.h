@@ -10,6 +10,7 @@
 #include "render/shader/UniformBufferStruct.h"
 #include "utils/MeshGeneration.h"
 #include "render/material/MaterialTypes.h"
+#import "EngTypes.h"
 
 enum class LightObjectType : int {
   Point = 0,
@@ -29,7 +30,7 @@ public:
   float squareAttenuation() const { return _squareAttenuation; }
   void squareAttenuation(float value) { _squareAttenuation = value; _updateRadius(); }
 
-  LightObjectType type() { return _type; }
+  LightObjectType type() const { return _type; }
   void type(LightObjectType value) { _type = value; }
 
   vec3 color() const { return _color; }
@@ -50,21 +51,24 @@ public:
   void render(IRenderer &renderer) override;
 
 private:
+
+  // Common light properties
   float _radius;
-  float _coneAngle = 30;
-  float _squareAttenuation;
   vec3 _color = vec3(1, 1, 1);
+  float _squareAttenuation;
   float _lightCutoff = 0.02;
+  unsigned int _index; // index in scene array
+
+  // Spotlight properties
+  float _coneAngle = 30;
 
   void _updateAttenuation();
   void _updateRadius();
 
-  unsigned int _index; // index in scene array
   LightObjectType _type = LightObjectType::Point;
 
   MeshPtr _debugMesh;
   MaterialSingleColorPtr _debugMaterial;
-
 };
 
 typedef std::shared_ptr<LightObject> LightObjectPtr;

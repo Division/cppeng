@@ -22,6 +22,9 @@ enum class Key : int {
   S,
   E,
   Q,
+  C,
+  X,
+  Z,
   Space,
   Esc,
 

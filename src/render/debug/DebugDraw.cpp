@@ -27,7 +27,7 @@ void DebugDraw::drawPoint(const vec3 &p, const vec3 &color, float size) {
   _pointColors.push_back(vec4(color, size));
 }
 
-void DebugDraw::drawFrustum(mat4 viewProjection) {
+void DebugDraw::drawFrustum(mat4 viewProjection, vec4 color) {
   auto inv = glm::inverse(viewProjection);
   vec4 quad1[4] = {
       inv * vec4(1, -1, -1, 1),
@@ -44,10 +44,15 @@ void DebugDraw::drawFrustum(mat4 viewProjection) {
   };
 
   for (int i = 0; i < 4; i++) {
-    drawPoint(quad1[i], vec3(1, 0, 0), 10);
-    drawLine(quad1[i], quad1[(i + 1) % 4], vec4(1, 0, 0, 1));
-    drawLine(quad2[i], quad2[(i + 1) % 4], vec4(1, 0, 0, 1));
-    drawLine(quad1[i], quad2[i], vec4(1, 0, 0, 1));
+    quad1[i] /= quad1[i].w;
+    quad2[i] /= quad2[i].w;
+  }
+
+  for (int i = 0; i < 4; i++) {
+    drawPoint(quad1[i], vec3(color), 10);
+    drawLine(quad1[i], quad1[(i + 1) % 4], color);
+    drawLine(quad2[i], quad2[(i + 1) % 4], color);
+    drawLine(quad1[i], quad2[i], color);
   }
 }
 

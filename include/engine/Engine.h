@@ -27,8 +27,9 @@ public:
   std::shared_ptr<DebugDraw> debugDraw() const;
 
   const Input *const input() const { return _input; }
+  double time () { return _currentTime; }
 
-  const Renderer *renderer() { return _renderer; }
+  Renderer *renderer() { return _renderer; }
   const Window *window() { return _window; }
 
   friend void mainLoop(void *arg);

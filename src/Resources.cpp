@@ -54,6 +54,8 @@ bool Resources::loadShaderFromStream(std::istream &stream, const std::string &na
   return result;
 }
 
+
+// TODO: return ShaderPtr
 Shader *Resources::getShader(const std::string &name) {
   if (_shaders.count(name)) {
     return _shaders[name];

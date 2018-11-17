@@ -7,9 +7,8 @@
 
 #include <vector>
 #include <unordered_map>
+#include "EngTypes.h"
 #include "GameObject.h"
-#include "objects/Camera.h"
-#include "objects/LightObject.h"
 
 class Scene : public IGameObjectManager {
 public:
@@ -19,8 +18,9 @@ public:
   const std::unordered_map<GameObjectID, GameObjectPtr> *const gameObjectMap() const { return &_objectMap; };
   const std::vector<GameObjectPtr> *const gameObjects() const { return &_gameObjects; }
   // Temporary returns all objects.
-  const std::vector<GameObjectPtr> *const visibleObjects(CameraPtr camera) const { return &_gameObjects; }
-  const std::vector<LightObjectPtr> *const visibleLights(CameraPtr camera) const { return &_lights; }
+  const std::vector<ProjectorPtr> *const visibleProjectors(const CameraPtr camera) const { return &_projectors; }
+  const std::vector<GameObjectPtr> *const visibleObjects(const CameraPtr camera) const { return &_gameObjects; }
+  const std::vector<LightObjectPtr> *const visibleLights(const CameraPtr camera) const { return &_lights; }
   void update(float dt);
 
   int cameraCount() { return (int)_cameraMap.size(); }
@@ -32,6 +32,7 @@ protected:
   void destroyGameObject(GameObjectPtr object) override;
 
   // ITransformManager
+  // TODO: change to TransformPtr
   void transformChangeParent(Transform *transform, Transform *oldParent, Transform *newParent) override;
 
   // update
@@ -44,6 +45,7 @@ protected:
 
   // TODO: make cameras sorted list
   std::unordered_map<GameObjectID, CameraPtr> _cameraMap; // maps GameObject::id() to Camera
+  std::vector<ProjectorPtr> _projectors; // Array of projectors
   std::vector<LightObjectPtr> _lights; // Array of scene lights
   std::vector<GameObjectPtr> _gameObjects; // Full list of scene game objects
   std::unordered_map<GameObjectID, Transform *>_rootTransformMap; // maps GameObject::id() to the top level transforms
@@ -51,6 +53,5 @@ protected:
   void _processAddedObject(GameObjectPtr object);
   void _processRemovedObject(GameObjectPtr object);
 };
-
 
 #endif //CPPWRAPPER_SCENE_H

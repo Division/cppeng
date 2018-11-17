@@ -58,7 +58,6 @@ void Terrain::_generateMesh() {
     }
   }
 
-//  indices.resize(9);
   _mesh->setVertices(vertices);
   _mesh->setIndices(indices);
   _mesh->setTexCoord0(texcoord);

@@ -7,8 +7,14 @@
 
 #include <memory>
 
+class Texture;
+typedef std::shared_ptr<Texture> TexturePtr;
+
 class LightObject;
 typedef std::shared_ptr<LightObject> LightObjectPtr;
+
+class Projector;
+typedef std::shared_ptr<Projector> ProjectorPtr;
 
 class Camera;
 typedef std::shared_ptr<Camera> CameraPtr;

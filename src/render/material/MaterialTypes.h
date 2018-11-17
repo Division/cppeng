@@ -32,9 +32,12 @@ public:
   MaterialTexture();
   void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
   TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
+  void texture1(TexturePtr texture) { return; _bindings.textureBindings[_texture1Binding].texture = texture; }
+  TexturePtr texture1() const { return _bindings.textureBindings[_texture1Binding].texture; }
 
 protected:
   int _texture0Binding = -1;
+  int _texture1Binding = -1;
 };
 
 
@@ -63,6 +66,8 @@ protected:
   int _specularmapBinging;
 };
 
+// This material is used for testing only
+// Actual projection rendering is built into the render pipeline
 class MaterialTextureProjection: public Material {
 public:
   MaterialTextureProjection();

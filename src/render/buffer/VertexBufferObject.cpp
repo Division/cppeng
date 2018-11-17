@@ -12,6 +12,8 @@ const int ALIGN_BYTES = 4;
 VertexBufferObject::VertexBufferObject(GLenum target, GLenum usage, unsigned int fixedSize)
     : _target(target), _usage(usage), _fixedSize(fixedSize) {
   glGenBuffers(1, &_vbo);
+  bind();
+  _recreateBuffer();
 }
 
 VertexBufferObject::~VertexBufferObject() {
@@ -58,7 +60,7 @@ void VertexBufferObject::upload() {
   engine::checkGLError();
 
   _dirty = false;
-  this->erase();
+  this->resize(0);
 }
 
 

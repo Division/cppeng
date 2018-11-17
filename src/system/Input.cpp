@@ -18,6 +18,9 @@ const std::unordered_map<int, int> INPUT_CONVERSION = {
     { (int)Key::D, GLFW_KEY_D },
     { (int)Key::E, GLFW_KEY_E },
     { (int)Key::Q, GLFW_KEY_Q },
+    { (int)Key::C, GLFW_KEY_C },
+    { (int)Key::X, GLFW_KEY_X },
+    { (int)Key::Z, GLFW_KEY_Z },
     { (int)Key::Space, GLFW_KEY_SPACE },
     { (int)Key::Esc, GLFW_KEY_ESCAPE },
 

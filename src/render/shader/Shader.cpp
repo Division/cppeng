@@ -129,7 +129,7 @@ Uniform *Shader::addUniform(const UniformName type) {
   auto result = this->getUniform(type);
 
   if (UNIFORM_TEXTURE_BLOCKS.find(type) != UNIFORM_TEXTURE_BLOCKS.end()) {
-//    ENGLog("Added default uniform texture value for %s", uniformName.c_str());
+    ENGLog("Added default uniform texture value for %s = %i", uniformName.c_str(), UNIFORM_TEXTURE_BLOCKS.at(type));
     bind();
     result->setInt(UNIFORM_TEXTURE_BLOCKS.at(type));
   }

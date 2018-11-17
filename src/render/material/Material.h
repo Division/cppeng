@@ -25,6 +25,7 @@ public:
   void setProjection(const mat4 &projection);
   void uploadBindings() const;
   void activateTextures() const;
+
 protected:
   int _modelViewBinding = -1;
   int _projectionBinding = -1;

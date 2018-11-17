@@ -6,15 +6,19 @@
 #include <objects/Camera.h>
 #include "LightGrid.h"
 #include "objects/LightObject.h"
+#include "objects/Projector.h"
 #include "system/Logging.h"
 #include "render/buffer/TextureBufferObject.h"
 #include "render/shader/Uniform.h"
 #include "render/debug/DebugDraw.h"
+#include <functional>
 
 struct LightGridStruct {
   unsigned int offset;
   unsigned short pointLightCount;
   unsigned short spotLightCount;
+  unsigned short projectorCount;
+  unsigned short decalCount;
 };
 
 LightGrid::LightGrid(unsigned int cellSize) : _cellSize(cellSize) {
@@ -22,19 +26,15 @@ LightGrid::LightGrid(unsigned int cellSize) : _cellSize(cellSize) {
   // WebGL build doesn't allow to use texture buffer object, so conditionally fallback here
   // to use simple 2D texture as a buffer
 #if ENGINE_USE_BUFFER_TEXTURE
-  _lightGrid = std::make_unique<SwappableTextureBufferObject>(GL_RG32UI, GL_DYNAMIC_DRAW);
-  _lightIndex = std::make_unique<SwappableTextureBufferObject>(GL_R16UI, GL_DYNAMIC_DRAW);
+  _lightGrid = std::make_shared<SwappableTextureBufferObject>(GL_RGB32UI, GL_DYNAMIC_DRAW);
+  _lightIndex = std::make_shared<SwappableTextureBufferObject>(GL_R16UI, GL_DYNAMIC_DRAW);
 #else
-  _lightGrid = std::make_unique<SwappableTexture2DBuffer>(0, GL_RG32UI);
-  _lightIndex = std::make_unique<SwappableTexture2DBuffer>(4096, GL_R16UI);
+  _lightGrid = std::make_shared<SwappableTexture2DBuffer>(0, GL_RGB32UI);
+  _lightIndex = std::make_shared<SwappableTexture2DBuffer>(4096, GL_R16UI);
 #endif
 
   _lightGridBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::LightGrid);
   _lightIndexBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::LightIndices);
-}
-
-LightGrid::~LightGrid() {
-
 }
 
 void LightGrid::update(unsigned int screenWidth, unsigned int screenHeight) {
@@ -58,36 +58,26 @@ void LightGrid::_clearCells() {
   for (auto &cell: _cells) {
     cell.pointLights.clear();
     cell.spotLights.clear();
+    cell.projectors.clear();
+    cell.decals.clear();
   }
 }
 
-void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera) {
-  vec3 position = light->transform()->worldPosition();
-  float radius = light->radius();
+// Executes callback for every cell within projected edgePoints bounds
+// edgePoints is vector because it has different length depending on the object
+void LightGrid::_appendItem(const CameraPtr camera, const std::vector<vec3> &edgePoints, std::function<void (LightGridCell *)> callback) {
+  std::vector<vec3> projectedEdges(edgePoints.size());
+  AABB bounds;
 
-  vec3 lightExtremums[4] = {
-      position + camera->transform()->left() * radius,
-      position + camera->transform()->right() * radius,
-      position + camera->transform()->up() * radius,
-      position + camera->transform()->down() * radius
-  };
-
-
-  AABB bounds = light->bounds();
-  if (_debugDraw && light->debugEnabled()) {
-    _debugDraw->drawAABB(bounds, vec4(light->color(), 1));
-  }
-
-  for (int i = 0; i < 4; i++) {
-    lightExtremums[i] = glm::project(lightExtremums[i], camera->viewMatrix(), camera->projectionMatrix(), camera->viewport());
+  for (int i = 0; i < edgePoints.size(); i++) {
+    projectedEdges[i] = glm::project(edgePoints[i], camera->viewMatrix(), camera->projectionMatrix(), camera->viewport());
     if (i == 0) {
-      bounds.min = lightExtremums[i];
-      bounds.max = lightExtremums[i];
+      bounds.min = projectedEdges[i];
+      bounds.max = projectedEdges[i];
     } else {
-      bounds.expand(lightExtremums[i]);
+      bounds.expand(projectedEdges[i]);
     }
   }
-
 
   auto startX = (int)floorf(fminf(fmaxf(bounds.min.x / _cellSize, 0), _cellsX - 1));
   auto startY = (int)floorf(fminf(fmaxf(bounds.min.y / _cellSize, 0), _cellsY - 1));
@@ -101,6 +91,24 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
   for (int i = startX; i <= endX; i++ ) {
     for (int j = startY; j <= endY; j++) {
       auto cell = _getCellByXY(i, j);
+      callback(cell);
+    }
+  }
+}
+
+void LightGrid::appendLights(const std::vector<LightObjectPtr> *lights, const CameraPtr camera) {
+  _lightEdges.resize(4);
+
+  for (auto &light : *lights) {
+    vec3 position = light->transform()->worldPosition();
+    float radius = light->radius();
+
+    _lightEdges[0] = position + camera->transform()->left() * radius;
+    _lightEdges[1] = position + camera->transform()->right() * radius;
+    _lightEdges[2] = position + camera->transform()->up() * radius;
+    _lightEdges[3] = position + camera->transform()->down() * radius;
+
+    _appendItem(camera, _lightEdges, [&](LightGridCell *cell) {
       switch(light->type()) {
         case LightObjectType::Spot:
           cell->spotLights.push_back(light);
@@ -109,18 +117,30 @@ void LightGrid::_appendLight(const LightObjectPtr light, const CameraPtr camera)
           cell->pointLights.push_back(light);
           break;
       }
-    }
-  }
-
-//  ENGLog("Light grid (%i, %i) (%i, %i)", startX, startY, endX, endY);
-}
-
-void LightGrid::appendLights(const LightList *lights, const CameraPtr camera) {
-  for (auto &light : *lights) {
-    _appendLight(light, camera);
+    });
   }
 }
 
+void LightGrid::appendProjectors(const std::vector<ProjectorPtr> *projectors, const CameraPtr camera) {
+  for (auto &projector : *projectors) {
+    vec3 position = projector->transform()->worldPosition();
+
+    projector->getEdgePoints(_lightEdges);
+
+    _appendItem(camera, _lightEdges, [&](LightGridCell *cell) {
+      switch(projector->type()) {
+        case ProjectorType::Projection:
+          cell->projectors.push_back(projector);
+          break;
+        case ProjectorType::Decal:
+          cell->decals.push_back(projector);
+          break;
+      }
+    });
+  }
+}
+
+// Upload grid data into the GPU buffers
 void LightGrid::upload() {
   _lightGrid->swap();
   _lightIndex->swap();
@@ -133,33 +153,57 @@ void LightGrid::upload() {
   gridBuffer->targetWidth(_cellsX);
 #endif
 
+  // Resize grid buffer to fit all the cell structs
   gridBuffer->resize((unsigned int)_cells.size() * sizeof(LightGridStruct));
+  // Little bit unsafe but convenient way to directly modify data within the memory
   auto gridBufferPointer = (LightGridStruct *)gridBuffer->bufferPointer();
 
   unsigned int currentOffset = 0;
   for (int i = 0; i < _cells.size(); i++) {
     auto &cell = _cells[i];
 
+    // Writing cell data
+    // Referencing memory at the offset sizeof(LightGridStruct) * i
     gridBufferPointer[i].offset = currentOffset;
     gridBufferPointer[i].pointLightCount = (unsigned short)cell.pointLights.size();
     gridBufferPointer[i].spotLightCount = (unsigned short)cell.spotLights.size();
+    gridBufferPointer[i].projectorCount = (unsigned short)cell.projectors.size();
+    gridBufferPointer[i].decalCount = (unsigned short)cell.decals.size();
 
-    int indexDataSize = gridBufferPointer[i].pointLightCount + gridBufferPointer[i].spotLightCount;
+    // Writing indices
+    // Count of light sources to put into the index data structure
+    int indexDataSize = gridBufferPointer[i].pointLightCount +
+                        gridBufferPointer[i].spotLightCount +
+                        gridBufferPointer[i].projectorCount +
+                        gridBufferPointer[i].decalCount;
+
     indexBuffer->resize((indexDataSize + currentOffset) * sizeof(unsigned short));
     // pointer should be obtained after resize() since resize may reallocate the data
     auto indexBufferPointer = (unsigned short *)indexBuffer->bufferPointer();
 
+    // Indices for point lights
     for (int j = 0; j < gridBufferPointer[i].pointLightCount; j++) {
       indexBufferPointer[currentOffset + j] = (unsigned short)cell.pointLights[j]->index();
     }
-
     currentOffset += gridBufferPointer[i].pointLightCount;
 
+    // Indices for spot lights
     for (int j = 0; j < gridBufferPointer[i].spotLightCount; j++) {
       indexBufferPointer[currentOffset + j] = (unsigned short)cell.spotLights[j]->index();
     }
-
     currentOffset += gridBufferPointer[i].spotLightCount;
+
+    // Indices for projectors
+    for (int j = 0; j < gridBufferPointer[i].projectorCount; j++) {
+      indexBufferPointer[currentOffset + j] = (unsigned short)cell.projectors[j]->index();
+    }
+    currentOffset += gridBufferPointer[i].projectorCount;
+
+    // Indices for decals
+    for (int j = 0; j < gridBufferPointer[i].decalCount; j++) {
+      indexBufferPointer[currentOffset + j] = (unsigned short)cell.decals[j]->index();
+    }
+    currentOffset += gridBufferPointer[i].decalCount;
   }
 
   gridBuffer->setDirty();

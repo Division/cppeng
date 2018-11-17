@@ -5,6 +5,7 @@
 #ifndef CPPWRAPPER_ICLEANABLE_H
 #define CPPWRAPPER_ICLEANABLE_H
 
+// TODO: remove cleanables
 class ICleanable
 {
 public:

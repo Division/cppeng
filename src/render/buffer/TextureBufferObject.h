@@ -11,7 +11,7 @@
 #include "render/texture/TextureSlot.h"
 #include "EngMath.h"
 
-
+// Texture which data is supplied by VBO
 class TextureBufferObject : public VertexBufferObject {
 public:
   TextureBufferObject(GLenum format, GLenum usage);
@@ -24,7 +24,10 @@ private:
   GLenum _format;
 };
 
-
+// On WebGL texture buffers are not supported.
+// This class provides interface similar to TextureBufferObject
+// The difference is that data is stored in a regular texture instead of VBO
+// Updates are done with glTexSubImage2D
 class Texture2DBuffer: public MemoryBuffer {
 public:
   Texture2DBuffer(int targetWidth, GLenum internalFormat);
@@ -44,6 +47,7 @@ private:
   GLenum _type;
 };
 
+// Swappable buffer contains several buffer instances and allow switching between them
 
 class SwappableTexture2DBuffer: public SwappableBufferObject<Texture2DBuffer> {
 public:

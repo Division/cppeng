@@ -12,6 +12,9 @@
 
 class SwappableVertexBufferObject;
 
+// Class manages uniform buffer objects
+// Mainly used to conveniently share uniform data between shaders
+// and fast batch data update
 class UBOManager {
 public:
   UBOManager();
@@ -20,12 +23,20 @@ public:
   void upload();
   void setupForRender(RenderOperation *rop);
   void updateLights(const std::vector<LightObjectPtr> *lights);
+  void updateProjectors(const std::vector<ProjectorPtr> *projectors);
   void setCamera(CameraPtr camera);
 private:
+  // Data related to objects transformation
   std::shared_ptr<SwappableVertexBufferObject> _transform;
-  std::shared_ptr<SwappableVertexBufferObject> _light;
-  std::shared_ptr<SwappableVertexBufferObject> _camera;
 
+  // Regular light sources (point, spot, directional)
+  std::shared_ptr<SwappableVertexBufferObject> _light;
+
+  // Decals and projective texture light sources
+  std::shared_ptr<SwappableVertexBufferObject> _projector;
+
+  // Cameras
+  std::shared_ptr<SwappableVertexBufferObject> _camera;
 };
 
 

@@ -16,10 +16,13 @@
 #include "objects/Camera.h"
 #include "render/lighting/LightGrid.h"
 #include "render/debug/DebugDraw.h"
+#include "render/shader/Uniform.h"
 
 using namespace glm;
 
 Renderer::Renderer(Window *window) {
+  _projectorTextureUniform = UNIFORM_TEXTURE_BLOCKS.at(UniformName::ProjectorTexture);
+//  _projectorTextureUniform = UNIFORM_TEXTURE_BLOCKS.at(UniformName::Texture1);
   _uboManager = std::make_unique<UBOManager>();
   _lightGrid = std::make_unique<LightGrid>();
   _debugDraw = std::make_shared<DebugDraw>();
@@ -67,9 +70,6 @@ void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transf
 }
 
 void Renderer::setupMaterialBindings(RenderOperation *rop) {
-//  material->setProjection(state.projectionMatrix);
-//  material->setView(state.viewMatrix);
-
   if (rop->material->hasTransformBlock()) {
     UBOStruct::TransformStruct transformStruct;
     transformStruct.transform = rop->modelMatrix;
@@ -110,11 +110,14 @@ void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
 
   auto lights = scene.visibleLights(camera);
   _lightGrid->appendLights(lights, camera);
+  auto projectors = scene.visibleProjectors(camera);
+  _lightGrid->appendProjectors(projectors, camera);
   _lightGrid->upload();
   _lightGrid->bindBufferTextures();
 
   _uboManager->setCamera(camera);
   _uboManager->updateLights(lights);
+  _uboManager->updateProjectors(projectors);
   _uboManager->upload();
 
   _processRenderPipeline();
@@ -131,23 +134,29 @@ void Renderer::_prepareQueues(Scene &scene, CameraPtr camera) {
 }
 
 void Renderer::_processRenderPipeline() {
+  if (_projectorTexture && _projectorTexture->id()) {
+    glActiveTexture(GL_TEXTURE0 + 11);
+    glBindTexture(GL_TEXTURE_2D, _projectorTexture->id());
+  }
+
   // Opaque
   auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
   for (auto &rop : opaqueQueue) {
     _uboManager->setupForRender(&rop);
+
     renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
   }
 
   // Debug
 //  glEnable(GL_PROGRAM_POINT_SIZE);
-//  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_DEPTH_TEST);
   auto &debugQueue = _queues[(int)RenderQueue::Debug];
   for (auto &rop : debugQueue) {
     _uboManager->setupForRender(&rop);
     renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
   }
 //  glDisable(GL_PROGRAM_POINT_SIZE);
-//  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
 }
 
 void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) {

@@ -3,6 +3,7 @@
 //
 
 #include "Material.h"
+#include "system/Logging.h"
 
 void Material::setProjection(const mat4 &projection) {
   _bindings.mat4Bindings[_projectionBinding].matrix = projection;
@@ -97,10 +98,16 @@ void Material::uploadBindings() const {
 }
 
 Material::Material() {
+
 }
 
 void Material::activateTextures() const {
   for (auto &binding : _bindings.textureBindings) {
+    if (!binding.texture) {
+      ENGLog("Error: Texture not specified for unit: %i", binding.textureUnit);
+      continue;
+    }
+
     glActiveTexture(GL_TEXTURE0 + binding.textureUnit);
     glBindTexture(GL_TEXTURE_2D, binding.texture->id());
   }

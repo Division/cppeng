@@ -20,7 +20,7 @@ loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy, con
 
     if (materialPicker) {
       meshObject->material(materialPicker->getMaterial(hierarchy));
-    } else{
+    } else {
       MaterialPicker picker;
       meshObject->material(picker.getMaterial(hierarchy));
     };

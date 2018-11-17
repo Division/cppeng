@@ -21,7 +21,10 @@ class Material;
 class LightGrid;
 class Window;
 class DebugDraw;
+class Texture;
+typedef std::shared_ptr<Texture> TexturePtr;
 
+// TODO: refactor into PassRenderer, render into offscreen framebuffer
 class Renderer : IRenderer {
 public:
   Renderer(Window *window);
@@ -30,14 +33,17 @@ public:
 
   GlobalState state;
 
-  ShaderGenerator *generator() { return &_generator; }
+  ShaderGenerator *generator() { return &_generator; } // TODO: move to another place
   ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps) const;
   std::shared_ptr<DebugDraw> debugDraw() const { return _debugDraw; }
 
-
+  // Rendering
   void renderScene(Scene &scene);
   void postUpdate(float dt);
   const vec4 viewport() const { return _window->viewport(); }
+
+  void projectorTexture(const TexturePtr texture) { _projectorTexture = texture; }
+  TexturePtr projectorTexture() const { return _projectorTexture; }
 
   // IRenderer
   void addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) override;
@@ -52,6 +58,8 @@ private:
 
   std::unique_ptr<UBOManager> _uboManager;
   std::unique_ptr<LightGrid> _lightGrid;
+  std::shared_ptr<Texture> _projectorTexture; // usually a spritesheet
+  unsigned int _projectorTextureUniform = 0;
 
   std::vector<RenderOperation> _queues[(int)RenderQueue::Count];
   unsigned int _ropCounter;

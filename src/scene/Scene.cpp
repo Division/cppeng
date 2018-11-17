@@ -3,9 +3,13 @@
 //
 
 #include "Scene.h"
+#include "objects/Projector.h"
+#include "objects/Camera.h"
+#include "objects/LightObject.h"
 
 #define IS_CAMERA(object) (bool)(dynamic_cast<Camera *>((object).get()))
 #define IS_LIGHT(object) (bool)(dynamic_cast<LightObject *>((object).get()))
+#define IS_PROJECTOR(object) (bool)(dynamic_cast<Projector *>((object).get()))
 
 void Scene::setAsDefault() {
   GameObject::_defaultManager = this;
@@ -43,6 +47,13 @@ void Scene::_processAddedObject(GameObjectPtr object) {
     light->_index = _lights.size() - 1;
     _lightCount += 1;
   }
+
+    // Object is projector
+  else if (IS_PROJECTOR(object)) {
+    ProjectorPtr projector = std::dynamic_pointer_cast<Projector>(object);
+    _projectors.push_back(projector); // TODO: try to find free empty index
+    projector->_index = _projectors.size() - 1;
+  }
 }
 
 void Scene::_processRemovedObject(GameObjectPtr object) {
@@ -56,6 +67,15 @@ void Scene::_processRemovedObject(GameObjectPtr object) {
       if (light->id() == object->id()) {
         light = nullptr; // just set to null for future reuse
         _lightCount -= 1;
+        break;
+      }
+    }
+  }
+
+  else if (IS_PROJECTOR(object)) {
+    for (auto &projector : _projectors) {
+      if (projector->id() == object->id()) {
+        projector = nullptr;
         break;
       }
     }

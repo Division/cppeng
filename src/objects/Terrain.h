@@ -15,6 +15,10 @@ struct TerrainLayer {
   TexturePtr normal;
 };
 
+// Simplest terrain class ever
+// Reads photoshop .raw heightmap
+// Supports splatmap and up to 4 layers of texture + normal.
+// No LOD, geomipmapping etc. Just renders all the geometry in a single draw call.
 class Terrain : public MeshObject {
 public:
   void loadHeightmap(const std::string &filename);

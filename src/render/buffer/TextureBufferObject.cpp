@@ -70,6 +70,12 @@ Texture2DBuffer::Texture2DBuffer(int targetWidth, GLenum internalFormat)
       _pixelSizeBytes = 8;
       break;
 
+    case GL_RGB32UI:
+      _format = GL_RGB_INTEGER;
+      _type = GL_UNSIGNED_INT;
+      _pixelSizeBytes = 12;
+      break;
+
     default:
       throw std::runtime_error("Unsupported internal type");
   }

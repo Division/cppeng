@@ -10,29 +10,48 @@
 #include "render/buffer/VertexBufferObject.h"
 #include "objects/Camera.h"
 #include "EngineGL.h"
+#import "objects/LightObject.h"
+#import "objects/Projector.h"
 
 const unsigned int MAX_LIGHTS = 1000;
 
 UBOManager::UBOManager() {
-  unsigned int lightMaxSize = sizeof(UBOStruct::Light) * MAX_LIGHTS;
+  auto lightMaxSize = sizeof(UBOStruct::Light) * MAX_LIGHTS;
+  auto projectorMaxSize = sizeof(UBOStruct::Projector) * MAX_LIGHTS;
 
-  _transform = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
-  _light = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, lightMaxSize);
-  _camera = std::make_unique<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
+  _transform = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
+  _light = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, lightMaxSize);
+  _projector = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, projectorMaxSize);
+  _camera = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
 }
 
 void UBOManager::updateLights(const std::vector<LightObjectPtr> *lights) {
-
-  auto alignBytes = 0;
+  auto alignBytes = 0u;
   auto buffer = _light->current();
 
+  // note that elements in lights array may be null
   for (auto &light : *lights) {
-    UBOStruct::Light lightData;
-    if (light) {
-      lightData = light->getLightStruct();
+    if (!light) {
+      continue;
     }
 
+    UBOStruct::Light lightData = light->getLightStruct();
     buffer->appendData((void *) &lightData, sizeof(lightData), alignBytes);
+  }
+}
+
+void UBOManager::updateProjectors(const std::vector<ProjectorPtr> *projectors) {
+  auto alignBytes = 0u;
+  auto buffer = _projector->current();
+
+  // note that elements in projectors array may be null
+  for (auto &projector : *projectors) {
+    if (!projector) {
+      continue;
+    }
+
+    UBOStruct::Projector projectorData = projector->getProjectorStruct();
+    buffer->appendData((void *) &projectorData, sizeof(projectorData), alignBytes);
   }
 }
 
@@ -68,6 +87,10 @@ void UBOManager::swap() {
   _light->current()->resize(0);
   glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)UniformBlockName::Light, _light->current()->vbo());
 
+  _projector->swap();
+  _projector->current()->resize(0);
+  glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)UniformBlockName::Projector, _projector->current()->vbo());
+
   _camera->swap();
   _camera->current()->resize(0);
   glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)UniformBlockName::Camera, _camera->current()->vbo());
@@ -76,9 +99,11 @@ void UBOManager::swap() {
 void UBOManager::upload() {
   _transform->current()->upload();
   _light->current()->upload();
+  _projector->current()->upload();
   _camera->current()->upload();
 }
 
+// TODO: move out of this class
 void UBOManager::setupForRender(RenderOperation *rop) {
   MaterialPtr material = rop->material;
   material->shader()->bind();
