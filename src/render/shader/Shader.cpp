@@ -171,7 +171,7 @@ ShaderCapsSet::Bitmask ShaderCapsSet::_calculateBitMask() const {
   Bitmask result = 0;
 
   for (auto cap : _caps) {
-    result |= (Bitmask)cap;
+    result |= 1u << (Bitmask)cap;
   }
 
   return result;

@@ -48,6 +48,8 @@ public:
   void orthographicSize(float orthographicSize) { _orthographicSize = orthographicSize; }
   float orthographicSize() const { return _orthographicSize; }
 
+  void adjustAttenuation(float cutoff = 0.02);
+
   // Frustum matrix
   const mat4 viewProjection() const { return _viewProjection; }
 
@@ -68,7 +70,7 @@ public:
 
 private:
   // common
-  vec4 _color = vec4(0, 0, 1, 1);
+  vec4 _color = vec4(1, 1, 1, 1);
   unsigned int _index; // index in scene array
   TexturePtr _texture;
   TexturePtr _normalMap;
@@ -77,6 +79,7 @@ private:
   float _zNear = 1;
   float _zFar = 10;
   float _fov = 30; // Perspective projectors properties in degrees
+  float _squareAttenuation = 1;
   ProjectorType _type = ProjectorType::Decal;
 
   // Orthographic

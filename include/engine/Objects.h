@@ -6,5 +6,6 @@
 #define CPPWRAPPER_OBJECTS_H
 
 #include "objects/MeshObject.h"
+#include "objects/Camera.h"
 
 #endif //CPPWRAPPER_OBJECTS_H

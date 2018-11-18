@@ -33,6 +33,7 @@ enum class ShaderCaps : int {
   TerrainLayer1,
   TerrainLayer2,
   ProjectedTexture,
+  Count
 };
 
 class ShaderCapsSet {
@@ -43,12 +44,12 @@ public:
   void addCap (ShaderCaps cap);
   void removeCap (ShaderCaps cap);
   Bitmask getBitmask() const;
-  const std::unordered_set<int> &caps() { return _caps; }
+  const std::unordered_set<unsigned int> &caps() { return _caps; }
 
 private:
   mutable Bitmask _bitmask = 0; // cached bitmask
   mutable bool _maskDirty = false;
-  std::unordered_set<int> _caps;
+  std::unordered_set<unsigned int> _caps;
 
 private:
   Bitmask _calculateBitMask() const;

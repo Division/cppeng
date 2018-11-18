@@ -71,7 +71,12 @@ std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) {
   data["WEBGL"] = PLATFORM_WEBGL;
   data["USE_BUFFER_TEXTURE"] = ENGINE_USE_BUFFER_TEXTURE;
 
-  return _env.render_template(_templateMap[ROOT_TEMPLATE], data);
+  auto result = _env.render_template(_templateMap[ROOT_TEMPLATE], data);
+  if (caps->hasCap(ShaderCaps::VertexColor)) {
+    ENGLog("Debug src\n%s", result.c_str());
+  }
+
+  return result;
 }
 
 void ShaderGenerator::setupTemplates () {
