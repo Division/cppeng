@@ -56,6 +56,9 @@ public:
 
   void attenuation(float linear, float square);
 
+  Rect spriteBounds() const { return _spriteBounds; }
+  void spriteBounds(Rect value) { _spriteBounds = value; }
+
   // Frustum matrix
   const mat4 viewProjection() const { return _viewProjection; }
 
@@ -88,6 +91,7 @@ private:
   float _squareAttenuation = 0.44;
   float _linearAttenuation = 0.35;
   ProjectorType _type = ProjectorType::Decal;
+  Rect _spriteBounds = Rect(0, 0, 1, 1);
 
   // Orthographic
   bool _isOrthographic = false;

@@ -109,6 +109,7 @@ struct Rect {
   float width = 0;
   float height = 0;
 
+  Rect() = default;
   Rect(float x, float y, float width, float height) : x(x), y(y), width(width), height(height) {}
 };
 

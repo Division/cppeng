@@ -33,7 +33,7 @@ UBOStruct::Light LightObject::getLightStruct() const {
       break;
 
     case LightObjectType::Spot:
-      result.coneAngle = RAD(_coneAngle) / 2.0f;
+      result.coneAngle = cosf(RAD(_coneAngle) / 2.0f);
       result.direction = glm::normalize(transform()->forward());
       break;
   }

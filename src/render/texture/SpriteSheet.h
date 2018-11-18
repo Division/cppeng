@@ -8,21 +8,32 @@
 #include <string>
 #include "EngMath.h"
 #include <vector>
+#include <unordered_map>
 #include "Texture.h"
+#include "nlohmann/json.hpp"
+
+using namespace nlohmann;
 
 struct SpriteData {
-  std::string filename;
+  std::string name;
   Rect bounds;
 };
 
 class SpriteSheet {
 public:
-  SpriteSheet();
+  SpriteSheet() = default;
+  void addSprite(const std::string &name, float x, float y, float width, float height);
+  void loadFromJSON(const json &jsonData);
+  const std::string &spritesheetName() { return _spritesheetName; }
+  const std::vector<std::string> &spriteNames() { return _spriteNames; };
+  const SpriteData &getSpriteData(const std::string &name) { return _sprites.at(name); }
 
 private:
-  float _width;
-  float _height;
-  std::vector<SpriteData> _sprites;
+  float _width = 0;
+  float _height = 0;
+  std::string _spritesheetName;
+  std::vector<std::string> _spriteNames;
+  std::unordered_map<std::string, SpriteData> _sprites;
 };
 
 

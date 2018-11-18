@@ -11,10 +11,11 @@
 
 SpriteSheetPtr loader::loadSpritesheet(const std::string &filename) {
   std::ifstream file(filename);
-  std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+  std::string jsonString((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+  json jsonData = json::parse(jsonString);
+
   auto spritesheet = std::make_shared<SpriteSheet>();
-
-  ENGLog("TEXT %s", text.c_str());
-
+  spritesheet->loadFromJSON(jsonData);
   return spritesheet;
 }

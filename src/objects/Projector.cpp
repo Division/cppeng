@@ -34,8 +34,8 @@ UBOStruct::Projector Projector::getProjectorStruct() const {
   result.squareAttenuation = _squareAttenuation;
   result.linearAttenuation = _linearAttenuation;
   result.color = _color;
-  result.scale = vec2(1,1);
-  result.offset = vec2(0,0);
+  result.scale = vec2(_spriteBounds.width, _spriteBounds.height);
+  result.offset = vec2(_spriteBounds.x, _spriteBounds.y);
   result.projectionMatrix = _viewProjection;
 
   return result;
