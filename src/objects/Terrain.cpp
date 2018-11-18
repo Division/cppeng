@@ -91,16 +91,16 @@ void Terrain::_createMaterial() {
 void Terrain::addTextures(const std::string &diffuse, const std::string &normalMap) {
   TerrainLayer layer;
   layer.diffuse = loader::loadTexture(diffuse);
-  layer.normal = loader::loadTexture(normalMap);
+  layer.normal = loader::loadTexture(normalMap, false);
   _layers.emplace_back(layer);
 }
 
 void Terrain::loadSplatmap(const std::string &filename) {
-  _splatmap = loader::loadTexture(filename);
+  _splatmap = loader::loadTexture(filename, false);
 }
 
 void Terrain::loadSpecularmap(const std::string &filename) {
-  _specularmap = loader::loadTexture(filename);
+  _specularmap = loader::loadTexture(filename, false);
 }
 
 void Terrain::render(IRenderer &renderer) {

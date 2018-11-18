@@ -9,7 +9,7 @@
 #include "render/texture/Texture.h"
 
 namespace loader {
-  TexturePtr loadTexture(const std::string &name);
+  TexturePtr loadTexture(const std::string &name, bool sRGB = true);
 };
 
 

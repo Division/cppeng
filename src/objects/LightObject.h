@@ -30,6 +30,11 @@ public:
   float squareAttenuation() const { return _squareAttenuation; }
   void squareAttenuation(float value) { _squareAttenuation = value; _updateRadius(); }
 
+  float linearAttenuation() const { return _linearAttenuation; }
+  void linearAttenuation(float value) { _linearAttenuation = value; _updateRadius(); }
+
+  void attenuation(float linear, float square);
+
   LightObjectType type() const { return _type; }
   void type(LightObjectType value) { _type = value; }
 
@@ -53,10 +58,11 @@ public:
 private:
 
   // Common light properties
-  float _radius;
+  float _radius = 13;
   vec3 _color = vec3(1, 1, 1);
-  float _squareAttenuation;
-  float _lightCutoff = 0.02;
+  float _squareAttenuation = 0.44;
+  float _linearAttenuation = 0.35;
+  float _lightCutoff = 0.001;
   unsigned int _index; // index in scene array
 
   // Spotlight properties

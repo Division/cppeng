@@ -48,7 +48,13 @@ public:
   void orthographicSize(float orthographicSize) { _orthographicSize = orthographicSize; }
   float orthographicSize() const { return _orthographicSize; }
 
-  void adjustAttenuation(float cutoff = 0.02);
+  float linearAttenuation() const { return _linearAttenuation; }
+  void linearAttenuation(float value) { _linearAttenuation = value; }
+
+  float squareAttenuation() const { return _squareAttenuation; }
+  void squareAttenuation(float value) { _squareAttenuation = value; }
+
+  void attenuation(float linear, float square);
 
   // Frustum matrix
   const mat4 viewProjection() const { return _viewProjection; }
@@ -79,7 +85,8 @@ private:
   float _zNear = 1;
   float _zFar = 10;
   float _fov = 30; // Perspective projectors properties in degrees
-  float _squareAttenuation = 1;
+  float _squareAttenuation = 0.44;
+  float _linearAttenuation = 0.35;
   ProjectorType _type = ProjectorType::Decal;
 
   // Orthographic

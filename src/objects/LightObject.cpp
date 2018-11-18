@@ -4,24 +4,27 @@
 
 #include "LightObject.h"
 #include <memory>
+#include "engine/EngineMain.h"
+#include "render/debug/DebugDraw.h"
 
 void LightObject::_updateAttenuation() {
   _squareAttenuation = 1.0f / (_radius * _radius * _lightCutoff);
 }
 
 void LightObject::_updateRadius() {
-  _radius = sqrtf(1.0f / (_squareAttenuation * _lightCutoff));
+  _radius = fabs(( -_linearAttenuation - std::sqrtf(_linearAttenuation * _linearAttenuation - 4 * _squareAttenuation * (1 - 1 / _lightCutoff))) / (2 * _squareAttenuation));
 }
 
 LightObject::LightObject() : GameObject() {
-  radius(5);
+  _updateRadius();
 }
 
 UBOStruct::Light LightObject::getLightStruct() const {
   UBOStruct::Light result;
 
   result.position = transform()->worldPosition();
-  result.attenuation = squareAttenuation();
+  result.squareAttenuation = squareAttenuation();
+  result.linearAttenuation = linearAttenuation();
   result.color = color();
 
   switch (_type) {
@@ -70,6 +73,7 @@ void LightObject::render(IRenderer &renderer) {
   rop.modelMatrix = transform()->worldMatrix();
   rop.debugInfo = name();
   renderer.addRenderOperation(rop, RenderQueue::Opaque);
+  getEngine()->debugDraw()->drawAABB(this->bounds(), vec4(this->color(), 1));
 }
 
 float LightObject::getSpotRadius(float height) {
@@ -90,4 +94,10 @@ AABB LightObject::bounds() {
     auto position = transform()->worldPosition();
     return AABB::fromSphere(position, _radius);
   };
+}
+
+void LightObject::attenuation(float linear, float square) {
+  _linearAttenuation = linear;
+  _squareAttenuation = square;
+  _updateRadius();
 }

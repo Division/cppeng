@@ -31,7 +31,8 @@ UBOStruct::Projector Projector::getProjectorStruct() const {
   UBOStruct::Projector result;
 
   result.position = transform()->worldPosition();
-  result.attenuation = _squareAttenuation;
+  result.squareAttenuation = _squareAttenuation;
+  result.linearAttenuation = _linearAttenuation;
   result.color = _color;
   result.scale = vec2(1,1);
   result.offset = vec2(0,0);
@@ -73,7 +74,7 @@ void Projector::getEdgePoints (std::vector<vec3> &outEdgePoints) {
   }
 }
 
-void Projector::adjustAttenuation(float cutoff) {
-  float radius = _zFar - _zNear;
-  _squareAttenuation = 1.0f / (radius * radius * cutoff);
+void Projector::attenuation(float linear, float square) {
+  _linearAttenuation = linear;
+  _squareAttenuation = square;
 }

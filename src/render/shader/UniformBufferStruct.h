@@ -5,6 +5,8 @@
 #ifndef CPPWRAPPER_UNIFORMBUFFERSTRUCT_H
 #define CPPWRAPPER_UNIFORMBUFFERSTRUCT_H
 
+#include "EngMath.h"
+
 // Data structures shared between shaders
 namespace UBOStruct {
 
@@ -15,20 +17,22 @@ namespace UBOStruct {
 
   struct Light {
     vec3 position; // offset = 0, size = 12
-    float attenuation = 0; // offset = 12, alignment = 4, size = 4
+    float squareAttenuation = 0; // offset = 12, alignment = 4, size = 4
     vec3 color; // offset = 16, alignment = 16, size = 12
-    float padding1 = 0;
+    float linearAttenuation = 0;
     vec3 direction;
     float coneAngle = 0;
   };
 
   struct Projector {
     vec3 position; // offset = 0, size = 12
-    float attenuation = 0; // offset = 12, alignment = 4, size = 4
+    float squareAttenuation = 0; // offset = 12, alignment = 4, size = 4
     vec4 color; // offset = 16, alignment = 16, size = 12
     vec2 scale;
     vec2 offset;
     mat4 projectionMatrix;
+    float linearAttenuation = 0;
+    vec3 padding; // ending padding
   };
 
   struct Camera {

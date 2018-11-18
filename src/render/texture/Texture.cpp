@@ -14,26 +14,28 @@ void Texture::_genID() const {
   glGenTextures(1, &_id);
 }
 
-void Texture::initTexture2D(int width, int height, int channels, void *data) {
+void Texture::initTexture2D(int width, int height, int channels, bool sRGB, void *data) {
 
-  GLenum mode;
+  GLenum internalFormat;
+  GLenum format;
   switch (channels) {
     case 4:
-      mode = GL_RGBA;
+      format = GL_RGBA;
+      internalFormat = sRGB ? GL_SRGB_ALPHA : GL_RGBA;
       break;
 
     case 3:
-      mode = GL_RGB;
+      format = GL_RGB;
+      internalFormat = sRGB ? GL_SRGB : GL_RGB;
       break;
 
     default:
-      ENGLog("Invalid channel number");
-      return;
+      throw std::runtime_error("Invalid texture channel number");
   }
 
   glBindTexture(GL_TEXTURE_2D, id());
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // required for proper loading
-  glTexImage2D(GL_TEXTURE_2D, 0, mode, width, height, 0, mode, GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
   glGenerateMipmap(GL_TEXTURE_2D);
 
   ENGLog("TEXTURE 2D LOADED, %ix%i", width, height);

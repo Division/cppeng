@@ -18,7 +18,7 @@ public:
   Texture() = default;
   explicit Texture(GLuint id): _id(id) {}
   GLuint id() const { if (!_id) { _genID(); } return _id; }
-  void initTexture2D(int width, int height, int channels, void *data);
+  void initTexture2D(int width, int height, int channels, bool sRGB, void *data);
 
 private:
   mutable GLuint _id = 0;
