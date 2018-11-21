@@ -7,8 +7,8 @@
 
 #include <memory>
 #include "render/material/Material.h"
-#include "objects/LightObject.h"
 #include "EngTypes.h"
+#include "RenderOperation.h"
 
 class SwappableVertexBufferObject;
 

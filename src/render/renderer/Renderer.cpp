@@ -20,9 +20,8 @@
 
 using namespace glm;
 
-Renderer::Renderer(Window *window) {
+Renderer::Renderer(std::shared_ptr<Window> window) {
   _projectorTextureUniform = UNIFORM_TEXTURE_BLOCKS.at(UniformName::ProjectorTexture);
-  _uboManager = std::make_unique<UBOManager>();
   _lightGrid = std::make_unique<LightGrid>();
   _debugDraw = std::make_shared<DebugDraw>();
   _lightGrid->setDebugDraw(_debugDraw);
@@ -31,10 +30,6 @@ Renderer::Renderer(Window *window) {
 
 Renderer::~Renderer() {
   // requires non-inline destructor to make unique_ptr forward declaration work
-}
-
-void Renderer::setupShaders() {
-  _generator.setupTemplates();
 }
 
 ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) const {
@@ -93,9 +88,6 @@ void Renderer::_clearQueues() {
 }
 
 void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
-  state.projectionMatrix = camera->projectionMatrix();
-  state.viewMatrix = camera->viewMatrix();
-
   _clearQueues();
 
   auto visibleObjects = scene.visibleObjects(camera);

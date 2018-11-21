@@ -9,7 +9,6 @@
 #include "render/shader/Shader.h"
 #include <unordered_map>
 #include "IRenderer.h"
-#include "GlobalState.h"
 #include <memory>
 #include <system/Window.h>
 #include "UBOManager.h"
@@ -25,15 +24,11 @@ class Texture;
 typedef std::shared_ptr<Texture> TexturePtr;
 
 // TODO: refactor into PassRenderer, render into offscreen framebuffer
-class Renderer : IRenderer {
+class Renderer : public IRenderer {
 public:
-  Renderer(Window *window);
+  explicit Renderer(std::shared_ptr<Window> window);
   ~Renderer();
-  void setupShaders();
 
-  GlobalState state;
-
-  ShaderGenerator *generator() { return &_generator; } // TODO: move to another place
   ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps) const;
   std::shared_ptr<DebugDraw> debugDraw() const { return _debugDraw; }
 
@@ -54,7 +49,7 @@ private:
   mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
   std::shared_ptr<DebugDraw> _debugDraw;
 
-  Window *_window;
+  std::shared_ptr<Window> _window;
 
   std::unique_ptr<UBOManager> _uboManager;
   std::unique_ptr<LightGrid> _lightGrid;

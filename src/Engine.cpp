@@ -11,8 +11,9 @@
 #include "render/renderer/Renderer.h"
 #include "loader/TextureLoader.h"
 #include "render/texture/Texture.h"
+#include "render/shader/ShaderGenerator.h"
 #include "EngMath.h"
-
+#include "render/shader/ShaderCaps.h"
 #include "scene/Scene.h"
 
 using namespace glm;
@@ -22,13 +23,13 @@ using namespace glm;
 #endif
 
 Engine::Engine() {
-  _window = new Window();
+  _window = std::make_shared<Window>();
+  _generator = std::make_shared<ShaderGenerator>();
   _input = new Input(_window);
 }
 
 Engine::~Engine() {
   delete _renderer;
-  delete _window;
   delete _input;
 }
 
@@ -123,8 +124,10 @@ void Engine::update(double dt) {
 
 void Engine::init() {
   engine::GLCaps::init(); // Setup OpenGL caps
+  _generator->setupTemplates();
+
   _renderer = new Renderer(_window);
-  _renderer->setupShaders();
+
 
   _game->init(this);
   engine::checkGLError();
@@ -137,6 +140,10 @@ void Engine::renderScene(Scene &scene) {
 
 std::shared_ptr<DebugDraw> Engine::debugDraw() const {
   return _renderer->debugDraw();
+}
+
+ShaderPtr Engine::getShaderWithCaps (std::shared_ptr<ShaderCapsSet> caps) const {
+  return _generator->getShaderWithCaps(caps);
 }
 
 // JS Bindings

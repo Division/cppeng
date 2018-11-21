@@ -58,28 +58,6 @@ struct AABB {
     return true;
   }
 
-  AABB multMatrix(const mat4 &matrix) {
-//    vec3 s = size();
-
-//    const vec3 vertices[] = {
-//      matrix * min,
-//      matrix * vec4((min + s * vec3(0, 0, 1)),
-//      matrix * (min + s * vec3(1, 0, 1)),
-//      matrix * (min + s * vec3(1, 0, 0)),
-//      matrix * (max - s * vec3(1, 0, 1)),
-//      matrix * (max - s * vec3(1, 0, 0)),
-//      matrix * (max),
-//      matrix * (max - s * vec3(0, 0, 1)),
-//    };
-
-//    AABB result (vertices[0], vertices[0]);
-//    for (int i = 1; i < 8; i++) {
-//      result.expand(vertices[i]);
-//    }
-
-//    return result;
-  }
-
   AABB project(const mat4 &modelMatrix, const mat4 &projectionMatrix, const vec4 &viewport) {
     vec3 s = size();
 

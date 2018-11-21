@@ -39,9 +39,6 @@ public:
   void zFar(float zFar) { _zFar = zFar; }
   float zFar() const { return _zFar; }
 
-  void texture(TexturePtr texture) { _texture = texture; }
-  TexturePtr texture() const { return _texture; }
-
   void isOrthographic(bool isOrthographic) { _isOrthographic = isOrthographic; }
   bool isOrthographic() const { return _isOrthographic; }
 
@@ -80,9 +77,7 @@ public:
 private:
   // common
   vec4 _color = vec4(1, 1, 1, 1);
-  unsigned int _index; // index in scene array
-  TexturePtr _texture;
-  TexturePtr _normalMap;
+  unsigned int _index = 0; // index in scene array
   mat4 _viewProjection;
   float _aspect = 1;
   float _zNear = 1;

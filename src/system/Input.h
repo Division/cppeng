@@ -8,6 +8,7 @@
 #include "glm/glm.hpp"
 #include "EngineGL.h"
 #include "Window.h"
+#include <memory>
 
 using namespace glm;
 
@@ -38,7 +39,7 @@ class Input {
 public:
   friend class Engine;
 
-  explicit Input(Window *window): _window(window) {}
+  explicit Input(const std::shared_ptr<Window> window): _window(window) {}
   int keyDown(Key key) const;
   int keyDown(int key) const { return glfwGetKey(_window->glfwID(), key); }
   int mouseDown(int key) const { return glfwGetMouseButton(_window->glfwID(), key); }
@@ -46,7 +47,7 @@ public:
   const vec2 mouseDelta() const { return _mouseDelta; }
 private:
   void _update();
-  Window *_window;
+  std::shared_ptr<Window>_window;
   vec2 _mousePos;
   vec2 _prevMousePos;
   vec2 _mouseDelta;

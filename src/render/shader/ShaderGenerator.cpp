@@ -6,6 +6,8 @@
 #include "system/Logging.h"
 #include <unordered_map>
 #include <string>
+#include "loader/ShaderLoader.h"
+#include "Shader.h"
 
 #ifdef __EMSCRIPTEN__
 const std::string GLSL_VERSION = "300 es";
@@ -65,13 +67,13 @@ void ShaderGenerator::_addTemplateCallback(std::string tplName) {
   });
 }
 
-std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) {
+std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) const {
   json data = this->_getJSONForCaps(caps);
   data["version"] = GLSL_VERSION;
   data["WEBGL"] = PLATFORM_WEBGL;
   data["USE_BUFFER_TEXTURE"] = ENGINE_USE_BUFFER_TEXTURE;
 
-  auto result = _env.render_template(_templateMap[ROOT_TEMPLATE], data);
+  auto result = _env.render_template(_templateMap.at(ROOT_TEMPLATE), data);
   if (caps->hasCap(ShaderCaps::VertexColor)) {
     ENGLog("Debug src\n%s", result.c_str());
   }
@@ -87,7 +89,7 @@ void ShaderGenerator::setupTemplates () {
   }
 }
 
-json ShaderGenerator::_getJSONForCaps(ShaderCapsSetPtr caps) {
+json ShaderGenerator::_getJSONForCaps(ShaderCapsSetPtr caps) const {
   json result;
 
   for (auto cap : CAPS_TO_PARAM_MAP) {
@@ -95,6 +97,27 @@ json ShaderGenerator::_getJSONForCaps(ShaderCapsSetPtr caps) {
     bool hasCap = caps->hasCap(scap);
     auto key = cap.second;
     result[key] = hasCap;
+  }
+
+  return result;
+}
+
+ShaderPtr ShaderGenerator::getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps) const {
+  ShaderPtr result;
+
+  auto iterator = _shaders.find(caps->getBitmask());
+  if (iterator == _shaders.end()) {
+    std::string shaderSource = this->generateShaderSource(caps);
+    std::stringstream stream;
+    stream.str(shaderSource);
+    std::string vertexSource;
+    std::string fragmentSource;
+
+    loader::loadShader(stream, &vertexSource, &fragmentSource);
+    result = ShaderPtr(new Shader(vertexSource, fragmentSource));
+    _shaders[caps->getBitmask()] = result;
+  } else {
+    result = iterator->second;
   }
 
   return result;

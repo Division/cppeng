@@ -17,7 +17,7 @@ class Input;
 
 class Window {
 public:
-  Window() {}
+  Window() = default;
   void initOpenGLWindow(int width, int height);
   void swapBuffers();
   void processEvents();
@@ -35,8 +35,8 @@ public:
 
 private:
   GLFWwindow* _window = nullptr;
-  int _width;
-  int _height;
+  int _width = 0;
+  int _height = 0;
   void _updateSize();
 };
 

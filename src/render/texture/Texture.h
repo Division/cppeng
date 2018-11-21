@@ -26,7 +26,6 @@ private:
 private:
   void _genID() const;
   void _uploadData();
-
 };
 
 typedef std::shared_ptr<Texture> TexturePtr;

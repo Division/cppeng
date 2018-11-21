@@ -7,26 +7,30 @@
 
 #include <string>
 #include <unordered_map>
-#include "Shader.h"
 
 #include "nlohmann/json.hpp"
 #include "inja.hpp"
+#include "ShaderCaps.h"
 
 using json = nlohmann::json;
+
+class Shader;
+typedef std::shared_ptr<Shader> ShaderPtr;
 
 class ShaderGenerator {
 public:
   ShaderGenerator();
   void setupTemplates();
-  std::string generateShaderSource(ShaderCapsSetPtr caps);
+  std::string generateShaderSource(ShaderCapsSetPtr caps) const;
+  ShaderPtr getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps) const;
 
 private:
-  inja::Environment _env;
+  mutable inja::Environment _env;
   std::unordered_map<std::string, inja::Template> _templateMap;
 
 private:
-  json _getJSONForCaps(ShaderCapsSetPtr shaderCaps);
-
+  mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
+  json _getJSONForCaps(ShaderCapsSetPtr shaderCaps) const;
   void _addTemplateCallback(std::string tplName);
 };
 
