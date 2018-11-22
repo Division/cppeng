@@ -18,7 +18,8 @@
 #include "render/debug/DebugDraw.h"
 #include "render/material/Material.h"
 #include "render/material/MaterialTypes.h"
+#include <memory>
 
-Engine *getEngine();
+std::shared_ptr<Engine> getEngine();
 
 #endif //TESTLIBRARY_ENGINEMAIN_H

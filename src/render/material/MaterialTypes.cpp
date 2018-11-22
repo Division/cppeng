@@ -3,7 +3,7 @@
 //
 
 #include "MaterialTypes.h"
-#include "engine/EngineMain.h"
+#include "EngineMain.h"
 #include "render/renderer/Renderer.h"
 
 MaterialSingleColor::MaterialSingleColor() {
@@ -13,7 +13,7 @@ MaterialSingleColor::MaterialSingleColor() {
 
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Color);
-  _shader = engine->renderer()->getShaderWithCaps(caps);
+  _shader = engine->getShaderWithCaps(caps);
 
   // Manually create uniforms for now
   _shader->addUniform(UniformName::Color);
@@ -29,7 +29,7 @@ MaterialDebug::MaterialDebug() {
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::PointSize);
   caps->addCap(ShaderCaps::VertexColor);
-  _shader = engine->renderer()->getShaderWithCaps(caps);
+  _shader = engine->getShaderWithCaps(caps);
 
   _shader->addUniformBlock(UniformBlockName::Transform);
   _shader->addUniformBlock(UniformBlockName::Camera);
@@ -43,7 +43,7 @@ MaterialTexture::MaterialTexture() {
 
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Texture0);
-  _shader = engine->renderer()->getShaderWithCaps(caps);
+  _shader = engine->getShaderWithCaps(caps);
 
   // Manually create uniforms for now
   _shader->addUniform(UniformName::Texture0);
@@ -61,7 +61,7 @@ MaterialLighting::MaterialLighting() {
 
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Lighting);
-  _shader = engine->renderer()->getShaderWithCaps(caps);
+  _shader = engine->getShaderWithCaps(caps);
 
   // Manually create uniforms for now
   _shader->addUniform(UniformName::LightGrid);
@@ -101,7 +101,7 @@ MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
   }
 
 
-  _shader = engine->renderer()->getShaderWithCaps(caps);
+  _shader = engine->getShaderWithCaps(caps);
 
   if (specularmap) {
     _shader->addUniform(UniformName::SpecularMap);
@@ -136,7 +136,7 @@ MaterialTextureProjection::MaterialTextureProjection() {
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Lighting);
   caps->addCap(ShaderCaps::ProjectedTexture);
-  _shader = engine->renderer()->getShaderWithCaps(caps);
+  _shader = engine->getShaderWithCaps(caps);
 
   _projectedTextureBinding = _addTextureBinding(UniformName::ProjectedTexture);
   _projectedTextureMatrixBinding= _addMat4Binding(UniformName::ProjectedTextureMatrix);

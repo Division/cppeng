@@ -1,4 +1,4 @@
-#include "engine/Engine.h"
+#include "Engine.h"
 #include "EngineGL.h"
 #include <iostream>
 #include "system/Window.h"
@@ -6,6 +6,8 @@
 #include "Resources.h"
 #include <system/Logging.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <Engine.h>
+
 #include "render/mesh/Mesh.h"
 #include "render/shader/Shader.h"
 #include "render/renderer/Renderer.h"
@@ -15,6 +17,8 @@
 #include "EngMath.h"
 #include "render/shader/ShaderCaps.h"
 #include "scene/Scene.h"
+#include "render/renderer/SceneRenderer.h"
+#include "EngineMain.h"
 
 using namespace glm;
 
@@ -25,12 +29,11 @@ using namespace glm;
 Engine::Engine() {
   _window = std::make_shared<Window>();
   _generator = std::make_shared<ShaderGenerator>();
-  _input = new Input(_window);
+  _input = std::make_shared<Input>(_window);
 }
 
 Engine::~Engine() {
-  delete _renderer;
-  delete _input;
+
 }
 
 void Engine::quit() {
@@ -89,7 +92,7 @@ void Engine::startEmscriptenLoop() {
 }
 #endif
 
-void Engine::setup(IGame *game) {
+void Engine::setup(std::weak_ptr<IGame> game) {
   _window->initOpenGLWindow(640, 480);
   _game = game;
 
@@ -115,9 +118,8 @@ void Engine::update(double dt) {
   glEnable(GL_DEPTH_TEST);
   glCullFace(GL_BACK);
 
-  _lastDt = (float)dt;
   _input->_update();
-  _game->update((float)dt);
+  _game.lock()->update((float)dt);
 
   engine::checkGLError();
 }
@@ -125,25 +127,26 @@ void Engine::update(double dt) {
 void Engine::init() {
   engine::GLCaps::init(); // Setup OpenGL caps
   _generator->setupTemplates();
+  _sceneRenderer = std::make_shared<SceneRenderer>();
 
-  _renderer = new Renderer(_window);
-
-
-  _game->init(this);
+  _game.lock()->init(getEngine());
   engine::checkGLError();
 }
 
-void Engine::renderScene(Scene &scene) {
-  _renderer->postUpdate(_lastDt);
-  _renderer->renderScene(scene);
+void Engine::renderScene(std::shared_ptr<Scene> scene) {
+  _sceneRenderer->renderScene(scene);
 }
 
 std::shared_ptr<DebugDraw> Engine::debugDraw() const {
-  return _renderer->debugDraw();
+  return _sceneRenderer->debugDraw();
 }
 
 ShaderPtr Engine::getShaderWithCaps (std::shared_ptr<ShaderCapsSet> caps) const {
   return _generator->getShaderWithCaps(caps);
+}
+
+void Engine::projectorTexture(const std::shared_ptr<Texture> texture) {
+  _sceneRenderer->projectorTexture(texture);
 }
 
 // JS Bindings

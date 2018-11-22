@@ -6,6 +6,7 @@
 #include "objects/Projector.h"
 #include "objects/Camera.h"
 #include "objects/LightObject.h"
+#include <algorithm>
 
 #define IS_CAMERA(object) (bool)(dynamic_cast<Camera *>((object).get()))
 #define IS_LIGHT(object) (bool)(dynamic_cast<LightObject *>((object).get()))
@@ -37,7 +38,7 @@ void Scene::_processAddedObject(GameObjectPtr object) {
   // Object is camera
   if (IS_CAMERA(object)) {
     CameraPtr camera = std::dynamic_pointer_cast<Camera>(object);
-    _cameraMap[object->id()] = camera;
+    _cameras.push_back(camera);
   }
 
   // Object is light
@@ -59,7 +60,7 @@ void Scene::_processAddedObject(GameObjectPtr object) {
 void Scene::_processRemovedObject(GameObjectPtr object) {
   // Object is camera
   if (IS_CAMERA(object)) {
-    _cameraMap.erase(object->id());
+    auto cameraPosition = std::find(_cameras.begin(), _cameras.end(), std::static_pointer_cast<Camera>(object));
   }
 
   else if (IS_LIGHT(object)) {

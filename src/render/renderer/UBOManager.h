@@ -11,6 +11,7 @@
 #include "RenderOperation.h"
 
 class SwappableVertexBufferObject;
+class ICameraParamsProvider;
 
 // Class manages uniform buffer objects
 // Mainly used to conveniently share uniform data between shaders
@@ -18,13 +19,13 @@ class SwappableVertexBufferObject;
 class UBOManager {
 public:
   UBOManager();
-  void processMeterialBindings(RenderOperation *rop);
+  void setTransformBlock(RenderOperation *rop);
   void swap();
   void upload();
   void setupForRender(RenderOperation *rop);
-  void updateLights(const std::vector<LightObjectPtr> *lights);
-  void updateProjectors(const std::vector<ProjectorPtr> *projectors);
-  void setCamera(CameraPtr camera);
+  void updateLights(const std::vector<LightObjectPtr> &lights);
+  void updateProjectors(const std::vector<ProjectorPtr> &projectors);
+  void setCamera(std::shared_ptr<ICameraParamsProvider> camera);
 private:
   // Data related to objects transformation
   std::shared_ptr<SwappableVertexBufferObject> _transform;

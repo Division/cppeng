@@ -11,6 +11,11 @@
 class Mesh;
 class Material;
 
+enum class RenderMode : int {
+  DepthOnly = 0,
+  Normal
+};
+
 enum class RenderQueue : int {
   Opaque = 0,
   Translucent,
@@ -20,6 +25,7 @@ enum class RenderQueue : int {
 
 class IRenderer {
 public:
+  virtual ~IRenderer() = default;
   virtual void addRenderOperation(RenderOperation &rop, RenderQueue queue) = 0;
   virtual void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) = 0;
 };

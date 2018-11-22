@@ -3,7 +3,7 @@
 //
 
 #include "Camera.h"
-#include "engine/EngineMain.h"
+#include "EngineMain.h"
 #include "render/renderer/Renderer.h"
 
 void Camera::_updateProjection() {
@@ -18,7 +18,7 @@ void Camera::_updateView() {
 
 void Camera::_updateViewport() {
   auto engine = getEngine();
-  _viewport = engine->renderer()->viewport();
+  _viewport = engine->window()->viewport(); // TODO: modify if camera rendertarget support is required
 }
 
 void Camera::postUpdate() {

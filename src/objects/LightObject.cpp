@@ -4,7 +4,7 @@
 
 #include "LightObject.h"
 #include <memory>
-#include "engine/EngineMain.h"
+#include "EngineMain.h"
 #include "render/debug/DebugDraw.h"
 
 void LightObject::_updateAttenuation() {

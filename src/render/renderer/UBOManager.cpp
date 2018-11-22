@@ -10,8 +10,9 @@
 #include "render/buffer/VertexBufferObject.h"
 #include "objects/Camera.h"
 #include "EngineGL.h"
-#import "objects/LightObject.h"
-#import "objects/Projector.h"
+#include "objects/LightObject.h"
+#include  "objects/Projector.h"
+#include "render/renderer/ICameraParamsProvider.h"
 
 const unsigned int MAX_LIGHTS = 1000;
 
@@ -19,18 +20,19 @@ UBOManager::UBOManager() {
   auto lightMaxSize = sizeof(UBOStruct::Light) * MAX_LIGHTS;
   auto projectorMaxSize = sizeof(UBOStruct::Projector) * MAX_LIGHTS;
 
+  // TODO: looks like it should be changed to map/unmap buffer
   _transform = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
   _light = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, lightMaxSize);
   _projector = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, projectorMaxSize);
   _camera = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
 }
 
-void UBOManager::updateLights(const std::vector<LightObjectPtr> *lights) {
+void UBOManager::updateLights(const std::vector<LightObjectPtr> &lights) {
   auto alignBytes = 0u;
   auto buffer = _light->current();
 
   // note that elements in lights array may be null
-  for (auto &light : *lights) {
+  for (auto &light : lights) {
     if (!light) {
       continue;
     }
@@ -40,12 +42,12 @@ void UBOManager::updateLights(const std::vector<LightObjectPtr> *lights) {
   }
 }
 
-void UBOManager::updateProjectors(const std::vector<ProjectorPtr> *projectors) {
+void UBOManager::updateProjectors(const std::vector<ProjectorPtr> &projectors) {
   auto alignBytes = 0u;
   auto buffer = _projector->current();
 
   // note that elements in projectors array may be null
-  for (auto &projector : *projectors) {
+  for (auto &projector : projectors) {
     if (!projector) {
       continue;
     }
@@ -55,19 +57,19 @@ void UBOManager::updateProjectors(const std::vector<ProjectorPtr> *projectors) {
   }
 }
 
-void UBOManager::setCamera(CameraPtr camera) {
+void UBOManager::setCamera(std::shared_ptr<ICameraParamsProvider> camera) {
   UBOStruct::Camera cameraData;
-  cameraData.position = camera->transform()->worldPosition();
-  cameraData.screenSize = camera->screenSize();
-  cameraData.viewMatrix = camera->viewMatrix();
-  cameraData.projectionMatrix = camera->projectionMatrix();
+  cameraData.position = camera->cameraPosition();
+  cameraData.screenSize = camera->cameraViewSize();
+  cameraData.viewMatrix = camera->cameraViewMatrix();
+  cameraData.projectionMatrix = camera->cameraProjectionMatrix();
 
   auto alignBytes = (unsigned int)engine::GLCaps::uboOffsetAlignment();
   auto buffer = _camera->current();
   buffer->appendData((void *) &cameraData, sizeof(cameraData), alignBytes);
 }
 
-void UBOManager::processMeterialBindings(RenderOperation *rop) {
+void UBOManager::setTransformBlock(RenderOperation *rop) {
   MaterialPtr material = rop->material;
   auto buffer = _transform->current();
 
@@ -75,7 +77,7 @@ void UBOManager::processMeterialBindings(RenderOperation *rop) {
     auto &transformStruct = material->getTransformStruct();
     auto alignBytes = (unsigned int)engine::GLCaps::uboOffsetAlignment();
     auto offset = (unsigned int)buffer->appendData((void *) &transformStruct, sizeof(transformStruct), alignBytes);
-    rop->transformBlockOffset = offset;
+    rop->transformBlockOffset = (int)offset;
   }
 }
 
@@ -103,7 +105,6 @@ void UBOManager::upload() {
   _camera->current()->upload();
 }
 
-// TODO: move out of this class
 void UBOManager::setupForRender(RenderOperation *rop) {
   MaterialPtr material = rop->material;
   material->shader()->bind();
@@ -111,7 +112,7 @@ void UBOManager::setupForRender(RenderOperation *rop) {
   material->activateTextures();
 
   if (material->hasTransformBlock()) {
-    auto offset = rop->transformBlockOffset;
+    auto offset = (unsigned int)rop->transformBlockOffset;
     auto size = sizeof(UBOStruct::TransformStruct);
     auto slot = (GLuint)UniformBlockName::Transform;
     auto vbo = _transform->current()->vbo();

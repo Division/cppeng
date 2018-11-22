@@ -13,6 +13,7 @@
 #include <system/Window.h>
 #include "UBOManager.h"
 #include "EngMath.h"
+#include "ICameraParamsProvider.h"
 
 class Camera;
 class Scene;
@@ -22,20 +23,24 @@ class Window;
 class DebugDraw;
 class Texture;
 typedef std::shared_ptr<Texture> TexturePtr;
+class Scene;
+typedef std::shared_ptr<Scene> ScenePtr;
+class View;
+typedef std::shared_ptr<View> ViewPtr;
 
-// TODO: refactor into PassRenderer, render into offscreen framebuffer
+
+// For now renderer is a single instance per app
+// It may change if need to render multiple fully shaded passes
+// (each pass would require it's own LightGrid instance)
 class Renderer : public IRenderer {
 public:
-  explicit Renderer(std::shared_ptr<Window> window);
-  ~Renderer();
+  explicit Renderer();
+  ~Renderer() override;
 
-  ShaderPtr getShaderWithCaps (ShaderCapsSetPtr caps) const;
   std::shared_ptr<DebugDraw> debugDraw() const { return _debugDraw; }
 
   // Rendering
-  void renderScene(Scene &scene);
-  void postUpdate(float dt);
-  const vec4 viewport() const { return _window->viewport(); }
+  void renderScene(std::shared_ptr<Scene> scene, ViewPtr view);
 
   void projectorTexture(const TexturePtr texture) { _projectorTexture = texture; }
   TexturePtr projectorTexture() const { return _projectorTexture; }
@@ -45,11 +50,7 @@ public:
   void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) override;
 
 private:
-  mutable ShaderGenerator _generator;
-  mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
   std::shared_ptr<DebugDraw> _debugDraw;
-
-  std::shared_ptr<Window> _window;
 
   std::unique_ptr<UBOManager> _uboManager;
   std::unique_ptr<LightGrid> _lightGrid;
@@ -60,10 +61,10 @@ private:
   unsigned int _ropCounter;
 
 private:
-  void _prepareQueues(Scene &scene, std::shared_ptr<Camera> camera);
+  void _prepareQueues(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
   void _processRenderPipeline();
-  void _renderCamera(Scene &scene, std::shared_ptr<Camera> camera);
-  void setupMaterialBindings(RenderOperation *rop);
+  void _renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera);
+  void setupAndUploadUBO(RenderOperation *rop);
   void _clearQueues();
 };
 

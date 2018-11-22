@@ -2,13 +2,13 @@
 // Created by Sidorenko Nikita on 1/17/18.
 //
 
-#import <Engine/EngineMain.h>
+#import <EngineMain.h>
 
-Engine *engineInstance = nullptr;
+std::shared_ptr<Engine> engineInstance = nullptr;
 
-Engine *getEngine() {
+std::shared_ptr<Engine> getEngine() {
   if (!engineInstance) {
-    engineInstance = new Engine();
+    engineInstance = std::make_shared<Engine>();
   }
 
   return engineInstance;

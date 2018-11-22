@@ -11,7 +11,7 @@ void SpriteSheet::addSprite(const std::string &name, float x, float y, float wid
   }
 
   auto rect = Rect(x / _width, y / _height, width / _width, height / _height);
-  _sprites[name] = { name: name, bounds: rect };
+  _sprites[name] = SpriteData(name, rect);
   _spriteNames.push_back(name);
 }
 

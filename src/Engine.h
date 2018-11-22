@@ -16,6 +16,8 @@ class DebugDraw;
 class ShaderGenerator;
 class Shader;
 class ShaderCapsSet;
+class SceneRenderer;
+class Texture;
 
 typedef std::shared_ptr<Shader> ShaderPtr;
 
@@ -24,21 +26,22 @@ public:
   Engine();
   ~Engine();
 
-  void setup(IGame *game);
+  void setup(std::weak_ptr<IGame> game);
   void quit();
   void printStatus();
   void update(double dt);
-  void renderScene(Scene &scene);
+  void renderScene(std::shared_ptr<Scene> scene);
 
   std::shared_ptr<ShaderGenerator> generator() { return _generator; }
   ShaderPtr getShaderWithCaps (std::shared_ptr<ShaderCapsSet> caps) const;
 
   std::shared_ptr<DebugDraw> debugDraw() const;
 
-  const Input *const input() const { return _input; }
+  const std::shared_ptr<Input> input() const { return _input; }
   double time () { return _currentTime; }
 
-  Renderer *renderer() { return _renderer; }
+  void projectorTexture(const std::shared_ptr<Texture> texture);
+
   const std::shared_ptr<Window>window() { return _window; }
 
   friend void mainLoop(void *arg);
@@ -51,14 +54,13 @@ private:
   void init();
 
 private:
+  std::shared_ptr<SceneRenderer> _sceneRenderer;
   std::shared_ptr<Window> _window;
   std::shared_ptr<ShaderGenerator> _generator;
-  Renderer *_renderer;
-  Input *_input;
-  IGame *_game;
+  std::shared_ptr<Input> _input;
+  std::weak_ptr<IGame> _game;
 
-  float _lastDt;
-  bool _shouldQuit;
+  bool _shouldQuit = false;
   double _currentTime = 0;
   double _startTime = 0;
 };

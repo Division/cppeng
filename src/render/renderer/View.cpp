@@ -5,6 +5,3 @@
 #include "View.h"
 #include "Renderer.h"
 
-View::View(bool lightingEnabled) {
-   _renderer = std::make_unique<Renderer>(nullptr);
-}

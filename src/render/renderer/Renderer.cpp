@@ -17,40 +17,20 @@
 #include "render/lighting/LightGrid.h"
 #include "render/debug/DebugDraw.h"
 #include "render/shader/Uniform.h"
+#include "View.h"
 
 using namespace glm;
 
-Renderer::Renderer(std::shared_ptr<Window> window) {
+Renderer::Renderer() {
   _projectorTextureUniform = UNIFORM_TEXTURE_BLOCKS.at(UniformName::ProjectorTexture);
   _lightGrid = std::make_unique<LightGrid>();
+  _uboManager = std::make_unique<UBOManager>();
   _debugDraw = std::make_shared<DebugDraw>();
   _lightGrid->setDebugDraw(_debugDraw);
-  _window = window;
 }
 
 Renderer::~Renderer() {
   // requires non-inline destructor to make unique_ptr forward declaration work
-}
-
-ShaderPtr Renderer::getShaderWithCaps (ShaderCapsSetPtr caps) const {
-  ShaderPtr result;
-
-  auto iterator = _shaders.find(caps->getBitmask());
-  if (iterator == _shaders.end()) {
-    std::string shaderSource = _generator.generateShaderSource(caps);
-    std::stringstream stream;
-    stream.str(shaderSource);
-    std::string vertexSource;
-    std::string fragmentSource;
-
-    loader::loadShader(stream, &vertexSource, &fragmentSource);
-    result = ShaderPtr(new Shader(vertexSource, fragmentSource));
-    _shaders[caps->getBitmask()] = result;
-  } else {
-    result = iterator->second;
-  }
-
-  return result;
 }
 
 void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) {
@@ -63,7 +43,7 @@ void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transf
   }
 }
 
-void Renderer::setupMaterialBindings(RenderOperation *rop) {
+void Renderer::setupAndUploadUBO(RenderOperation *rop) {
   if (rop->material->hasTransformBlock()) {
     UBOStruct::TransformStruct transformStruct;
     transformStruct.transform = rop->modelMatrix;
@@ -71,13 +51,11 @@ void Renderer::setupMaterialBindings(RenderOperation *rop) {
     rop->material->setTransformBlock(transformStruct);
   }
 
-  _uboManager->processMeterialBindings(rop);
+  _uboManager->setTransformBlock(rop);
 }
 
-void Renderer::renderScene(Scene &scene) {
-  for (auto &camera : *scene.cameras()) {
-    _renderCamera(scene, std::const_pointer_cast<Camera>(camera.second));
-  }
+void Renderer::renderScene(std::shared_ptr<Scene> scene, ViewPtr view) {
+  _renderCamera(scene, view->camera());
 }
 
 void Renderer::_clearQueues() {
@@ -87,22 +65,31 @@ void Renderer::_clearQueues() {
   }
 }
 
-void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
+void Renderer::_renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera) {
   _clearQueues();
 
-  auto visibleObjects = scene.visibleObjects(camera);
-  for (auto &object : *visibleObjects) {
+  auto visibleObjects = scene->visibleObjects(camera);
+  for (auto &object : visibleObjects) {
     object->render(*this);
   }
 
   _debugDraw->render(*this);
+  _uboManager->swap();
 
-  _prepareQueues(scene, camera);
+  for (auto &queue : _queues) {
+    for (auto &rop : queue) {
+      setupAndUploadUBO(&rop);
+    }
+  }
 
-  auto lights = scene.visibleLights(camera);
+  auto windowSize = camera->cameraViewSize();
+  _lightGrid->update(windowSize.x, windowSize.y);
+
+  auto lights = scene->visibleLights(camera);
   _lightGrid->appendLights(lights, camera);
-  auto projectors = scene.visibleProjectors(camera);
+  auto projectors = scene->visibleProjectors(camera);
   _lightGrid->appendProjectors(projectors, camera);
+
   _lightGrid->upload();
   _lightGrid->bindBufferTextures();
 
@@ -114,14 +101,8 @@ void Renderer::_renderCamera(Scene &scene, CameraPtr camera) {
   _processRenderPipeline();
 }
 
-void Renderer::_prepareQueues(Scene &scene, CameraPtr camera) {
-  _uboManager->swap();
+void Renderer::_prepareQueues(std::shared_ptr<Scene> scene, CameraPtr camera) {
 
-  for (auto &queue : _queues) {
-    for (auto &rop : queue) {
-      setupMaterialBindings(&rop);
-    }
-  }
 }
 
 void Renderer::_processRenderPipeline() {
@@ -159,8 +140,4 @@ void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue)
   auto &queue = _queues[(int)renderQueue];
   rop.index = _ropCounter++;
   queue.push_back(rop);
-}
-
-void Renderer::postUpdate(float dt) {
-  _lightGrid->update(_window->width(), _window->height());
 }

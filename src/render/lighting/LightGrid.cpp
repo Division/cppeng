@@ -12,6 +12,7 @@
 #include "render/shader/Uniform.h"
 #include "render/debug/DebugDraw.h"
 #include <functional>
+#include "render/renderer/ICameraParamsProvider.h"
 
 struct LightGridStruct {
   unsigned int offset;
@@ -65,12 +66,13 @@ void LightGrid::_clearCells() {
 
 // Executes callback for every cell within projected edgePoints bounds
 // edgePoints is vector because it has different length depending on the object
-void LightGrid::_appendItem(const CameraPtr camera, const std::vector<vec3> &edgePoints, std::function<void (LightGridCell *)> callback) {
+void LightGrid::_appendItem(const std::shared_ptr<ICameraParamsProvider> camera, const std::vector<vec3> &edgePoints,
+                            std::function<void(LightGridCell *)> callback) {
   std::vector<vec3> projectedEdges(edgePoints.size());
   AABB bounds;
 
   for (int i = 0; i < edgePoints.size(); i++) {
-    projectedEdges[i] = glm::project(edgePoints[i], camera->viewMatrix(), camera->projectionMatrix(), camera->viewport());
+    projectedEdges[i] = glm::project(edgePoints[i], camera->cameraViewMatrix(), camera->cameraProjectionMatrix(), camera->cameraViewport());
     if (i == 0) {
       bounds.min = projectedEdges[i];
       bounds.max = projectedEdges[i];
@@ -84,6 +86,11 @@ void LightGrid::_appendItem(const CameraPtr camera, const std::vector<vec3> &edg
   auto endX = (int)round(floorf(fmaxf(fminf(bounds.max.x / _cellSize, _cellsX - 1), 0)));
   auto endY = (int)round(floorf(fmaxf(fminf(bounds.max.y / _cellSize, _cellsY - 1), 0)));
 
+//  startX = 0;
+//  startY = 0;
+//  endX = _cellsX - 1;
+//  endY = _cellsY - 1;
+
   if ((endX < 0) || (startX >= (int)_cellsX) || (endY < 0) || (startY >= (int)_cellsY)) {
     return; // light out of grid bounds
   }
@@ -96,17 +103,18 @@ void LightGrid::_appendItem(const CameraPtr camera, const std::vector<vec3> &edg
   }
 }
 
-void LightGrid::appendLights(const std::vector<LightObjectPtr> *lights, const CameraPtr camera) {
+void LightGrid::appendLights(const std::vector<LightObjectPtr> &lights,
+                             const std::shared_ptr<ICameraParamsProvider> camera) {
   _lightEdges.resize(4);
 
-  for (auto &light : *lights) {
+  for (auto &light : lights) {
     vec3 position = light->transform()->worldPosition();
     float radius = light->radius();
 
-    _lightEdges[0] = position + camera->transform()->left() * radius;
-    _lightEdges[1] = position + camera->transform()->right() * radius;
-    _lightEdges[2] = position + camera->transform()->up() * radius;
-    _lightEdges[3] = position + camera->transform()->down() * radius;
+    _lightEdges[0] = position + camera->cameraLeft() * radius;
+    _lightEdges[1] = position + camera->cameraRight() * radius;
+    _lightEdges[2] = position + camera->cameraUp() * radius;
+    _lightEdges[3] = position + camera->cameraDown() * radius;
 
     _appendItem(camera, _lightEdges, [&](LightGridCell *cell) {
       switch(light->type()) {
@@ -121,8 +129,9 @@ void LightGrid::appendLights(const std::vector<LightObjectPtr> *lights, const Ca
   }
 }
 
-void LightGrid::appendProjectors(const std::vector<ProjectorPtr> *projectors, const CameraPtr camera) {
-  for (auto &projector : *projectors) {
+void LightGrid::appendProjectors(const std::vector<ProjectorPtr> &projectors,
+                                 std::shared_ptr<ICameraParamsProvider> camera) {
+  for (auto &projector : projectors) {
     vec3 position = projector->transform()->worldPosition();
 
     projector->getEdgePoints(_lightEdges);

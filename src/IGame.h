@@ -5,11 +5,14 @@
 #ifndef CPPWRAPPER_IGAME_H
 #define CPPWRAPPER_IGAME_H
 
+#include <memory>
+
 class Engine;
 
 class IGame {
 public:
-  virtual void init(Engine *engine) = 0;
+  virtual ~IGame() = default;
+  virtual void init(std::shared_ptr<Engine> engine) = 0;
   virtual void update(float dt) = 0;
 };
 

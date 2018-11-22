@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "EngTypes.h"
 #include "GameObject.h"
+#include "render/renderer/ICameraParamsProvider.h"
 
 class Scene : public IGameObjectManager {
 public:
@@ -18,13 +19,13 @@ public:
   const std::unordered_map<GameObjectID, GameObjectPtr> *const gameObjectMap() const { return &_objectMap; };
   const std::vector<GameObjectPtr> *const gameObjects() const { return &_gameObjects; }
   // Temporary returns all objects.
-  const std::vector<ProjectorPtr> *const visibleProjectors(const CameraPtr camera) const { return &_projectors; }
-  const std::vector<GameObjectPtr> *const visibleObjects(const CameraPtr camera) const { return &_gameObjects; }
-  const std::vector<LightObjectPtr> *const visibleLights(const CameraPtr camera) const { return &_lights; }
+  const std::vector<ProjectorPtr> &visibleProjectors(const std::shared_ptr<ICameraParamsProvider> camera) const { return _projectors; }
+  const std::vector<GameObjectPtr> &visibleObjects(const std::shared_ptr<ICameraParamsProvider> camera) const { return _gameObjects; }
+  const std::vector<LightObjectPtr> &visibleLights(const std::shared_ptr<ICameraParamsProvider> camera) const { return _lights; }
   void update(float dt);
 
-  int cameraCount() { return (int)_cameraMap.size(); }
-  const std::unordered_map<GameObjectID, CameraPtr> *cameras() const { return &_cameraMap; }
+  int cameraCount() { return (int)_cameras.size(); }
+  const auto &cameras() const { return _cameras; }
 
 protected:
   // IGameObjectManager
@@ -44,7 +45,7 @@ protected:
   std::unordered_map<GameObjectID, GameObjectPtr> _objectMap; // maps GameObject::id() to GameObject
 
   // TODO: make cameras sorted list
-  std::unordered_map<GameObjectID, CameraPtr> _cameraMap; // maps GameObject::id() to Camera
+  std::vector<CameraPtr> _cameras; // maps GameObject::id() to Camera
   std::vector<ProjectorPtr> _projectors; // Array of projectors
   std::vector<LightObjectPtr> _lights; // Array of scene lights
   std::vector<GameObjectPtr> _gameObjects; // Full list of scene game objects

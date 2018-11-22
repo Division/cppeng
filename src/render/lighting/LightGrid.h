@@ -10,6 +10,7 @@
 #include "EngMath.h"
 #include <memory>
 
+class ICameraParamsProvider;
 class SwappableTextureBufferObject;
 class SwappableTexture2DBuffer;
 class DebugDraw;
@@ -28,8 +29,8 @@ public:
   ~LightGrid() = default;
 
   void update(unsigned int screenWidth, unsigned int screenHeight);
-  void appendLights(const std::vector<LightObjectPtr> *lights, const CameraPtr camera);
-  void appendProjectors(const std::vector<ProjectorPtr> *projectors, const CameraPtr camera);
+  void appendLights(const std::vector<LightObjectPtr> &lights, std::shared_ptr<ICameraParamsProvider> camera);
+  void appendProjectors(const std::vector<ProjectorPtr> &projectors, std::shared_ptr<ICameraParamsProvider> camera);
   void upload();
   void bindBufferTextures();
   void setDebugDraw(std::shared_ptr<DebugDraw> debugDraw);
@@ -54,7 +55,8 @@ private:
 private:
   LightGridCell *_getCellByXY(int x, int y) { return &_cells[x + y * _cellsX]; };
   void _clearCells();
-  void _appendItem(const CameraPtr camera, const std::vector<vec3> &edgePoints, std::function<void (LightGridCell *)> callback);
+  void _appendItem(const std::shared_ptr<ICameraParamsProvider> camera, const std::vector<vec3> &edgePoints,
+                   std::function<void(LightGridCell *)> callback);
 
   // Temporary vector to pass data through the functions
   // Placed here instead of the stack to reduce heap allocations

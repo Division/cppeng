@@ -14,20 +14,22 @@ typedef std::shared_ptr<Scene> ScenePtr;
 
 class UBOManager;
 class LightGrid;
+class Renderer;
+class DebugDraw;
 
 class SceneRenderer {
 public:
   SceneRenderer();
-
   ~SceneRenderer();
 
+  void projectorTexture(const TexturePtr texture);
+  std::shared_ptr<DebugDraw> debugDraw() const;
   void renderScene(ScenePtr scene) const;
 
 private:
-  std::unique_ptr<UBOManager> _uboManager;
-  std::unique_ptr<LightGrid> _lightGrid;
-  View _depthPrePass;
-  View _mainPass;
+  std::unique_ptr<Renderer> _renderer;
+  std::shared_ptr<View> _depthPrePass;
+  std::shared_ptr<View> _mainPass;
 };
 
 

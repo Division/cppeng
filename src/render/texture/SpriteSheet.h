@@ -15,6 +15,8 @@
 using namespace nlohmann;
 
 struct SpriteData {
+  SpriteData() { name = ""; }
+  SpriteData(const std::string &name, Rect bounds) : name(name), bounds(bounds) {}
   std::string name;
   Rect bounds;
 };
