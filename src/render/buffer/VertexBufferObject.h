@@ -16,6 +16,7 @@ public:
   ~VertexBufferObject() override;
 
   virtual void bind();
+  virtual void unbind();
   void upload() override;
   GLuint vbo() { return _vbo; }
 
@@ -27,6 +28,7 @@ protected:
   unsigned int _fixedSize;
   void _recreateBuffer();
 };
+
 
 typedef std::shared_ptr<VertexBufferObject> VertexBufferObjectPtr;
 
@@ -45,5 +47,7 @@ private:
   GLenum _usage;
   unsigned int _fixedSize;
 };
+
+typedef std::shared_ptr<SwappableVertexBufferObject> SwappableVertexBufferObjectPtr;
 
 #endif //CPPWRAPPER_VERTEXBUFFEROBJECT_H

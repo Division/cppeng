@@ -86,11 +86,6 @@ void LightGrid::_appendItem(const std::shared_ptr<ICameraParamsProvider> camera,
   auto endX = (int)round(floorf(fmaxf(fminf(bounds.max.x / _cellSize, _cellsX - 1), 0)));
   auto endY = (int)round(floorf(fmaxf(fminf(bounds.max.y / _cellSize, _cellsY - 1), 0)));
 
-//  startX = 0;
-//  startY = 0;
-//  endX = _cellsX - 1;
-//  endY = _cellsY - 1;
-
   if ((endX < 0) || (startX >= (int)_cellsX) || (endY < 0) || (startY >= (int)_cellsY)) {
     return; // light out of grid bounds
   }

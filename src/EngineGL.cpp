@@ -32,12 +32,17 @@ GLint engine::GLCaps::_maxUBOSize = 0;
 GLint engine::GLCaps::_uboOffsetAlignment = 0;
 GLint engine::GLCaps::_maxTextureSize = 0;
 GLint engine::GLCaps::_maxUBOBindings = 0;
+GLint engine::GLCaps::_minMapBufferAlighment = 0;
 
 void engine::GLCaps::init() {
   glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &_maxUBOSize);
   glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &_uboOffsetAlignment);
   glGetIntegerv(GL_MAX_TEXTURE_SIZE, &_maxTextureSize);
   glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &_maxUBOBindings);
+//  for some reason constant not available. Specs says it's at least 64. Let's try 256
+//  glGetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &_minMapBufferAlighment);
+  _minMapBufferAlighment = 256;
+
 
   ENGLog("OpenGL Caps:");
   ENGLog("    GL_MAX_UNIFORM_BLOCK_SIZE: %i", _maxUBOSize);

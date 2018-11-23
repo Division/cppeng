@@ -107,7 +107,8 @@ set(ENGINE_SOURCES
         src/render/renderer/View.h
         src/render/shader/ShaderCaps.h
         src/render/shader/ShaderCaps.cpp
-        src/render/renderer/ICameraParamsProvider.h)
+        src/render/renderer/ICameraParamsProvider.h
+        src/render/buffer/MultiVertexBufferObject.cpp src/render/buffer/MultiVertexBufferObject.h)
 
 add_library(cppeng ${ENGINE_SOURCES})
 

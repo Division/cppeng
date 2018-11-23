@@ -24,12 +24,16 @@ namespace engine {
 
     static GLint maxUBOSize() { return _maxUBOSize; }
     static GLint uboOffsetAlignment() { return _uboOffsetAlignment; }
+    static GLint minMapBufferAlighment() { return _minMapBufferAlighment; }
 
   private:
     // UBO
     static GLint _maxUBOSize;
     static GLint _uboOffsetAlignment;
     static GLint _maxUBOBindings;
+
+    // Buffer
+    static GLint _minMapBufferAlighment;
 
     // Texture
     static GLint _maxTextureSize;

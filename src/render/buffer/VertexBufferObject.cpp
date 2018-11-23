@@ -24,6 +24,9 @@ inline void VertexBufferObject::bind() {
   glBindBuffer(_target, _vbo);
 }
 
+inline void VertexBufferObject::unbind() {
+  glBindBuffer(_target, 0);
+}
 
 void VertexBufferObject::_recreateBuffer() {
   auto targetSize = _data.size();
