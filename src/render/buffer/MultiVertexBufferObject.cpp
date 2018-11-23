@@ -4,16 +4,16 @@
 
 #include "MultiVertexBufferObject.h"
 #include "system/Logging.h"
+#include "EngMath.h"
+#include "EngineGL.h"
 
 void MultiVertexBufferObject::map() {
   _isMapped = true;
   _setCurrentBufferMapping(true);
 
-  // Create first buffer if required
-  if (_buffers.empty()) {
-    _currentIndex = -1;
-    _nextVBO();
-  }
+  // Every time it's mapped next VBO is assigned
+  // May be a subject to change by mapping to buffer ranges
+  _nextVBO();
 }
 
 void MultiVertexBufferObject::unmap() {
@@ -26,32 +26,30 @@ MultiVBOAddress MultiVertexBufferObject::appendData(void *data, unsigned int siz
     throw std::runtime_error("can't write to unmapped buffer");
   }
 
-  if (size > _bufferSize) {
+  unsigned int alignedSize = _alignment > 0 ? (unsigned int)(ceil((float)size / _alignment) * _alignment) : size;
+
+  if (alignedSize > _bufferSize) {
     throw std::runtime_error("Can't write more data than buffer size");
   }
 
-  if (size > _bufferSize / 2.0f) {
-    ENGLog("Ineffective use of MultiVertexBufferObject");
-  }
-
   // Current buffer is out of space?
-  if (_currentOffset + size > _bufferSize) {
+  if (_currentOffset + alignedSize > _bufferSize) {
     _nextVBO();
   }
-  auto resultOffset = _currentOffset; // address is the offset before size added
+  auto resultOffset = _currentOffset; // address is the offset before size was added
   auto resultIndex = (unsigned int)_currentIndex;
 
-  _currentOffset += size;
   memcpy(&_mappedPointer[_currentOffset], data, size);
-
+  _currentOffset += alignedSize; // include alignment
 
   return MultiVBOAddress{resultIndex, resultOffset};
 }
 
 // Should be called before data population
 void MultiVertexBufferObject::swapBuffers() {
-  _currentIndex = 0;
+  _currentIndex = -1;
   _currentOffset = 0;
+
   for (auto &buffer : _buffers) {
     buffer->swap();
   }
@@ -65,7 +63,8 @@ void MultiVertexBufferObject::_nextVBO() {
   _currentOffset = 0;
 
   if (_buffers.size() <= _currentIndex) {
-    _buffers.emplace_back(std::make_shared<SwappableVertexBufferObject>(_target, _usage));
+    ENGLog("multi vbo added");
+    _buffers.emplace_back(std::make_shared<SwappableVertexBufferObject>(_target, _usage, _bufferSize));
   }
 
   _setCurrentBufferMapping(true);
@@ -85,4 +84,8 @@ void MultiVertexBufferObject::_setCurrentBufferMapping(bool mapped) {
     glUnmapBuffer(_target);
     buffer->current()->unbind();
   };
+}
+
+unsigned int MultiVertexBufferObject::getVBO(unsigned int index) {
+  return _buffers[index]->current()->vbo();
 }

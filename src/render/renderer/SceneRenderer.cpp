@@ -20,6 +20,8 @@ SceneRenderer::SceneRenderer() {
 }
 
 void SceneRenderer::renderScene(ScenePtr scene) const {
+  _renderer->renderPrepare();
+
   // TODO: shadow map rendering first
 
   auto camera = scene->cameraCount() ? scene->cameras()[0] : nullptr;

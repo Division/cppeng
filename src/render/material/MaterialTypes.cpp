@@ -100,7 +100,6 @@ MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
     _normalMapBindings[i] = _addTextureBinding((UniformName)normalMapOffset);
   }
 
-
   _shader = engine->getShaderWithCaps(caps);
 
   if (specularmap) {

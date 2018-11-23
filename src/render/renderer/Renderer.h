@@ -40,6 +40,7 @@ public:
   std::shared_ptr<DebugDraw> debugDraw() const { return _debugDraw; }
 
   // Rendering
+  void renderPrepare();
   void renderScene(std::shared_ptr<Scene> scene, ViewPtr view);
 
   void projectorTexture(const TexturePtr texture) { _projectorTexture = texture; }

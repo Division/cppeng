@@ -74,9 +74,6 @@ std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) const {
   data["USE_BUFFER_TEXTURE"] = ENGINE_USE_BUFFER_TEXTURE;
 
   auto result = _env.render_template(_templateMap.at(ROOT_TEMPLATE), data);
-  if (caps->hasCap(ShaderCaps::VertexColor)) {
-    ENGLog("Debug src\n%s", result.c_str());
-  }
 
   return result;
 }

@@ -7,6 +7,7 @@
 #include "system/Logging.h"
 #include <memory>
 #include <vector>
+#include "render/buffer/MultiVertexBufferObject.h"
 #include "render/buffer/VertexBufferObject.h"
 #include "objects/Camera.h"
 #include "EngineGL.h"
@@ -20,8 +21,12 @@ UBOManager::UBOManager() {
   auto lightMaxSize = sizeof(UBOStruct::Light) * MAX_LIGHTS;
   auto projectorMaxSize = sizeof(UBOStruct::Projector) * MAX_LIGHTS;
 
-  // TODO: looks like it should be changed to map/unmap buffer
-  _transform = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
+  _transform = std::make_shared<MultiVertexBufferObject>(
+    GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW,
+    engine::GLCaps::maxUBOSize(),
+    engine::GLCaps::uboOffsetAlignment()
+  );
+
   _light = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, lightMaxSize);
   _projector = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, projectorMaxSize);
   _camera = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
@@ -71,19 +76,15 @@ void UBOManager::setCamera(std::shared_ptr<ICameraParamsProvider> camera) {
 
 void UBOManager::setTransformBlock(RenderOperation *rop) {
   MaterialPtr material = rop->material;
-  auto buffer = _transform->current();
-
   if (material->hasTransformBlock()) {
     auto &transformStruct = material->getTransformStruct();
-    auto alignBytes = (unsigned int)engine::GLCaps::uboOffsetAlignment();
-    auto offset = (unsigned int)buffer->appendData((void *) &transformStruct, sizeof(transformStruct), alignBytes);
-    rop->transformBlockOffset = (int)offset;
+    auto address = _transform->appendData((void *) &transformStruct, sizeof(transformStruct));
+    rop->transformBlockOffset = address;
   }
 }
 
 void UBOManager::swap() {
-  _transform->swap();
-  _transform->current()->resize(0);
+  _transform->swapBuffers();
 
   _light->swap();
   _light->current()->resize(0);
@@ -99,7 +100,6 @@ void UBOManager::swap() {
 }
 
 void UBOManager::upload() {
-  _transform->current()->upload();
   _light->current()->upload();
   _projector->current()->upload();
   _camera->current()->upload();
@@ -112,12 +112,20 @@ void UBOManager::setupForRender(RenderOperation *rop) {
   material->activateTextures();
 
   if (material->hasTransformBlock()) {
-    auto offset = (unsigned int)rop->transformBlockOffset;
+    auto address = rop->transformBlockOffset;
     auto size = sizeof(UBOStruct::TransformStruct);
     auto slot = (GLuint)UniformBlockName::Transform;
-    auto vbo = _transform->current()->vbo();
-    glBindBufferRange(GL_UNIFORM_BUFFER, slot, vbo, offset, size);
+    auto vbo = _transform->getVBO(address.index);
+    glBindBufferRange(GL_UNIFORM_BUFFER, slot, vbo, address.offset, size);
   } else {
     ENGLog("No transform");
   }
+}
+
+void UBOManager::map() {
+  _transform->map();
+}
+
+void UBOManager::unmap() {
+  _transform->unmap();
 }

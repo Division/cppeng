@@ -74,13 +74,14 @@ void Renderer::_renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICame
   }
 
   _debugDraw->render(*this);
-  _uboManager->swap();
 
+  _uboManager->map();
   for (auto &queue : _queues) {
     for (auto &rop : queue) {
       setupAndUploadUBO(&rop);
     }
   }
+  _uboManager->unmap();
 
   auto windowSize = camera->cameraViewSize();
   _lightGrid->update(windowSize.x, windowSize.y);
@@ -140,4 +141,8 @@ void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue)
   auto &queue = _queues[(int)renderQueue];
   rop.index = _ropCounter++;
   queue.push_back(rop);
+}
+
+void Renderer::renderPrepare() {
+  _uboManager->swap();
 }

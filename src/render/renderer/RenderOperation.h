@@ -9,6 +9,7 @@
 #include "EngMath.h"
 #include "EngineGL.h"
 #include "render/material/Material.h"
+#include "render/buffer/MultiVBOAddress.h"
 
 struct RenderOperation {
   MeshPtr mesh;
@@ -16,7 +17,7 @@ struct RenderOperation {
   mat4 modelMatrix;
   GLenum mode = GL_TRIANGLES;
   unsigned int index;
-  int transformBlockOffset; // signed int to use -1 as unready marker
+  MultiVBOAddress transformBlockOffset; // signed int to use -1 as unready marker
   int renderOrder;
   std::string debugInfo;
 

@@ -9,12 +9,6 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/html5.h>
-
-EM_BOOL onWebResize(int eventType, const EmscriptenUiEvent* event, void* userData) {
-  double w, h;
-  emscripten_get_element_css_size(nullptr, &w, &h);
-  ENGLog("Window resize %fx%f", w, h);
-}
 #endif
 
 

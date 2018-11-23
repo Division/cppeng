@@ -11,6 +11,7 @@
 #include "RenderOperation.h"
 
 class SwappableVertexBufferObject;
+class MultiVertexBufferObject;
 class ICameraParamsProvider;
 
 // Class manages uniform buffer objects
@@ -26,9 +27,11 @@ public:
   void updateLights(const std::vector<LightObjectPtr> &lights);
   void updateProjectors(const std::vector<ProjectorPtr> &projectors);
   void setCamera(std::shared_ptr<ICameraParamsProvider> camera);
+  void map();
+  void unmap();
 private:
   // Data related to objects transformation
-  std::shared_ptr<SwappableVertexBufferObject> _transform;
+  std::shared_ptr<MultiVertexBufferObject> _transform;
 
   // Regular light sources (point, spot, directional)
   std::shared_ptr<SwappableVertexBufferObject> _light;
