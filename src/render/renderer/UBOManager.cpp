@@ -99,9 +99,12 @@ void UBOManager::swap() {
   glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)UniformBlockName::Camera, _camera->current()->vbo());
 }
 
-void UBOManager::upload() {
-  _light->current()->upload();
-  _projector->current()->upload();
+void UBOManager::upload(bool includeLighting) {
+  if (includeLighting) {
+    _light->current()->upload();
+    _projector->current()->upload();
+  }
+
   _camera->current()->upload();
 }
 

@@ -9,6 +9,11 @@
 #include "EngMath.h"
 #include <vector>
 
+class MaterialDepthPrepass: public Material {
+public:
+  MaterialDepthPrepass();
+};
+
 class MaterialSingleColor: public Material {
 public:
   MaterialSingleColor();

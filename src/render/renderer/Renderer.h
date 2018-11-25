@@ -52,18 +52,18 @@ public:
 
 private:
   std::shared_ptr<DebugDraw> _debugDraw;
-
   std::unique_ptr<UBOManager> _uboManager;
   std::unique_ptr<LightGrid> _lightGrid;
   std::shared_ptr<Texture> _projectorTexture; // usually a spritesheet
   unsigned int _projectorTextureUniform = 0;
+  std::shared_ptr<Material> _depthPrePassMaterial;
 
   std::vector<RenderOperation> _queues[(int)RenderQueue::Count];
   unsigned int _ropCounter;
 
 private:
   void _prepareQueues(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
-  void _processRenderPipeline();
+  void _processRenderPipeline(RenderMode mode);
   void _renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera);
   void setupAndUploadUBO(RenderOperation *rop);
   void _clearQueues();

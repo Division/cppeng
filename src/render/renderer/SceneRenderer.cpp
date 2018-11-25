@@ -10,6 +10,7 @@
 #include <render/renderer/Renderer.h>
 #include "render/renderer/ICameraParamsProvider.h"
 #include "objects/Camera.h"
+#include "utils/Performance.h"
 
 SceneRenderer::SceneRenderer() {
   _depthPrePass = std::make_shared<View>();
@@ -27,8 +28,15 @@ void SceneRenderer::renderScene(ScenePtr scene) const {
   auto camera = scene->cameraCount() ? scene->cameras()[0] : nullptr;
   if (!camera) { return; }
 
+  engine::Performance::startTimer(engine::Performance::Entry::DepthPrePass);
+  _depthPrePass->camera(std::static_pointer_cast<ICameraParamsProvider>(camera));
+  _renderer->renderScene(scene, _depthPrePass);
+  engine::Performance::stopTimer(engine::Performance::Entry::DepthPrePass);
+
+  engine::Performance::startTimer(engine::Performance::Entry::MainPass);
   _mainPass->camera(std::static_pointer_cast<ICameraParamsProvider>(camera));
   _renderer->renderScene(scene, _mainPass);
+  engine::Performance::stopTimer(engine::Performance::Entry::MainPass);
 }
 
 SceneRenderer::~SceneRenderer() {

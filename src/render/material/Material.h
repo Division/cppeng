@@ -18,7 +18,7 @@ public:
   const ShaderPtr shader() const { return _shader; }
 
   bool hasTransformBlock() { return _bindings.hasTransform; }
-  void setTransformBlock(UBOStruct::TransformStruct &value) { _bindings.transform.data = value; }
+  void setTransformBlock(const UBOStruct::TransformStruct &value) { _bindings.transform.data = value; }
   const UBOStruct::TransformStruct &getTransformStruct() { return _bindings.transform.data; }
 
   void setView(const mat4 &viewMatrix);

@@ -6,6 +6,14 @@
 #include "EngineMain.h"
 #include "render/renderer/Renderer.h"
 
+MaterialDepthPrepass::MaterialDepthPrepass() {
+  auto engine = getEngine();
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>(); // empty caps
+  _shader = engine->getShaderWithCaps(caps);
+  _shader->addUniformBlock(UniformBlockName::Transform);
+  _shader->addUniformBlock(UniformBlockName::Camera);
+};
+
 MaterialSingleColor::MaterialSingleColor() {
   auto engine = getEngine();
 

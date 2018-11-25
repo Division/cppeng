@@ -19,6 +19,7 @@
 #include "scene/Scene.h"
 #include "render/renderer/SceneRenderer.h"
 #include "EngineMain.h"
+#include "utils/Performance.h"
 
 using namespace glm;
 
@@ -44,6 +45,8 @@ void Engine::quit() {
 bool shouldPrint = false;
 
 void mainLoop(void *arg) {
+  engine::Performance::startTimer(engine::Performance::Entry::Frame);
+
   auto engine = static_cast<Engine*>(arg);
 
   // Time
@@ -64,12 +67,16 @@ void mainLoop(void *arg) {
   // Update
   engine->_window->processEvents();
   engine->update(dt);
+
+  engine::Performance::startTimer(engine::Performance::Entry::SwapBuffers);
   engine->_window->swapBuffers();
+  engine::Performance::stopTimer(engine::Performance::Entry::SwapBuffers);
 
   if (engine->_window->quitTriggered()) {
     engine->quit();
   }
 
+  engine::Performance::stopTimer(engine::Performance::Entry::Frame);
 }
 
 void Engine::printStatus() {
@@ -128,6 +135,8 @@ void Engine::init() {
   engine::GLCaps::init(); // Setup OpenGL caps
   _generator->setupTemplates();
   _sceneRenderer = std::make_shared<SceneRenderer>();
+
+  engine::Performance::initialize();
 
   _game.lock()->init(getEngine());
   engine::checkGLError();

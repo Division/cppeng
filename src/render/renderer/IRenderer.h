@@ -13,7 +13,8 @@ class Material;
 
 enum class RenderMode : int {
   DepthOnly = 0,
-  Normal
+  Normal, // Depth test, no depth write,
+  NormalDepthWrite // To use without depth pre pass
 };
 
 enum class RenderQueue : int {

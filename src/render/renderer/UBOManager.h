@@ -22,7 +22,7 @@ public:
   UBOManager();
   void setTransformBlock(RenderOperation *rop);
   void swap();
-  void upload();
+  void upload(bool includeLighting);
   void setupForRender(RenderOperation *rop);
   void updateLights(const std::vector<LightObjectPtr> &lights);
   void updateProjectors(const std::vector<ProjectorPtr> &projectors);

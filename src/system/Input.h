@@ -28,6 +28,7 @@ enum class Key : int {
   Z,
   Space,
   Esc,
+  Equal,
 
   MouseLeft,
   MouseRight,

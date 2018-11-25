@@ -23,6 +23,7 @@ const std::unordered_map<int, int> INPUT_CONVERSION = {
     { (int)Key::Z, GLFW_KEY_Z },
     { (int)Key::Space, GLFW_KEY_SPACE },
     { (int)Key::Esc, GLFW_KEY_ESCAPE },
+    { (int)Key::Equal, GLFW_KEY_EQUAL},
 
     { (int)Key::MouseLeft, GLFW_MOUSE_BUTTON_1 },
     { (int)Key::MouseRight, GLFW_MOUSE_BUTTON_2 }

@@ -3,6 +3,7 @@
 //
 
 #include <system/Window.h>
+#include <glm/gtx/perpendicular.inl>
 #include "Renderer.h"
 #include "loader/ShaderLoader.h"
 
@@ -13,11 +14,13 @@
 #include "glm/glm.hpp"
 #include "scene/Scene.h"
 #include"render/material/Material.h"
+#include"render/material/MaterialTypes.h"
 #include "objects/Camera.h"
 #include "render/lighting/LightGrid.h"
 #include "render/debug/DebugDraw.h"
 #include "render/shader/Uniform.h"
 #include "View.h"
+#include "utils/Performance.h"
 
 using namespace glm;
 
@@ -27,6 +30,7 @@ Renderer::Renderer() {
   _uboManager = std::make_unique<UBOManager>();
   _debugDraw = std::make_shared<DebugDraw>();
   _lightGrid->setDebugDraw(_debugDraw);
+  _depthPrePassMaterial = std::make_shared<MaterialDepthPrepass>();
 }
 
 Renderer::~Renderer() {
@@ -55,18 +59,35 @@ void Renderer::setupAndUploadUBO(RenderOperation *rop) {
 }
 
 void Renderer::renderScene(std::shared_ptr<Scene> scene, ViewPtr view) {
-  _renderCamera(scene, view->camera());
-}
+  switch (view->mode()) {
+    case RenderMode::DepthOnly:
+      glDepthMask(GL_TRUE);
+      glClear(GL_DEPTH_BUFFER_BIT);
+      glEnable(GL_DEPTH_TEST);
+      glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+      glDepthFunc(GL_LESS);
+      break;
 
-void Renderer::_clearQueues() {
-  _ropCounter = 0;
-  for (auto &queue : _queues) {
-    queue.clear();
+    case RenderMode::Normal:
+      glDepthMask(GL_FALSE);
+      glEnable(GL_DEPTH_TEST);
+      glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+      glDepthFunc(GL_LEQUAL);
+      break;
+
+    case RenderMode::NormalDepthWrite:
+      glDepthMask(GL_TRUE);
+      glEnable(GL_DEPTH_TEST);
+      glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+      glDepthFunc(GL_LEQUAL);
+      break;
   }
-}
 
-void Renderer::_renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera) {
+  bool needsLighting = true || view->mode() != RenderMode::DepthOnly;
+
   _clearQueues();
+
+  auto camera = view->camera();
 
   auto visibleObjects = scene->visibleObjects(camera);
   for (auto &object : visibleObjects) {
@@ -83,41 +104,70 @@ void Renderer::_renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICame
   }
   _uboManager->unmap();
 
-  auto windowSize = camera->cameraViewSize();
-  _lightGrid->update(windowSize.x, windowSize.y);
+  if (needsLighting) {
+    engine::Performance::startTimer(engine::Performance::Entry::LightGrid);
+    auto windowSize = camera->cameraViewSize();
+    _lightGrid->update(windowSize.x, windowSize.y);
 
-  auto lights = scene->visibleLights(camera);
-  _lightGrid->appendLights(lights, camera);
-  auto projectors = scene->visibleProjectors(camera);
-  _lightGrid->appendProjectors(projectors, camera);
+    auto lights = scene->visibleLights(camera);
+    _lightGrid->appendLights(lights, camera);
+    auto projectors = scene->visibleProjectors(camera);
+    _lightGrid->appendProjectors(projectors, camera);
 
-  _lightGrid->upload();
-  _lightGrid->bindBufferTextures();
+    _lightGrid->upload();
+    _lightGrid->bindBufferTextures();
+    _uboManager->updateLights(lights);
+    _uboManager->updateProjectors(projectors);
+    engine::Performance::stopTimer(engine::Performance::Entry::LightGrid);
+  }
 
   _uboManager->setCamera(camera);
-  _uboManager->updateLights(lights);
-  _uboManager->updateProjectors(projectors);
-  _uboManager->upload();
+  _uboManager->upload(needsLighting);
 
-  _processRenderPipeline();
+  _processRenderPipeline(view->mode());
+}
+
+void Renderer::_clearQueues() {
+  _ropCounter = 0;
+  for (auto &queue : _queues) {
+    queue.clear();
+  }
+}
+
+void Renderer::_renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera) {
+
 }
 
 void Renderer::_prepareQueues(std::shared_ptr<Scene> scene, CameraPtr camera) {
 
 }
 
-void Renderer::_processRenderPipeline() {
+void Renderer::_processRenderPipeline(RenderMode mode) {
   if (_projectorTexture && _projectorTexture->id()) {
     glActiveTexture(GL_TEXTURE0 + _projectorTextureUniform);
     glBindTexture(GL_TEXTURE_2D, _projectorTexture->id());
   }
 
+  bool isDepthOnly = mode == RenderMode::DepthOnly;
+  MaterialPtr tempMaterial;
+
   // Opaque
   auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
   for (auto &rop : opaqueQueue) {
+    if (isDepthOnly) {
+      tempMaterial = rop.material;
+      rop.material = _depthPrePassMaterial;
+      rop.material->setTransformBlock(tempMaterial->getTransformStruct());
+    }
     _uboManager->setupForRender(&rop);
-
     renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
+    if (isDepthOnly) {
+      rop.material = tempMaterial;
+    }
+  }
+
+  if (isDepthOnly) {
+    return;
   }
 
   // Debug
