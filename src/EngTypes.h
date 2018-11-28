@@ -10,6 +10,9 @@
 class Texture;
 typedef std::shared_ptr<Texture> TexturePtr;
 
+class Material;
+typedef std::shared_ptr<Material> MaterialPtr;
+
 class LightObject;
 typedef std::shared_ptr<LightObject> LightObjectPtr;
 
@@ -18,6 +21,9 @@ typedef std::shared_ptr<Projector> ProjectorPtr;
 
 class Camera;
 typedef std::shared_ptr<Camera> CameraPtr;
+
+class Shader;
+typedef std::shared_ptr<Shader> ShaderPtr;
 
 //class MaterialTexutre;
 //typedef std::shared_ptr<MaterialTexutre> MaterialTexutrePtr;
@@ -30,6 +36,12 @@ typedef std::shared_ptr<Terrain> TerrainPtr;
 
 class SpriteSheet;
 typedef std::shared_ptr<SpriteSheet> SpriteSheetPtr;
+
+class ShaderCapsSet;
+typedef std::shared_ptr<ShaderCapsSet> ShaderCapsSetPtr;
+
+class SwappableFrameBufferObject;
+typedef std::shared_ptr<SwappableFrameBufferObject> SwappableFrameBufferObjectPtr;
 
 #endif //CPPWRAPPER_ENGTYPES_H
 

@@ -94,6 +94,10 @@ void Shader::bind() {
   glUseProgram(_program);
 }
 
+void Shader::unbind() {
+  glUseProgram(0);
+}
+
 //------------------------------------------------------------------------
 // Uniform
 //------------------------------------------------------------------------
@@ -140,3 +144,4 @@ Uniform *Shader::addUniform(const UniformName type) {
 Uniform *Shader::getUniform (const UniformName type) {
   return _uniforms[(int)type].get();
 }
+

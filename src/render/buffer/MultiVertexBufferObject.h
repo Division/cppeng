@@ -10,6 +10,8 @@
 #include "MultiVBOAddress.h"
 #include "VertexBufferObject.h"
 
+#define USE_MEMORY_BUFFER_MAP false
+
 // Some buffers (e.g. UBO) have limited maximum capacity
 // To handle all required data, multiple buffers should be allocated
 // This class does it by creating buffers when required and mapping data
@@ -20,7 +22,7 @@
 // Also, next vbo is picked after each map() call
 class MultiVertexBufferObject {
 public:
-  MultiVertexBufferObject(GLenum target, GLenum usage, unsigned int bufferSize, unsigned int alignment, GLenum access = GL_WRITE_ONLY) :
+  MultiVertexBufferObject(GLenum target, GLenum usage, unsigned int bufferSize, unsigned int alignment, GLenum access = GL_MAP_WRITE_BIT) :
       _target(target), _usage(usage), _bufferSize(bufferSize), _alignment(alignment), _access(access) {}
 
   unsigned int getVBO(unsigned int index);

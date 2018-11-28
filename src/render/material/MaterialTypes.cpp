@@ -6,6 +6,12 @@
 #include "EngineMain.h"
 #include "render/renderer/Renderer.h"
 
+MaterialPostEffect::MaterialPostEffect(ShaderPtr shader) {
+  _shader = shader;
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
+  _shader->addUniform(UniformName::Texture0);
+}
+
 MaterialDepthPrepass::MaterialDepthPrepass() {
   auto engine = getEngine();
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>(); // empty caps

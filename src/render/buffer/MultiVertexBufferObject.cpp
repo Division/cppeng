@@ -8,17 +8,24 @@
 #include "EngineGL.h"
 
 void MultiVertexBufferObject::map() {
-  _isMapped = true;
+
+  if (_buffers.size() <= _currentIndex) {
+    ENGLog("multi vbo added");
+    _buffers.emplace_back(std::make_shared<SwappableVertexBufferObject>(_target, _usage, _bufferSize));
+  }
+
   _setCurrentBufferMapping(true);
 
   // Every time it's mapped next VBO is assigned
   // May be a subject to change by mapping to buffer ranges
-  _nextVBO();
+  _isMapped = true;
 }
 
 void MultiVertexBufferObject::unmap() {
-  _isMapped = false;
   _setCurrentBufferMapping(false);
+  _currentIndex += 1;
+  _currentOffset = 0;
+  _isMapped = false;
 }
 
 MultiVBOAddress MultiVertexBufferObject::appendData(void *data, unsigned int size) {
@@ -47,7 +54,7 @@ MultiVBOAddress MultiVertexBufferObject::appendData(void *data, unsigned int siz
 
 // Should be called before data population
 void MultiVertexBufferObject::swapBuffers() {
-  _currentIndex = -1;
+  _currentIndex = 0;
   _currentOffset = 0;
 
   for (auto &buffer : _buffers) {
@@ -77,13 +84,28 @@ void MultiVertexBufferObject::_setCurrentBufferMapping(bool mapped) {
 
   auto &buffer = _buffers[_currentIndex];
 
+#if USE_MEMORY_BUFFER_MAP
   if (mapped) {
     buffer->current()->bind();
-    _mappedPointer = (char *)glMapBuffer(_target, _access);
+    buffer->current()->resize(_bufferSize);
+    _mappedPointer = buffer->current()->bufferPointer();
+  } else {
+    _mappedPointer = nullptr;
+    buffer->current()->resize(_currentOffset);
+    buffer->current()->upload();
+    buffer->current()->unbind();
+  };
+#else
+  if (mapped) {
+    buffer->current()->bind();
+    _mappedPointer = (char *)glMapBufferRange(_target, 0, _bufferSize, _access);
   } else {
     glUnmapBuffer(_target);
     buffer->current()->unbind();
   };
+#endif
+
+  engine::checkGLError();
 }
 
 unsigned int MultiVertexBufferObject::getVBO(unsigned int index) {

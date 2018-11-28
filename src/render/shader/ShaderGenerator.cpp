@@ -67,13 +67,13 @@ void ShaderGenerator::_addTemplateCallback(std::string tplName) {
   });
 }
 
-std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps) const {
+std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps, const std::string rootTemplate) const {
   json data = this->_getJSONForCaps(caps);
   data["version"] = GLSL_VERSION;
   data["WEBGL"] = PLATFORM_WEBGL;
   data["USE_BUFFER_TEXTURE"] = ENGINE_USE_BUFFER_TEXTURE;
 
-  auto result = _env.render_template(_templateMap.at(ROOT_TEMPLATE), data);
+  auto result = _env.render_template(_templateMap.at(rootTemplate), data);
 
   return result;
 }
@@ -84,6 +84,12 @@ void ShaderGenerator::setupTemplates () {
     auto tpl = _env.parse_template(path);
     _templateMap[filename] = tpl;
   }
+}
+
+void ShaderGenerator::addTemplate(const std::string &name) {
+  auto path = TEMPLATE_ROOT + name;
+  _templateMap[name] = _env.parse_template(path);
+  _addTemplateCallback(name);
 }
 
 json ShaderGenerator::_getJSONForCaps(ShaderCapsSetPtr caps) const {
@@ -99,12 +105,13 @@ json ShaderGenerator::_getJSONForCaps(ShaderCapsSetPtr caps) const {
   return result;
 }
 
-ShaderPtr ShaderGenerator::getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps) const {
+ShaderPtr ShaderGenerator::getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps, const std::string &rootTemplate) const {
   ShaderPtr result;
 
-  auto iterator = _shaders.find(caps->getBitmask());
-  if (iterator == _shaders.end()) {
-    std::string shaderSource = this->generateShaderSource(caps);
+  auto &shaderCache = _shaders[rootTemplate];
+  auto iterator = shaderCache.find(caps->getBitmask());
+  if (iterator == shaderCache.end()) {
+    std::string shaderSource = this->generateShaderSource(caps, rootTemplate);
     std::stringstream stream;
     stream.str(shaderSource);
     std::string vertexSource;
@@ -112,10 +119,14 @@ ShaderPtr ShaderGenerator::getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps
 
     loader::loadShader(stream, &vertexSource, &fragmentSource);
     result = std::make_shared<Shader>(vertexSource, fragmentSource);
-    _shaders[caps->getBitmask()] = result;
+    shaderCache[caps->getBitmask()] = result;
   } else {
     result = iterator->second;
   }
 
   return result;
+}
+
+ShaderPtr ShaderGenerator::getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps) const {
+  return getShaderWithCaps(caps, ROOT_TEMPLATE);
 }

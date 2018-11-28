@@ -32,7 +32,7 @@ public:
   void update(double dt);
   void renderScene(std::shared_ptr<Scene> scene);
 
-  std::shared_ptr<ShaderGenerator> generator() { return _generator; }
+  std::shared_ptr<ShaderGenerator> shaderGenerator() { return _generator; }
   ShaderPtr getShaderWithCaps (std::shared_ptr<ShaderCapsSet> caps) const;
 
   std::shared_ptr<DebugDraw> debugDraw() const;

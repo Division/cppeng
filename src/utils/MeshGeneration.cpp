@@ -10,14 +10,14 @@ void MeshGeneration::generateSphere(MeshPtr mesh, int parallelCount, int meridia
   std::vector<GLushort> indices;
 
   for (int j = 0; j < parallelCount; j++) {
-    float parallel = M_PI * (float)j / (float)(parallelCount - 1);
+    float parallel = (float)M_PI * (float)j / (float)(parallelCount - 1);
 
     for (int i = 0; i < meridianCount; i++) {
-      float meridian = 2.0 * M_PI * (float)i / (float)meridianCount;
+      float meridian = (float)(2.0 * M_PI * (float)i / (float)meridianCount);
       float x = radius * sinf(parallel) * cosf(meridian);
       float z = radius * cosf(parallel);
 
-      vertices.push_back(vec3(radius * sinf(parallel) * cosf(meridian),
+      vertices.emplace_back(vec3(radius * sinf(parallel) * cosf(meridian),
                          radius * sinf(parallel) * sinf(meridian),
                          radius * cosf(parallel)));
 
@@ -93,3 +93,27 @@ void MeshGeneration::generateCone(MeshPtr mesh, float height, float radius, int 
 
   mesh->setVertices(vertices);
 }
+
+void MeshGeneration::generateFullScreenQuad(MeshPtr mesh) {
+  std::vector<vec3> vertices = {
+    vec3(-1, 1, 0),
+    vec3(-1, -1, 0),
+    vec3(1, -1, 0),
+    vec3(1, -1, 0),
+    vec3(1, 1, 0),
+    vec3(-1, 1, 0),
+  };
+
+  std::vector<vec2> texCoords= {
+    vec2(0, 1),
+    vec2(0, 0),
+    vec2(1, 0),
+    vec2(1, 0),
+    vec2(1, 1),
+    vec2(0, 1)
+  };
+
+  mesh->setVertices(vertices);
+  mesh->setTexCoord0(texCoords);
+}
+

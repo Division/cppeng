@@ -9,6 +9,16 @@
 #include "EngMath.h"
 #include <vector>
 
+class MaterialPostEffect: public Material {
+public:
+  MaterialPostEffect(ShaderPtr shader);
+  void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
+  TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
+
+private:
+  int _texture0Binding = -1;
+};
+
 class MaterialDepthPrepass: public Material {
 public:
   MaterialDepthPrepass();

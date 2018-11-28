@@ -66,7 +66,6 @@ void VertexBufferObject::upload() {
   this->resize(0);
 }
 
-
 std::shared_ptr<VertexBufferObject> SwappableVertexBufferObject::createBuffer() {
   return std::make_shared<VertexBufferObject>(_target, _usage, _fixedSize);
 }

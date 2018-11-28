@@ -21,15 +21,19 @@ class ShaderGenerator {
 public:
   ShaderGenerator();
   void setupTemplates();
-  std::string generateShaderSource(ShaderCapsSetPtr caps) const;
+  void addTemplate(const std::string &name);
+  std::string generateShaderSource(ShaderCapsSetPtr caps, const std::string rootTemplate) const;
   ShaderPtr getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps) const;
+  ShaderPtr getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps, const std::string &rootTemplate) const;
 
 private:
   mutable inja::Environment _env;
   std::unordered_map<std::string, inja::Template> _templateMap;
 
 private:
-  mutable std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> _shaders;
+  typedef std::unordered_map<ShaderCapsSet::Bitmask, ShaderPtr> ShaderCache;
+
+  mutable std::unordered_map<std::string, ShaderCache> _shaders;
   json _getJSONForCaps(ShaderCapsSetPtr shaderCaps) const;
   void _addTemplateCallback(std::string tplName);
 };

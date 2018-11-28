@@ -6,16 +6,19 @@
 #define CPPWRAPPER_SCENERENDERER_H
 
 #include <memory>
-#import "View.h"
-#import "IRenderer.h"
+#include "View.h"
+#include "IRenderer.h"
 
 class Scene;
 typedef std::shared_ptr<Scene> ScenePtr;
 
+class Texture;
 class UBOManager;
 class LightGrid;
 class Renderer;
 class DebugDraw;
+class SwappableFrameBufferObject;
+class PostEffect;
 
 class SceneRenderer {
 public:
@@ -27,9 +30,13 @@ public:
   void renderScene(ScenePtr scene) const;
 
 private:
-  std::unique_ptr<Renderer> _renderer;
+  mutable std::shared_ptr<Texture> _tex;
+  std::shared_ptr<Renderer> _renderer;
   std::shared_ptr<View> _depthPrePass;
   std::shared_ptr<View> _mainPass;
+  std::unique_ptr<PostEffect> _postEffect;
+
+  mutable std::shared_ptr<SwappableFrameBufferObject> _mainFrameBuffer = nullptr;
 };
 
 

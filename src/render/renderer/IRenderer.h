@@ -28,7 +28,7 @@ class IRenderer {
 public:
   virtual ~IRenderer() = default;
   virtual void addRenderOperation(RenderOperation &rop, RenderQueue queue) = 0;
-  virtual void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) = 0;
+  virtual void renderMesh(MeshPtr mesh, GLenum mode) = 0;
 };
 
 #endif //CPPWRAPPER_IRENDERER_H

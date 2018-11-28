@@ -37,7 +37,7 @@ Renderer::~Renderer() {
   // requires non-inline destructor to make unique_ptr forward declaration work
 }
 
-void Renderer::renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) {
+void Renderer::renderMesh(MeshPtr mesh, GLenum mode) {
   glBindVertexArray(mesh->vao());
 
   if (mesh->hasIndices()) {
@@ -83,7 +83,7 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene, ViewPtr view) {
       break;
   }
 
-  bool needsLighting = true || view->mode() != RenderMode::DepthOnly;
+  bool needsLighting = view->mode() != RenderMode::DepthOnly;
 
   _clearQueues();
 
@@ -160,7 +160,7 @@ void Renderer::_processRenderPipeline(RenderMode mode) {
       rop.material->setTransformBlock(tempMaterial->getTransformStruct());
     }
     _uboManager->setupForRender(&rop);
-    renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
+    renderMesh(rop.mesh, rop.mode);
     if (isDepthOnly) {
       rop.material = tempMaterial;
     }
@@ -176,7 +176,7 @@ void Renderer::_processRenderPipeline(RenderMode mode) {
   auto &debugQueue = _queues[(int)RenderQueue::Debug];
   for (auto &rop : debugQueue) {
     _uboManager->setupForRender(&rop);
-    renderMesh(rop.mesh, rop.material, rop.modelMatrix, rop.mode);
+    renderMesh(rop.mesh, rop.mode);
   }
 //  glDisable(GL_PROGRAM_POINT_SIZE);
 //  glEnable(GL_DEPTH_TEST);

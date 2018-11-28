@@ -48,7 +48,7 @@ public:
 
   // IRenderer
   void addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) override;
-  void renderMesh(MeshPtr mesh, MaterialPtr material, const mat4 &transform, GLenum mode) override;
+  void renderMesh(MeshPtr mesh, GLenum mode) override;
 
 private:
   std::shared_ptr<DebugDraw> _debugDraw;

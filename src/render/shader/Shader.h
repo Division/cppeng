@@ -40,6 +40,7 @@ public:
   virtual void notifyDirty(ICleanable *uniform);
 
   void bind();
+  void unbind();
 
   UniformBlock *addUniformBlock(UniformBlockName blockName);
   UniformBlock *getUniformBlock(UniformBlockName type);
