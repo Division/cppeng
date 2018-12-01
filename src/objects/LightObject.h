@@ -72,6 +72,8 @@ public:
   mat4 cameraViewMatrix() const override { return _viewMatrix; }
   mat4 cameraProjectionMatrix() const override { return _projectionMatrix; }
   vec4 cameraViewport() const override { return _viewport; }
+  unsigned int cameraIndex() const override { return _cameraIndex; };
+  void cameraIndex(unsigned int index) override { _cameraIndex = index; };
 
 private:
   // Common light properties
@@ -91,6 +93,7 @@ private:
   vec4 _viewport;
   float _zMin = 0.1f;
   bool _castShadows = false;
+  unsigned int _cameraIndex = 0;
 
   void _updateAttenuation();
   void _updateRadius();

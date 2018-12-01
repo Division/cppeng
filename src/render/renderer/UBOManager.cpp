@@ -62,7 +62,7 @@ void UBOManager::updateProjectors(const std::vector<ProjectorPtr> &projectors) {
   }
 }
 
-void UBOManager::setCamera(std::shared_ptr<ICameraParamsProvider> camera) {
+int UBOManager::appendCamera(std::shared_ptr<ICameraParamsProvider> camera) {
   UBOStruct::Camera cameraData;
   cameraData.position = camera->cameraPosition();
   cameraData.screenSize = camera->cameraViewSize();
@@ -71,7 +71,9 @@ void UBOManager::setCamera(std::shared_ptr<ICameraParamsProvider> camera) {
 
   auto alignBytes = (unsigned int)engine::GLCaps::uboOffsetAlignment();
   auto buffer = _camera->current();
-  buffer->appendData((void *) &cameraData, sizeof(cameraData), alignBytes);
+  auto index = buffer->appendData((void *) &cameraData, sizeof(cameraData), alignBytes);
+  camera->cameraIndex((unsigned int)index);
+  return index;
 }
 
 void UBOManager::setTransformBlock(RenderOperation *rop) {
@@ -97,6 +99,8 @@ void UBOManager::swap() {
   _camera->swap();
   _camera->current()->resize(0);
   glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)UniformBlockName::Camera, _camera->current()->vbo());
+
+  _activeCameraOffset = -1;
 }
 
 void UBOManager::upload(bool includeLighting) {
@@ -122,6 +126,16 @@ void UBOManager::setupForRender(RenderOperation *rop) {
     glBindBufferRange(GL_UNIFORM_BUFFER, slot, vbo, address.offset, size);
   } else {
     ENGLog("No transform");
+  }
+}
+
+void UBOManager::activateCamera(unsigned int offset) {
+  if (_activeCameraOffset != offset) {
+    _activeCameraOffset = offset;
+    auto size = sizeof(UBOStruct::Camera);
+    auto slot = (GLuint)UniformBlockName::Camera;
+    auto vbo = _camera->current()->vbo();
+    glBindBufferRange(GL_UNIFORM_BUFFER, slot, vbo, offset, size);
   }
 }
 

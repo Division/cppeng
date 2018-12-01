@@ -19,8 +19,9 @@
 #include "render/shading/LightGrid.h"
 #include "render/debug/DebugDraw.h"
 #include "render/shader/Uniform.h"
-#include "View.h"
+#include "RenderPass.h"
 #include "utils/Performance.h"
+#include "objects/LightObject.h"
 
 using namespace glm;
 
@@ -58,7 +59,53 @@ void Renderer::setupAndUploadUBO(RenderOperation *rop) {
   _uboManager->setTransformBlock(rop);
 }
 
-void Renderer::renderScene(std::shared_ptr<Scene> scene, ViewPtr view) {
+// Executed once per frame. Upload most of the UBO.
+void Renderer::setupBuffers(ScenePtr &scene, CameraPtr &camera) {
+  _uboManager->swap();
+
+  engine::Performance::startTimer(engine::Performance::Entry::LightGrid);
+  auto windowSize = camera->cameraViewSize();
+  _lightGrid->update(windowSize.x, windowSize.y);
+
+  auto lights = scene->visibleLights(camera);
+  _lightGrid->appendLights(lights, camera);
+  auto projectors = scene->visibleProjectors(camera);
+  _lightGrid->appendProjectors(projectors, camera);
+
+  _lightGrid->upload();
+  _lightGrid->bindBufferTextures();
+  _uboManager->updateLights(lights);
+  _uboManager->updateProjectors(projectors);
+  engine::Performance::stopTimer(engine::Performance::Entry::LightGrid);
+
+  _uboManager->appendCamera(std::static_pointer_cast<ICameraParamsProvider>(camera));
+  for (auto &light : lights) {
+    if (light->castShadows()) {
+      _uboManager->appendCamera(std::static_pointer_cast<ICameraParamsProvider>(light));
+    }
+  }
+
+  _uboManager->upload(true);
+}
+
+// Called for every camera
+void Renderer::populateQueues(std::shared_ptr<Scene> scene, ICameraParamsProviderPtr camera) {
+
+  auto visibleObjects = scene->visibleObjects(camera);
+  for (auto &object : visibleObjects) {
+    object->render(*this);
+  }
+
+  _uboManager->map();
+  for (auto &queue : _queues) {
+    for (auto &rop : queue) {
+      setupAndUploadUBO(&rop);
+    }
+  }
+  _uboManager->unmap();
+}
+
+void Renderer::renderScene(RenderPassPtr view) {
   switch (view->mode()) {
     case RenderMode::DepthOnly:
       glDepthMask(GL_TRUE);
@@ -81,50 +128,16 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene, ViewPtr view) {
       glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
       glDepthFunc(GL_LEQUAL);
       break;
+
+    case RenderMode::UI:
+      glDepthMask(GL_FALSE);
+      glDisable(GL_DEPTH_TEST);
+      glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+      break;
   }
-
-  bool needsLighting = view->mode() != RenderMode::DepthOnly;
-
-  clearQueues();
 
   auto camera = view->camera();
-
-  auto visibleObjects = scene->visibleObjects(camera);
-  for (auto &object : visibleObjects) {
-    object->render(*this);
-  }
-
-  if (view->mode() == RenderMode::Normal) {
-    _debugDraw->render(*this);
-  }
-
-  _uboManager->map();
-  for (auto &queue : _queues) {
-    for (auto &rop : queue) {
-      setupAndUploadUBO(&rop);
-    }
-  }
-  _uboManager->unmap();
-
-  if (needsLighting) {
-    engine::Performance::startTimer(engine::Performance::Entry::LightGrid);
-    auto windowSize = camera->cameraViewSize();
-    _lightGrid->update(windowSize.x, windowSize.y);
-
-    auto lights = scene->visibleLights(camera);
-    _lightGrid->appendLights(lights, camera);
-    auto projectors = scene->visibleProjectors(camera);
-    _lightGrid->appendProjectors(projectors, camera);
-
-    _lightGrid->upload();
-    _lightGrid->bindBufferTextures();
-    _uboManager->updateLights(lights);
-    _uboManager->updateProjectors(projectors);
-    engine::Performance::stopTimer(engine::Performance::Entry::LightGrid);
-  }
-
-  _uboManager->setCamera(camera);
-  _uboManager->upload(needsLighting);
+  _uboManager->activateCamera(camera->cameraIndex());
 
   auto viewport = camera->cameraViewport();
   glViewport((int)viewport.x, (int)viewport.y, (int)viewport.z, (int)viewport.w);
@@ -147,10 +160,25 @@ void Renderer::_prepareQueues(std::shared_ptr<Scene> scene, CameraPtr camera) {
 }
 
 void Renderer::_processRenderPipeline(RenderMode mode) {
+
+  // For UI pass just render everything and exit function
+  if (mode == RenderMode::UI) {
+    auto &debugQueue = _queues[(int)RenderQueue::UI];
+    for (auto &rop : debugQueue) {
+      _uboManager->setupForRender(&rop);
+      renderMesh(rop.mesh, rop.mode);
+    }
+
+    return;
+  }
+  // ---------------
+
+  // Next, binding projector texture
   if (_projectorTexture && _projectorTexture->id()) {
     glActiveTexture(GL_TEXTURE0 + _projectorTextureUniform);
     glBindTexture(GL_TEXTURE_2D, _projectorTexture->id());
   }
+  // ---------------
 
   bool isDepthOnly = mode == RenderMode::DepthOnly;
   MaterialPtr tempMaterial;
@@ -158,32 +186,31 @@ void Renderer::_processRenderPipeline(RenderMode mode) {
   // Opaque
   auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
   for (auto &rop : opaqueQueue) {
-    if (isDepthOnly) {
+    if (isDepthOnly) { // For depth only pass substitute the material with the simplest shader
       tempMaterial = rop.material;
       rop.material = _depthPrePassMaterial;
       rop.material->setTransformBlock(tempMaterial->getTransformStruct());
     }
     _uboManager->setupForRender(&rop);
     renderMesh(rop.mesh, rop.mode);
-    if (isDepthOnly) {
+    if (isDepthOnly) { // and restore back
       rop.material = tempMaterial;
     }
   }
+  // ---------------
 
-  if (isDepthOnly) {
+  if (isDepthOnly) { // Debug and transparency are skipped for depth only
     return;
   }
 
   // Debug
-//  glEnable(GL_PROGRAM_POINT_SIZE);
-//  glDisable(GL_DEPTH_TEST);
   auto &debugQueue = _queues[(int)RenderQueue::Debug];
   for (auto &rop : debugQueue) {
     _uboManager->setupForRender(&rop);
     renderMesh(rop.mesh, rop.mode);
   }
-//  glDisable(GL_PROGRAM_POINT_SIZE);
-//  glEnable(GL_DEPTH_TEST);
+  // ---------------
+
 }
 
 void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) {
@@ -198,5 +225,5 @@ void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue)
 }
 
 void Renderer::renderPrepare() {
-  _uboManager->swap();
+
 }

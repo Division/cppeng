@@ -6,7 +6,7 @@
 #define CPPWRAPPER_SCENERENDERER_H
 
 #include <memory>
-#include "View.h"
+#include "RenderPass.h"
 #include "IRenderer.h"
 #include "render/shading/IShadowCaster.h"
 #include <vector>
@@ -35,8 +35,9 @@ public:
 private:
   std::shared_ptr<DebugDraw> _debugDraw;
   std::shared_ptr<Renderer> _renderer;
-  std::shared_ptr<View> _depthPrePass;
-  std::shared_ptr<View> _mainPass;
+  std::shared_ptr<RenderPass> _depthPrePass;
+  std::shared_ptr<RenderPass> _mainPass;
+  std::shared_ptr<RenderPass> _2dPass;
   std::unique_ptr<PostEffect> _postEffect;
   std::unique_ptr<ShadowMap> _shadowMap;
 

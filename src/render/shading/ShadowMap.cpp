@@ -6,7 +6,7 @@
 #include "render/buffer/FrameBufferObject.h"
 #include "render/renderer/Renderer.h"
 #include "IShadowCaster.h"
-#include "render/renderer/View.h"
+#include "render/renderer/RenderPass.h"
 
 const unsigned int CELL_COUNT = 8;
 const auto MAX_MAPS = CELL_COUNT * CELL_COUNT;
@@ -25,8 +25,8 @@ void ShadowMap::renderShadowMaps(const std::vector<IShadowCasterPtr> &shadowCast
   _depthAtlas->bind();
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  auto view = std::make_shared<View>();
-  view->mode(RenderMode::DepthOnly);
+  auto pass = std::make_shared<RenderPass>();
+  pass->mode(RenderMode::DepthOnly);
 
   unsigned int index = 0;
   for (auto &caster : shadowCasters) {
@@ -37,8 +37,10 @@ void ShadowMap::renderShadowMaps(const std::vector<IShadowCasterPtr> &shadowCast
 
     vec4 viewport = (vec4)getCellPixelRect(index);
     caster->viewport(viewport);
-    view->camera(caster);
-    _renderer->renderScene(scene, view);
+    pass->camera(caster);
+    _renderer->clearQueues();
+    _renderer->populateQueues(scene, caster);
+    _renderer->renderScene(pass);
     index++;
   }
 

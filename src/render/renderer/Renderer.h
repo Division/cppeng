@@ -25,8 +25,8 @@ class Texture;
 typedef std::shared_ptr<Texture> TexturePtr;
 class Scene;
 typedef std::shared_ptr<Scene> ScenePtr;
-class View;
-typedef std::shared_ptr<View> ViewPtr;
+class RenderPass;
+typedef std::shared_ptr<RenderPass> RenderPassPtr;
 typedef std::shared_ptr<DebugDraw> DebugDrawPtr;
 
 // For now renderer is a single instance per app
@@ -41,11 +41,14 @@ public:
 
   // Rendering
   void renderPrepare();
-  void renderScene(std::shared_ptr<Scene> scene, ViewPtr view);
+  void renderScene(RenderPassPtr view);
 
   void projectorTexture(const TexturePtr texture) { _projectorTexture = texture; }
   TexturePtr projectorTexture() const { return _projectorTexture; }
 
+  void clearQueues();
+  void setupBuffers(ScenePtr &scene, CameraPtr &camera);
+  void populateQueues(std::shared_ptr<Scene> scene, ICameraParamsProviderPtr camera);
   // IRenderer
   void addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) override;
   void renderMesh(MeshPtr mesh, GLenum mode) override;
@@ -60,9 +63,10 @@ private:
 
   std::vector<RenderOperation> _queues[(int)RenderQueue::Count];
   unsigned int _ropCounter;
+  int _mainCameraOffset = 0;
+  int _2dCameraOffset = 0;
 
 private:
-  void clearQueues();
   void _prepareQueues(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
   void _processRenderPipeline(RenderMode mode);
   void _renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera);

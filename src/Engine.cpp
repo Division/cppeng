@@ -69,7 +69,7 @@ void mainLoop(void *arg) {
   engine->update(dt);
 
   engine::Performance::startTimer(engine::Performance::Entry::SwapBuffers);
-  engine->_window->swapBuffers();
+    engine->_window->swapBuffers();
   engine::Performance::stopTimer(engine::Performance::Entry::SwapBuffers);
 
   if (engine->_window->quitTriggered()) {

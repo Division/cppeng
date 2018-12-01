@@ -23,7 +23,7 @@ public:
   void drawAABB(const AABB &bounds, const vec4 &color);
   void drawOBB(const OBB &bounds, const vec4 &color);
 
-  void render(IRenderer &renderer);
+  void render(std::shared_ptr<IRenderer> &renderer);
 private:
   int _currentMeshIndex = 0;
   std::vector<vec3> _lines;

@@ -26,7 +26,8 @@ public:
   void setupForRender(RenderOperation *rop);
   void updateLights(const std::vector<LightObjectPtr> &lights);
   void updateProjectors(const std::vector<ProjectorPtr> &projectors);
-  void setCamera(std::shared_ptr<ICameraParamsProvider> camera);
+  int appendCamera(std::shared_ptr<ICameraParamsProvider> camera);
+  void activateCamera(unsigned int offset);
   void map();
   void unmap();
 private:
@@ -43,8 +44,7 @@ private:
   std::shared_ptr<SwappableVertexBufferObject> _camera;
 
 private:
-  int _cameraIndex;
-  int _mainCameraIndex;
+  int _activeCameraOffset = -1;
 };
 
 

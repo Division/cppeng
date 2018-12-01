@@ -30,6 +30,8 @@ public:
   mat4 cameraViewMatrix() const override { return viewMatrix(); }
   mat4 cameraProjectionMatrix() const override { return projectionMatrix(); }
   vec4 cameraViewport() const override { return viewport(); }
+  unsigned int cameraIndex() const override { return _cameraIndex; }; // index is an offset in the corresponding UBO
+  void cameraIndex(unsigned int index) override { _cameraIndex = index; };
 
 protected:
   mat4 _projectionMatrix;
@@ -40,6 +42,7 @@ protected:
   float _aspect; // screen aspect
   unsigned long _mask = ~0ul; // mask to filter gameObjects
 
+  unsigned int _cameraIndex = 0;
 protected:
   inline void _updateProjection();
   inline void _updateView();

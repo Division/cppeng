@@ -12,7 +12,7 @@
 #include "EngMath.h"
 
 // Wraps a single pass with a particular camera
-class View {
+class RenderPass {
 public:
   uvec2 size () const { return this->_camera ? this->_camera->cameraViewSize() : uvec2(0, 0); }
 

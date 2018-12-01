@@ -44,6 +44,7 @@ void Window::initOpenGLWindow(int width, int height) {
 #endif
 //  glfwSetWindowSizeCallback(_window, window_size_callback);
 
+  glfwSwapInterval(0);
   _updateSize();
   ENGLog("Window created with resolution %ix%i", _width, _height);
   ENGLog("GL VERSION: %s", glGetString(GL_VERSION));

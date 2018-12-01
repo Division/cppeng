@@ -106,7 +106,7 @@ void DebugDraw::drawOBB(const OBB &bounds, const vec4 &color) {
   }
 }
 
-void DebugDraw::render(IRenderer &renderer) {
+void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
   if (!_material) { // needed to move material creation out from constructor because renderer isn't fully created yet
     _material = std::make_shared<MaterialDebug>();
   }
@@ -125,7 +125,7 @@ void DebugDraw::render(IRenderer &renderer) {
     lineROP.modelMatrix = mat4();
     lineROP.debugInfo = "debug lines";
     lineROP.mode = GL_LINES;
-    renderer.addRenderOperation(lineROP, RenderQueue::Debug);
+    renderer->addRenderOperation(lineROP, RenderQueue::Debug);
   }
 
   if (!_points.empty()) {
@@ -138,7 +138,7 @@ void DebugDraw::render(IRenderer &renderer) {
     pointROP.modelMatrix = mat4();
     pointROP.debugInfo = "debug points";
     pointROP.mode = GL_POINTS;
-    renderer.addRenderOperation(pointROP, RenderQueue::Debug);
+    renderer->addRenderOperation(pointROP, RenderQueue::Debug);
   }
 
   _lines.resize(0);
