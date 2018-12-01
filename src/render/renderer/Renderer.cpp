@@ -16,7 +16,7 @@
 #include"render/material/Material.h"
 #include"render/material/MaterialTypes.h"
 #include "objects/Camera.h"
-#include "render/lighting/LightGrid.h"
+#include "render/shading/LightGrid.h"
 #include "render/debug/DebugDraw.h"
 #include "render/shader/Uniform.h"
 #include "View.h"
@@ -24,11 +24,11 @@
 
 using namespace glm;
 
-Renderer::Renderer() {
+Renderer::Renderer(DebugDrawPtr debugDraw) {
   _projectorTextureUniform = UNIFORM_TEXTURE_BLOCKS.at(UniformName::ProjectorTexture);
   _lightGrid = std::make_unique<LightGrid>();
   _uboManager = std::make_unique<UBOManager>();
-  _debugDraw = std::make_shared<DebugDraw>();
+  _debugDraw = debugDraw;
   _lightGrid->setDebugDraw(_debugDraw);
   _depthPrePassMaterial = std::make_shared<MaterialDepthPrepass>();
 }
@@ -85,7 +85,7 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene, ViewPtr view) {
 
   bool needsLighting = view->mode() != RenderMode::DepthOnly;
 
-  _clearQueues();
+  clearQueues();
 
   auto camera = view->camera();
 
@@ -94,7 +94,9 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene, ViewPtr view) {
     object->render(*this);
   }
 
-  _debugDraw->render(*this);
+  if (view->mode() == RenderMode::Normal) {
+    _debugDraw->render(*this);
+  }
 
   _uboManager->map();
   for (auto &queue : _queues) {
@@ -124,10 +126,12 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene, ViewPtr view) {
   _uboManager->setCamera(camera);
   _uboManager->upload(needsLighting);
 
+  auto viewport = camera->cameraViewport();
+  glViewport((int)viewport.x, (int)viewport.y, (int)viewport.z, (int)viewport.w);
   _processRenderPipeline(view->mode());
 }
 
-void Renderer::_clearQueues() {
+void Renderer::clearQueues() {
   _ropCounter = 0;
   for (auto &queue : _queues) {
     queue.clear();

@@ -45,7 +45,7 @@ void Texture::initTexture2D(int width, int height, GLenum format, GLenum interna
   bool cpuMipMap = false;
   if (mipmaps) {
 #ifdef __EMSCRIPTEN__
-    if (sRGB) { // sRGB mips can only be generated on CPU in webgl build
+    if (internalFormat == GL_SRGB8 || internalFormat == GL_SRGB8_ALPHA8) { // sRGB mips can only be generated on CPU in webgl build
       ENGLog("Skipped mipmap because webgl doesn't support sRGB mip generation");
       cpuMipMap = true;
     }

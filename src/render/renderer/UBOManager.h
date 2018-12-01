@@ -41,6 +41,10 @@ private:
 
   // Cameras
   std::shared_ptr<SwappableVertexBufferObject> _camera;
+
+private:
+  int _cameraIndex;
+  int _mainCameraIndex;
 };
 
 

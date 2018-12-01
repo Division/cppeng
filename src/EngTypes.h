@@ -7,6 +7,9 @@
 
 #include <memory>
 
+class Scene;
+typedef std::shared_ptr<Scene> ScenePtr;
+
 class Texture;
 typedef std::shared_ptr<Texture> TexturePtr;
 
@@ -42,6 +45,10 @@ typedef std::shared_ptr<ShaderCapsSet> ShaderCapsSetPtr;
 
 class SwappableFrameBufferObject;
 typedef std::shared_ptr<SwappableFrameBufferObject> SwappableFrameBufferObjectPtr;
+
+class FrameBufferObject;
+typedef std::shared_ptr<FrameBufferObject> FrameBufferObjectPtr;
+
 
 #endif //CPPWRAPPER_ENGTYPES_H
 

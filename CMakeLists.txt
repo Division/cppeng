@@ -87,8 +87,8 @@ set(ENGINE_SOURCES
         src/render/buffer/TextureBufferObject.cpp
         src/render/buffer/TextureBufferObject.h
         src/render/texture/TextureSlot.h
-        src/render/lighting/LightGrid.cpp
-        src/render/lighting/LightGrid.h
+        src/render/shading/LightGrid.cpp
+        src/render/shading/LightGrid.h
         src/utils/Math.h
         lib/stb/stb_image.h
         src/EngImage.h
@@ -108,7 +108,7 @@ set(ENGINE_SOURCES
         src/render/shader/ShaderCaps.h
         src/render/shader/ShaderCaps.cpp
         src/render/renderer/ICameraParamsProvider.h
-        src/render/buffer/MultiVertexBufferObject.cpp src/render/buffer/MultiVertexBufferObject.h src/render/buffer/MultiVBOAddress.h src/utils/Performance.h src/utils/Performance.cpp src/render/buffer/FrameBufferObject.cpp src/render/buffer/FrameBufferObject.h src/render/effect/PostEffect.cpp src/render/effect/PostEffect.h)
+        src/render/buffer/MultiVertexBufferObject.cpp src/render/buffer/MultiVertexBufferObject.h src/render/buffer/MultiVBOAddress.h src/utils/Performance.h src/utils/Performance.cpp src/render/buffer/FrameBufferObject.cpp src/render/buffer/FrameBufferObject.h src/render/effect/PostEffect.cpp src/render/effect/PostEffect.h src/render/shading/ShadowMap.cpp src/render/shading/ShadowMap.h src/render/shading/IShadowCaster.h)
 
 add_library(cppeng ${ENGINE_SOURCES})
 

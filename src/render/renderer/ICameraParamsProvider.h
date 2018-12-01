@@ -6,6 +6,7 @@
 #define CPPWRAPPER_ICAMERAPARAMSPROVIDER_H
 
 #include "EngMath.h"
+#include <memory>
 
 // Scenes are rendered not only from the Camera scene objects, but also from the light's point of view
 // This abstraction serves as a common interface for them
@@ -23,5 +24,7 @@ public:
   virtual mat4 cameraProjectionMatrix() const = 0;
   virtual vec4 cameraViewport() const = 0;
 };
+
+typedef std::shared_ptr<ICameraParamsProvider> ICameraParamsProviderPtr;
 
 #endif //CPPWRAPPER_ICAMERAPARAMSPROVIDER_H

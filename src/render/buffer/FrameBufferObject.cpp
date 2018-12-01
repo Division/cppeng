@@ -11,6 +11,8 @@ FrameBufferObject::FrameBufferObject(unsigned int width, unsigned int height, bo
     throw std::runtime_error("either color or depth should be enabled for FBO");
   }
 
+  ENGLog("Creating FBO (%ix%i) Color: (%i), Depth: (%i)", width, height, color, depth);
+
   glGenFramebuffers(1, &_fboID);
   glBindFramebuffer(GL_FRAMEBUFFER, _fboID);
 

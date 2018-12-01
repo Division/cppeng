@@ -8,6 +8,8 @@
 #include <memory>
 #include "View.h"
 #include "IRenderer.h"
+#include "render/shading/IShadowCaster.h"
+#include <vector>
 
 class Scene;
 typedef std::shared_ptr<Scene> ScenePtr;
@@ -19,6 +21,7 @@ class Renderer;
 class DebugDraw;
 class SwappableFrameBufferObject;
 class PostEffect;
+class ShadowMap;
 
 class SceneRenderer {
 public:
@@ -30,13 +33,15 @@ public:
   void renderScene(ScenePtr scene) const;
 
 private:
-  mutable std::shared_ptr<Texture> _tex;
+  std::shared_ptr<DebugDraw> _debugDraw;
   std::shared_ptr<Renderer> _renderer;
   std::shared_ptr<View> _depthPrePass;
   std::shared_ptr<View> _mainPass;
   std::unique_ptr<PostEffect> _postEffect;
+  std::unique_ptr<ShadowMap> _shadowMap;
 
   mutable std::shared_ptr<SwappableFrameBufferObject> _mainFrameBuffer = nullptr;
+  mutable std::vector<std::shared_ptr<IShadowCaster>> _shadowCasters;
 };
 
 

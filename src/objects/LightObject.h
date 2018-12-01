@@ -10,16 +10,18 @@
 #include "render/shader/UniformBufferStruct.h"
 #include "utils/MeshGeneration.h"
 #include "render/material/MaterialTypes.h"
-#import "EngTypes.h"
+#include "EngTypes.h"
+#include "render/shading/IShadowCaster.h"
 
 enum class LightObjectType : int {
   Point = 0,
   Spot
 };
 
-class LightObject : public GameObject {
+class LightObject : public GameObject, public IShadowCaster {
 public:
   friend class Scene;
+  friend class ShadowMap;
 
   LightObject();
 
@@ -46,6 +48,9 @@ public:
 
   float getSpotRadius(float height);
 
+  bool castShadows() const override;
+  void castShadows(bool value) { _castShadows = value; }
+
   unsigned int index() const { return _index; }
 
   void enableDebug();
@@ -54,9 +59,21 @@ public:
   UBOStruct::Light getLightStruct() const;
 
   void render(IRenderer &renderer) override;
+  void postUpdate() override;
+
+  // ICameraParamsProvider
+  uvec2 cameraViewSize() const override { return  uvec2(_viewport.z, _viewport.w); }
+  vec3 cameraPosition() const override { return transform()->worldPosition(); }
+  mat4 cameraViewProjectionMatrix() const override { return _viewMatrix * _projectionMatrix; }
+  vec3 cameraLeft() const override { return transform()->left(); }
+  vec3 cameraRight() const override { return transform()->right(); }
+  vec3 cameraUp() const override { return transform()->up(); }
+  vec3 cameraDown() const override { return transform()->down(); }
+  mat4 cameraViewMatrix() const override { return _viewMatrix; }
+  mat4 cameraProjectionMatrix() const override { return _projectionMatrix; }
+  vec4 cameraViewport() const override { return _viewport; }
 
 private:
-
   // Common light properties
   float _radius = 13;
   vec3 _color = vec3(1, 1, 1);
@@ -68,6 +85,13 @@ private:
   // Spotlight properties
   float _coneAngle = 30;
 
+  // Shadows
+  mat4 _projectionMatrix;
+  mat4 _viewMatrix;
+  vec4 _viewport;
+  float _zMin = 0.1f;
+  bool _castShadows = false;
+
   void _updateAttenuation();
   void _updateRadius();
 
@@ -75,6 +99,11 @@ private:
 
   MeshPtr _debugMesh;
   MaterialSingleColorPtr _debugMaterial;
+
+protected:
+  // To be used by ShadowMap class
+  void viewport(vec4 value) override { _viewport = value; };
+  vec4 viewport() const override { return _viewport; };
 };
 
 typedef std::shared_ptr<LightObject> LightObjectPtr;

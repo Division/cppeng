@@ -101,3 +101,14 @@ void LightObject::attenuation(float linear, float square) {
   _squareAttenuation = square;
   _updateRadius();
 }
+
+void LightObject::postUpdate() {
+  // TODO: add directional support
+  // Shadow maps are square, so aspect is 1
+  _projectionMatrix = glm::perspective(glm::radians(_coneAngle), 1.0f, _zMin, _radius);
+  _viewMatrix = glm::inverse(transform()->worldMatrix());
+}
+
+bool LightObject::castShadows() const {
+  return _castShadows;
+}

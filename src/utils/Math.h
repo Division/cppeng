@@ -89,6 +89,7 @@ struct Rect {
 
   Rect() = default;
   Rect(float x, float y, float width, float height) : x(x), y(y), width(width), height(height) {}
+  operator vec4() const { return vec4(x, y, width, height); }
 };
 
 #endif //CPPWRAPPER_MATH_H

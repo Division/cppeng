@@ -84,14 +84,15 @@ void MultiVertexBufferObject::_setCurrentBufferMapping(bool mapped) {
 
   auto &buffer = _buffers[_currentIndex];
 
-#if USE_MEMORY_BUFFER_MAP
+#if not USE_MEMORY_BUFFER_MAP
   if (mapped) {
     buffer->current()->bind();
     buffer->current()->resize(_bufferSize);
     _mappedPointer = buffer->current()->bufferPointer();
+    buffer->current()->setDirty();
   } else {
     _mappedPointer = nullptr;
-    buffer->current()->resize(_currentOffset);
+    buffer->current()->resize(_bufferSize);
     buffer->current()->upload();
     buffer->current()->unbind();
   };

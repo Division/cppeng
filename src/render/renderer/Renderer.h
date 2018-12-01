@@ -27,14 +27,14 @@ class Scene;
 typedef std::shared_ptr<Scene> ScenePtr;
 class View;
 typedef std::shared_ptr<View> ViewPtr;
-
+typedef std::shared_ptr<DebugDraw> DebugDrawPtr;
 
 // For now renderer is a single instance per app
 // It may change if need to render multiple fully shaded passes
 // (each pass would require it's own LightGrid instance)
 class Renderer : public IRenderer {
 public:
-  explicit Renderer();
+  explicit Renderer(DebugDrawPtr debugDraw);
   ~Renderer() override;
 
   std::shared_ptr<DebugDraw> debugDraw() const { return _debugDraw; }
@@ -62,11 +62,11 @@ private:
   unsigned int _ropCounter;
 
 private:
+  void clearQueues();
   void _prepareQueues(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
   void _processRenderPipeline(RenderMode mode);
   void _renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera);
   void setupAndUploadUBO(RenderOperation *rop);
-  void _clearQueues();
 };
 
 
