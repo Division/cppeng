@@ -142,8 +142,8 @@ void Engine::init() {
   engine::checkGLError();
 }
 
-void Engine::renderScene(std::shared_ptr<Scene> scene) {
-  _sceneRenderer->renderScene(scene);
+void Engine::renderScene(std::shared_ptr<Scene> scene, ICameraParamsProviderPtr camera, ICameraParamsProviderPtr camera2D) {
+  _sceneRenderer->renderScene(scene, camera, camera2D);
 }
 
 std::shared_ptr<DebugDraw> Engine::debugDraw() const {

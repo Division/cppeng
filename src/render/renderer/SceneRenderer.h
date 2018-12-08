@@ -25,12 +25,17 @@ class ShadowMap;
 
 class SceneRenderer {
 public:
+  static float shadowAtlasSize();
+
   SceneRenderer();
   ~SceneRenderer();
 
   void projectorTexture(const TexturePtr texture);
   std::shared_ptr<DebugDraw> debugDraw() const;
-  void renderScene(ScenePtr scene) const;
+  void renderScene(ScenePtr scene, ICameraParamsProviderPtr camera, ICameraParamsProviderPtr camera2D = nullptr) const;
+  TexturePtr depthTexture();
+  TexturePtr shadowMapDepthTexture();
+
 
 private:
   std::shared_ptr<DebugDraw> _debugDraw;

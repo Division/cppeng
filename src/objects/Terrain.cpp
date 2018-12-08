@@ -71,6 +71,8 @@ void Terrain::_createMaterial() {
     return;
   }
 
+//  auto material = std::make_shared<MaterialLighting>();
+
   auto material = std::make_shared<MaterialTerrain>(_layers.size(), (bool)_specularmap);
   for (int i = 0; i < _layers.size(); i++) {
     material->diffuse(_layers[i].diffuse, i);

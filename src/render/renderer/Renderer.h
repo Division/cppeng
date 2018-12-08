@@ -39,15 +39,13 @@ public:
 
   std::shared_ptr<DebugDraw> debugDraw() const { return _debugDraw; }
 
-  // Rendering
-  void renderPrepare();
   void renderScene(RenderPassPtr view);
 
   void projectorTexture(const TexturePtr texture) { _projectorTexture = texture; }
   TexturePtr projectorTexture() const { return _projectorTexture; }
 
   void clearQueues();
-  void setupBuffers(ScenePtr &scene, CameraPtr &camera);
+  void setupBuffers(ScenePtr &scene, ICameraParamsProviderPtr &camera, ICameraParamsProviderPtr &camera2D);
   void populateQueues(std::shared_ptr<Scene> scene, ICameraParamsProviderPtr camera);
   // IRenderer
   void addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) override;

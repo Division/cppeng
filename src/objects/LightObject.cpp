@@ -6,6 +6,7 @@
 #include <memory>
 #include "EngineMain.h"
 #include "render/debug/DebugDraw.h"
+#include "render/renderer/SceneRenderer.h"
 
 void LightObject::_updateAttenuation() {
   _squareAttenuation = 1.0f / (_radius * _radius * _lightCutoff);
@@ -36,6 +37,14 @@ UBOStruct::Light LightObject::getLightStruct() const {
       result.coneAngle = cosf(RAD(_coneAngle) / 2.0f);
       result.direction = glm::normalize(transform()->forward());
       break;
+  }
+
+  if (castShadows()) {
+    result.shadowmapScale = vec2(_viewport.z, _viewport.w) / SceneRenderer::shadowAtlasSize();
+    result.shadowmapOffset= vec2(_viewport.x, _viewport.y) / SceneRenderer::shadowAtlasSize();
+    result.projectionMatrix = cameraViewProjectionMatrix();
+  } else {
+    result.shadowmapScale = vec2(0, 0);
   }
 
   return result;
@@ -107,8 +116,4 @@ void LightObject::postUpdate() {
   // Shadow maps are square, so aspect is 1
   _projectionMatrix = glm::perspective(glm::radians(_coneAngle), 1.0f, _zMin, _radius);
   _viewMatrix = glm::inverse(transform()->worldMatrix());
-}
-
-bool LightObject::castShadows() const {
-  return _castShadows;
 }

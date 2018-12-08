@@ -22,6 +22,7 @@
 #include "RenderPass.h"
 #include "utils/Performance.h"
 #include "objects/LightObject.h"
+#include "objects/Projector.h"
 
 using namespace glm;
 
@@ -60,7 +61,7 @@ void Renderer::setupAndUploadUBO(RenderOperation *rop) {
 }
 
 // Executed once per frame. Upload most of the UBO.
-void Renderer::setupBuffers(ScenePtr &scene, CameraPtr &camera) {
+void Renderer::setupBuffers(ScenePtr &scene, ICameraParamsProviderPtr &camera, ICameraParamsProviderPtr &camera2D) {
   _uboManager->swap();
 
   engine::Performance::startTimer(engine::Performance::Entry::LightGrid);
@@ -78,10 +79,20 @@ void Renderer::setupBuffers(ScenePtr &scene, CameraPtr &camera) {
   _uboManager->updateProjectors(projectors);
   engine::Performance::stopTimer(engine::Performance::Entry::LightGrid);
 
+  if (camera2D) {
+    _uboManager->appendCamera(std::static_pointer_cast<ICameraParamsProvider>(camera2D));
+  }
   _uboManager->appendCamera(std::static_pointer_cast<ICameraParamsProvider>(camera));
+
   for (auto &light : lights) {
     if (light->castShadows()) {
       _uboManager->appendCamera(std::static_pointer_cast<ICameraParamsProvider>(light));
+    }
+  }
+
+  for (auto &projector: projectors) {
+    if (projector->castShadows()) {
+      _uboManager->appendCamera(std::static_pointer_cast<ICameraParamsProvider>(projector));
     }
   }
 
@@ -109,7 +120,7 @@ void Renderer::renderScene(RenderPassPtr view) {
   switch (view->mode()) {
     case RenderMode::DepthOnly:
       glDepthMask(GL_TRUE);
-      glClear(GL_DEPTH_BUFFER_BIT);
+//      glClear(GL_DEPTH_BUFFER_BIT);
       glEnable(GL_DEPTH_TEST);
       glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
       glDepthFunc(GL_LESS);
@@ -163,12 +174,13 @@ void Renderer::_processRenderPipeline(RenderMode mode) {
 
   // For UI pass just render everything and exit function
   if (mode == RenderMode::UI) {
-    auto &debugQueue = _queues[(int)RenderQueue::UI];
-    for (auto &rop : debugQueue) {
+    glDisable(GL_CULL_FACE);
+    auto &uiQueue = _queues[(int)RenderQueue::UI];
+    for (auto &rop : uiQueue) {
       _uboManager->setupForRender(&rop);
       renderMesh(rop.mesh, rop.mode);
     }
-
+    glEnable(GL_CULL_FACE);
     return;
   }
   // ---------------
@@ -224,6 +236,3 @@ void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue)
   queue.push_back(rop);
 }
 
-void Renderer::renderPrepare() {
-
-}

@@ -11,14 +11,15 @@
 #include "render/material/MaterialTypes.h"
 #import "EngTypes.h"
 #import "EngMath.h"
+#include "render/shading/IShadowCaster.h"
 
 enum class ProjectorType : int {
-  Projection = 0, // Calculates as a light which color is based on the texture
+  Projector = 0, // Calculates as a light which color is based on the texture
   Decal // substitutes diffuse color and in some cases normals of the rendered object
 };
 
 // Object to use for decals and projective light sources rendering
-class Projector: public GameObject {
+class Projector: public GameObject, public IShadowCaster {
 public:
   friend class Scene;
 
@@ -74,11 +75,32 @@ public:
 
   void postUpdate() override;
 
+  // IShadowCaster
+  uvec2 cameraViewSize() const override { return uvec2(viewport()); }
+  vec3 cameraPosition() const override { return transform()->worldPosition(); }
+  mat4 cameraViewProjectionMatrix() const override { return _viewProjection; }
+  vec3 cameraLeft() const override { return transform()->left(); }
+  vec3 cameraRight() const override { return transform()->right(); }
+  vec3 cameraUp() const override { return transform()->up(); }
+  vec3 cameraDown() const override { return transform()->down(); }
+  mat4 cameraViewMatrix() const override { return _viewMatrix; }
+  mat4 cameraProjectionMatrix() const override { return _getProjection(); }
+  vec4 cameraViewport() const override { return viewport(); }
+  unsigned int cameraIndex() const override { return _cameraIndex; }; // index is an offset in the corresponding UBO
+  void cameraIndex(unsigned int index) override { _cameraIndex = index; };
+  bool castShadows() const override { return this->type() == ProjectorType::Projector && _castShadows; }; // only projectors cast shadows
+  void castShadows(bool value) { _castShadows = value; }
+
+protected:
+  void viewport(vec4 value) override { _viewport = value; };
+  vec4 viewport() const override { return _viewport; };
+
 private:
   // common
   vec4 _color = vec4(1, 1, 1, 1);
   unsigned int _index = 0; // index in scene array
   mat4 _viewProjection;
+  mat4 _viewMatrix;
   float _aspect = 1;
   float _zNear = 1;
   float _zFar = 10;
@@ -92,10 +114,15 @@ private:
   bool _isOrthographic = false;
   float _orthographicSize = 1.0f;
 
+  vec4 _viewport;
+  bool _castShadows = false;
+
+  unsigned int _cameraIndex = 0;
+
   bool _debugEnabled = false;
 
 private:
-  mat4 _getProjection();
+  mat4 _getProjection() const;
 };
 
 #endif //CPPWRAPPER_DECAL_H

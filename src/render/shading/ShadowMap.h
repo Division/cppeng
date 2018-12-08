@@ -18,6 +18,7 @@ public:
   ShadowMap(unsigned int resolutionX, unsigned int resolutionY, std::shared_ptr<Renderer> renderer);
 
   void renderShadowMaps(const std::vector<IShadowCasterPtr> &shadowCasters, const ScenePtr &scene);
+  TexturePtr depthAtlas();
 private:
   uvec2 _resolution;
   uvec2 _cellPixelSize;
@@ -25,6 +26,7 @@ private:
   unsigned int _pixelSpacing = 2;
   FrameBufferObjectPtr _depthAtlas;
   std::shared_ptr<Renderer> _renderer;
+  unsigned int _shadowmapBlock = 0;
 
 private:
   Rect getCellPixelRect(unsigned int index);

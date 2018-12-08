@@ -48,7 +48,7 @@ public:
 
   float getSpotRadius(float height);
 
-  bool castShadows() const override;
+  bool castShadows() const override { return _castShadows; };
   void castShadows(bool value) { _castShadows = value; }
 
   unsigned int index() const { return _index; }
@@ -64,7 +64,7 @@ public:
   // ICameraParamsProvider
   uvec2 cameraViewSize() const override { return  uvec2(_viewport.z, _viewport.w); }
   vec3 cameraPosition() const override { return transform()->worldPosition(); }
-  mat4 cameraViewProjectionMatrix() const override { return _viewMatrix * _projectionMatrix; }
+  mat4 cameraViewProjectionMatrix() const override { return _projectionMatrix * _viewMatrix; }
   vec3 cameraLeft() const override { return transform()->left(); }
   vec3 cameraRight() const override { return transform()->right(); }
   vec3 cameraUp() const override { return transform()->up(); }

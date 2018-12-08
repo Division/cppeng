@@ -22,6 +22,9 @@ namespace UBOStruct {
     float linearAttenuation = 0;
     vec3 direction;
     float coneAngle = 0;
+    mat4 projectionMatrix;
+    vec2 shadowmapScale;
+    vec2 shadowmapOffset;
   };
 
   struct Projector {
@@ -30,6 +33,8 @@ namespace UBOStruct {
     vec4 color; // offset = 16, alignment = 16, size = 12
     vec2 scale;
     vec2 offset;
+    vec2 shadowmapScale;
+    vec2 shadowmapOffset;
     mat4 projectionMatrix;
     float linearAttenuation = 0;
     vec3 padding; // ending padding

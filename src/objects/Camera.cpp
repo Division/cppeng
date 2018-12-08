@@ -9,7 +9,24 @@
 void Camera::_updateProjection() {
   auto engine = getEngine();
   auto window = engine->window();
-  _projectionMatrix = glm::perspective(glm::radians(45.f), window->aspect(), 0.1f, 1000.0f);
+
+  switch (_mode) {
+    case Mode::Perspective:
+      _projectionMatrix = glm::perspective(glm::radians(_fov), window->aspect(), 0.1f, 100.0f);
+      break;
+
+    case Mode::Ortho: {
+      float halfHeight = _orthographicSize / 2.0f;
+      float halfWidth = window->aspect() * halfHeight;
+      _projectionMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, 0.1f, 100.0f);
+      break;
+    }
+    case Mode::UI:
+      float halfHeight = window->height() / 2.0f;
+      float halfWidth = window->width() / 2.0f;
+      _projectionMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, -1.0f, 1.0f);
+      break;
+  }
 }
 
 void Camera::_updateView() {

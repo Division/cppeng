@@ -16,6 +16,7 @@
 #include "render/effect/PostEffect.h"
 #include "render/shading/ShadowMap.h"
 #include "objects/LightObject.h"
+#include "objects/Projector.h"
 #include "render/debug/DebugDraw.h"
 
 const unsigned int SHADOW_ATLAS_SIZE = 4096;
@@ -33,11 +34,10 @@ SceneRenderer::SceneRenderer() {
   _shadowMap = std::make_unique<ShadowMap>(SHADOW_ATLAS_SIZE, SHADOW_ATLAS_SIZE, _renderer);
 }
 
-void SceneRenderer::renderScene(ScenePtr scene) const {
-  auto camera = scene->cameraCount() ? scene->cameras()[0] : nullptr;
+void SceneRenderer::renderScene(ScenePtr scene, ICameraParamsProviderPtr camera, ICameraParamsProviderPtr camera2D) const {
   if (!camera) { return; }
 
-  _renderer->setupBuffers(scene, camera);
+  _renderer->setupBuffers(scene, camera, camera2D);
 
   // Shadow maps
   auto &visibleLights = scene->visibleLights(camera);
@@ -48,7 +48,14 @@ void SceneRenderer::renderScene(ScenePtr scene) const {
     }
   }
 
-//  _shadowMap->renderShadowMaps(_shadowCasters, scene);
+  auto &visibleProjectors = scene->visibleProjectors(camera);
+  for (auto &projector : visibleProjectors) {
+    if (projector->castShadows()) {
+      _shadowCasters.push_back(std::static_pointer_cast<IShadowCaster>(projector));
+    }
+  }
+
+  _shadowMap->renderShadowMaps(_shadowCasters, scene);
   //
 
   // Switching to main framebuffer
@@ -59,6 +66,8 @@ void SceneRenderer::renderScene(ScenePtr scene) const {
 
   _mainFrameBuffer->swap();
   _mainFrameBuffer->current()->bind();
+  glDepthMask(GL_TRUE);
+  glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   //
 
@@ -87,8 +96,10 @@ void SceneRenderer::renderScene(ScenePtr scene) const {
   //
 
   // 2D pass
-//  _2dPass->camera()
-//  _renderer->renderScene(scene, _2dPass);
+  if (camera2D) {
+    _2dPass->camera(camera2D);
+    _renderer->renderScene(_2dPass);
+  }
   //
 }
 
@@ -102,6 +113,19 @@ void SceneRenderer::projectorTexture(const TexturePtr texture) {
 
 std::shared_ptr<DebugDraw> SceneRenderer::debugDraw() const {
   return _renderer->debugDraw();
+}
+
+TexturePtr SceneRenderer::depthTexture() {
+  if (!_mainFrameBuffer) { return nullptr; }
+  return _mainFrameBuffer->current()->depthBuffer();
+}
+
+TexturePtr SceneRenderer::shadowMapDepthTexture() {
+  return _shadowMap->depthAtlas();
+}
+
+float SceneRenderer::shadowAtlasSize() {
+  return SHADOW_ATLAS_SIZE;
 }
 
 

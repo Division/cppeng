@@ -95,22 +95,29 @@ void MeshGeneration::generateCone(MeshPtr mesh, float height, float radius, int 
 }
 
 void MeshGeneration::generateFullScreenQuad(MeshPtr mesh) {
+  generateQuad(mesh, vec2(2, 2));
+}
+
+void MeshGeneration::generateQuad(MeshPtr mesh, vec2 size, vec2 origin) {
+  auto halfSize = vec3(size / 2.0f, 0);
+  auto offset = vec3((vec2(0.5f, 0.5f) - origin) * size, 0);
+
   std::vector<vec3> vertices = {
-    vec3(-1, 1, 0),
-    vec3(-1, -1, 0),
-    vec3(1, -1, 0),
-    vec3(1, -1, 0),
-    vec3(1, 1, 0),
-    vec3(-1, 1, 0),
+      vec3(-1, 1, 0) * halfSize + offset,
+      vec3(-1, -1, 0) * halfSize + offset,
+      vec3(1, -1, 0) * halfSize + offset,
+      vec3(1, -1, 0) * halfSize + offset,
+      vec3(1, 1, 0) * halfSize + offset,
+      vec3(-1, 1, 0) * halfSize + offset
   };
 
   std::vector<vec2> texCoords= {
-    vec2(0, 1),
-    vec2(0, 0),
-    vec2(1, 0),
-    vec2(1, 0),
-    vec2(1, 1),
-    vec2(0, 1)
+      vec2(0, 1),
+      vec2(0, 0),
+      vec2(1, 0),
+      vec2(1, 0),
+      vec2(1, 1),
+      vec2(0, 1)
   };
 
   mesh->setVertices(vertices);

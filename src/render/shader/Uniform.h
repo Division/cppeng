@@ -31,11 +31,13 @@ enum class UniformName : int {
   TerrainSplatmap,
   NormalMap,
   SpecularMap,
+  ShadowMap,
   ProjectorTexture,
   LightGrid,
   LightIndices,
   ProjectedTexture,
   ProjectedTextureMatrix,
+  NearFar,
   Count
 };
 

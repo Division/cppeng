@@ -22,11 +22,13 @@ const std::map<UniformName, std::string> UNIFORM_NAMES = {
     { UniformName::TerrainSplatmap, "uTerrainSplatmap" },
     { UniformName::NormalMap, "uNormalMap" },
     { UniformName::SpecularMap, "uSpecularMap" },
+    { UniformName::ShadowMap, "uShadowMap" },
     { UniformName::ProjectorTexture, "uProjectorTexture" },
     { UniformName::LightGrid, "uLightGrid" },
     { UniformName::LightIndices, "uLightIndices" },
     { UniformName::ProjectedTexture, "uProjectedTexture" },
     { UniformName::ProjectedTextureMatrix, "uProjectedTextureMatrix" },
+    { UniformName::NearFar, "uNearFar" }
 };
 
 const std::map<UniformName, unsigned int> UNIFORM_TEXTURE_BLOCKS = {
@@ -40,6 +42,7 @@ const std::map<UniformName, unsigned int> UNIFORM_TEXTURE_BLOCKS = {
     { UniformName::TerrainDiffuse1, 1 },
     { UniformName::TerrainDiffuse2, 2 },
     { UniformName::SpecularMap, 5 },
+    { UniformName::ShadowMap, 12 },
     { UniformName::TerrainNormal0, 6 },
     { UniformName::TerrainNormal1, 7 },
     { UniformName::TerrainNormal2, 8 },

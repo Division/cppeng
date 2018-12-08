@@ -6,6 +6,7 @@
 #include "render/shader/UniformBufferStruct.h"
 #include "EngineMain.h"
 #include "EngMath.h"
+#include "render/renderer/SceneRenderer.h"
 
 AABB Projector::bounds() {
   auto position = transform()->worldPosition();
@@ -14,10 +15,11 @@ AABB Projector::bounds() {
 
 
 void Projector::postUpdate() {
-  _viewProjection = _getProjection() * glm::inverse(transform()->worldMatrix());
+  _viewMatrix = glm::inverse(transform()->worldMatrix());
+  _viewProjection = _getProjection() * _viewMatrix;
 }
 
-mat4 Projector::_getProjection() {
+mat4 Projector::_getProjection() const {
   if (_isOrthographic) {
     float halfHeight = _orthographicSize / 2.0f;
     float halfWidth = _aspect * halfHeight;
@@ -36,6 +38,14 @@ UBOStruct::Projector Projector::getProjectorStruct() const {
   result.color = _color;
   result.scale = vec2(_spriteBounds.width, _spriteBounds.height);
   result.offset = vec2(_spriteBounds.x, _spriteBounds.y);
+
+  if (castShadows()) {
+    result.shadowmapScale = vec2(_viewport.z, _viewport.w) / SceneRenderer::shadowAtlasSize();
+    result.shadowmapOffset = vec2(_viewport.x, _viewport.y) / SceneRenderer::shadowAtlasSize();
+  } else {
+    result.shadowmapScale = vec2(0, 0);
+  }
+
   result.projectionMatrix = _viewProjection;
 
   return result;

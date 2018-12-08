@@ -12,12 +12,27 @@
 // Right now only one camera's render target can only be the main framebuffer
 class Camera : public GameObject, public ICameraParamsProvider {
 public:
+  enum class Mode : int {
+    Perspective = 0,
+    Ortho,
+    UI
+  };
+
   const mat4 &projectionMatrix() const { return _projectionMatrix; }
   const mat4 &viewMatrix() const { return _viewMatrix; }
   const mat4 viewProjectionMatrix() const { return _projectionMatrix * _viewMatrix; }
   const vec4 viewport() const { return _viewport; }
   const uvec2 screenSize() const { return uvec2(_viewport.z, _viewport.w); }
   void postUpdate() override;
+
+  void mode(Mode value) { _mode = value; }
+  Mode mode() const { return _mode; }
+
+  void orthographicSize(float orthographicSize) { _orthographicSize = orthographicSize; }
+  float orthographicSize() const { return _orthographicSize; }
+
+  void fov(float fov) { _fov = fov; }
+  float fov() const { return _fov; }
 
   // ICameraParamsProvider
   uvec2 cameraViewSize() const override { return  screenSize(); }
@@ -38,9 +53,11 @@ protected:
   mat4 _viewMatrix;
   vec4 _viewport;
 
-  float _fow;
-  float _aspect; // screen aspect
+  float _fov = 45.0f;
   unsigned long _mask = ~0ul; // mask to filter gameObjects
+
+  Mode _mode = Mode::Perspective;
+  float _orthographicSize = 0.0f;
 
   unsigned int _cameraIndex = 0;
 protected:

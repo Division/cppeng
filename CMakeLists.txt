@@ -103,7 +103,6 @@ set(ENGINE_SOURCES
         src/objects/Projector.h
         src/render/renderer/SceneRenderer.cpp
         src/render/renderer/SceneRenderer.h
-        src/render/renderer/RenderPass.cpp
         src/render/renderer/RenderPass.h
         src/render/shader/ShaderCaps.h
         src/render/shader/ShaderCaps.cpp

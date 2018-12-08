@@ -22,6 +22,9 @@ public:
   RenderMode mode () const { return _mode; }
   void mode (RenderMode value) { _mode = value; }
 
+  bool clearDepth = true;
+  bool clearColor = true;
+
 private:
   RenderMode _mode = RenderMode::Normal;
   std::shared_ptr<ICameraParamsProvider> _camera;

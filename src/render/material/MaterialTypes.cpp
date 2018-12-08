@@ -70,9 +70,6 @@ MaterialTexture::MaterialTexture() {
 MaterialLighting::MaterialLighting() {
   auto engine = getEngine();
 
-//  auto projectorTextureBinding = _addIntBinding(UniformName::ProjectorTexture);
-//  _bindings.intBindings[projectorTextureBinding].value = UNIFORM_TEXTURE_BLOCKS.at(UniformName::ProjectorTexture);
-
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Lighting);
   _shader = engine->getShaderWithCaps(caps);
@@ -81,6 +78,7 @@ MaterialLighting::MaterialLighting() {
   _shader->addUniform(UniformName::LightGrid);
   _shader->addUniform(UniformName::LightIndices);
   _shader->addUniform(UniformName::ProjectorTexture);
+  _shader->addUniform(UniformName::ShadowMap);
 
   _shader->addUniformBlock(UniformBlockName::Transform);
   _shader->addUniformBlock(UniformBlockName::Light);
@@ -136,6 +134,7 @@ MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
   _shader->addUniform(UniformName::LightGrid);
   _shader->addUniform(UniformName::LightIndices);
   _shader->addUniform(UniformName::ProjectorTexture);
+  _shader->addUniform(UniformName::ShadowMap);
 
   _shader->addUniformBlock(UniformBlockName::Transform);
   _shader->addUniformBlock(UniformBlockName::Light);

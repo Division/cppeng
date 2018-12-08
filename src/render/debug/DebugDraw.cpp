@@ -5,10 +5,30 @@
 #include "DebugDraw.h"
 #include "EngineGL.h"
 #include "render/mesh/Mesh.h"
-#include "render/material/MaterialTypes.h"
 #include "EngMath.h"
+#include "utils/MeshGeneration.h"
+#include "EngineMain.h"
+#include "render/shader/ShaderGenerator.h"
 
 DebugDraw::DebugDraw() {
+  _quadMesh = std::make_shared<Mesh>(true, 3, GL_STATIC_DRAW);
+  MeshGeneration::generateQuad(_quadMesh, vec2(1, 1));
+  _quadMesh->createBuffer();
+
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Texture0);
+  _textureShader = getEngine()->getShaderWithCaps(caps);
+  _textureShader->addUniformBlock(UniformBlockName::Transform);
+  _textureShader->addUniformBlock(UniformBlockName::Camera);
+
+  auto generator = getEngine()->shaderGenerator();
+  generator->addTemplate("debug/depth.glsl");
+  _depthMapShader = generator->getShaderWithCaps(caps, "debug/depth.glsl");
+  _depthMapShader->addUniform(UniformName::Texture0);
+  _depthMapShader->addUniform(UniformName::NearFar);
+  _depthMapShader->addUniformBlock(UniformBlockName::Transform);
+  _depthMapShader->addUniformBlock(UniformBlockName::Camera);
+
   _lineMeshes[0] = std::make_shared<Mesh>(true, 2, GL_DYNAMIC_DRAW);
   _lineMeshes[1] = std::make_shared<Mesh>(true, 2, GL_DYNAMIC_DRAW);
   _pointMeshes[0] = std::make_shared<Mesh>(true, 1, GL_DYNAMIC_DRAW);
@@ -141,9 +161,66 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
     renderer->addRenderOperation(pointROP, RenderQueue::Debug);
   }
 
+  for (int i = 0; i < _imageCount; i++) {
+    auto &image = _images[i];
+    RenderOperation imageROP;
+    imageROP.mesh = _quadMesh;
+    imageROP.material = image.material;
+    imageROP.modelMatrix = glm::translate(mat4(), vec3(image.bounds.x, image.bounds.y, 0));
+    imageROP.modelMatrix = glm::scale(imageROP.modelMatrix, vec3(image.bounds.z, image.bounds.w, 1));
+    imageROP.debugInfo = "debug texture";
+    imageROP.mode = GL_TRIANGLES;
+    renderer->addRenderOperation(imageROP, RenderQueue::UI);
+  }
+
+  for (int i = 0; i < _depthMapImageCount; i++) {
+    auto &image = _depthMapImages[i];
+    RenderOperation imageROP;
+    imageROP.mesh = _quadMesh;
+    imageROP.material = image.material;
+    imageROP.modelMatrix = glm::translate(mat4(), vec3(image.bounds.x, image.bounds.y, 0));
+    imageROP.modelMatrix = glm::scale(imageROP.modelMatrix, vec3(image.bounds.z, image.bounds.w, 1));
+    imageROP.debugInfo = "debug depth map";
+    imageROP.mode = GL_TRIANGLES;
+    renderer->addRenderOperation(imageROP, RenderQueue::UI);
+  }
+
+  _imageCount = 0;
+  _depthMapImageCount = 0;
   _lines.resize(0);
   _points.resize(0);
   _lineColors.resize(0);
   _pointColors.resize(0);
 }
 
+void DebugDraw::drawImage(TexturePtr texture, vec4 bounds) {
+  _imageCount += 1;
+
+  if (_imageCount > _images.size()) {
+    _images.emplace_back(Image(bounds));
+  }
+
+  _images[_imageCount - 1].material->texture(texture);
+  _images[_imageCount - 1].material->setShader(_textureShader);
+}
+
+void DebugDraw::drawDepthImage(TexturePtr texture, vec4 bounds, vec2 nearFar) {
+  _depthMapImageCount += 1;
+
+  if (_depthMapImageCount> _depthMapImages.size()) {
+    _depthMapImages.emplace_back(DepthMapImage(bounds));
+  }
+
+  _depthMapImages[_depthMapImageCount - 1].material->texture(texture);
+  _depthMapImages[_depthMapImageCount - 1].material->setNearFar(nearFar);
+  _depthMapImages[_depthMapImageCount - 1].material->setShader(_depthMapShader);
+}
+
+DebugDraw::DebugTextureMaterial::DebugTextureMaterial() {
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
+}
+
+DebugDraw::DebugDepthMapMaterial::DebugDepthMapMaterial() {
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
+  _nearFarBinding = _addVec2Binding(UniformName::NearFar);
+}

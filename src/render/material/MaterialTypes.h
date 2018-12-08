@@ -9,6 +9,8 @@
 #include "EngMath.h"
 #include <vector>
 
+// Note: materials should not be instantiated every frame
+
 class MaterialPostEffect: public Material {
 public:
   MaterialPostEffect(ShaderPtr shader);

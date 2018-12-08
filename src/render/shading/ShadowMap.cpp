@@ -7,6 +7,7 @@
 #include "render/renderer/Renderer.h"
 #include "IShadowCaster.h"
 #include "render/renderer/RenderPass.h"
+#include "render/shader/Uniform.h"
 
 const unsigned int CELL_COUNT = 8;
 const auto MAX_MAPS = CELL_COUNT * CELL_COUNT;
@@ -19,11 +20,16 @@ ShadowMap::ShadowMap(unsigned int resolutionX, unsigned int resolutionY, std::sh
   float emptySpacing = (CELL_COUNT - 1) * _pixelSpacing;
   _cellPixelSize = glm::floor(vec2(resolutionX - emptySpacing, resolutionY - emptySpacing) / (float)CELL_COUNT);
   _cellSize = vec2(_cellPixelSize) / vec2(_resolution);
+
+  _shadowmapBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::ShadowMap);
 }
 
 void ShadowMap::renderShadowMaps(const std::vector<IShadowCasterPtr> &shadowCasters, const ScenePtr &scene) {
+  _depthAtlas->depthBuffer()->bind(_shadowmapBlock);
   _depthAtlas->bind();
+  glDepthMask(GL_TRUE);
   glClear(GL_DEPTH_BUFFER_BIT);
+  glCullFace(GL_FRONT);
 
   auto pass = std::make_shared<RenderPass>();
   pass->mode(RenderMode::DepthOnly);
@@ -44,6 +50,7 @@ void ShadowMap::renderShadowMaps(const std::vector<IShadowCasterPtr> &shadowCast
     index++;
   }
 
+  glCullFace(GL_BACK);
   _depthAtlas->unbind();
 }
 
@@ -61,4 +68,8 @@ Rect ShadowMap::getCellRect(unsigned int index) {
   vec2 origin = vec2(x, y) * (vec2(_cellPixelSize) + (float)_pixelSpacing) / vec2(_resolution);
 
   return Rect(origin.x, origin.y, _cellSize.x, _cellSize.y);
+}
+
+TexturePtr ShadowMap::depthAtlas() {
+  return _depthAtlas->depthBuffer();
 }

@@ -7,6 +7,7 @@
 
 #include <IGame.h>
 #include <memory>
+#include <render/renderer/ICameraParamsProvider.h>
 
 class Window;
 class Renderer;
@@ -30,7 +31,7 @@ public:
   void quit();
   void printStatus();
   void update(double dt);
-  void renderScene(std::shared_ptr<Scene> scene);
+  void renderScene(std::shared_ptr<Scene> scene, ICameraParamsProviderPtr camera, ICameraParamsProviderPtr camera2D = nullptr);
 
   std::shared_ptr<ShaderGenerator> shaderGenerator() { return _generator; }
   ShaderPtr getShaderWithCaps (std::shared_ptr<ShaderCapsSet> caps) const;
@@ -41,6 +42,8 @@ public:
   double time () { return _currentTime; }
 
   void projectorTexture(const std::shared_ptr<Texture> texture);
+  const std::shared_ptr<SceneRenderer> sceneRenderer() const { return _sceneRenderer; }
+
 
   const std::shared_ptr<Window>window() { return _window; }
 

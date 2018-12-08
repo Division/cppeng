@@ -133,7 +133,7 @@ void LightGrid::appendProjectors(const std::vector<ProjectorPtr> &projectors,
 
     _appendItem(camera, _lightEdges, [&](LightGridCell *cell) {
       switch(projector->type()) {
-        case ProjectorType::Projection:
+        case ProjectorType::Projector:
           cell->projectors.push_back(projector);
           break;
         case ProjectorType::Decal:
