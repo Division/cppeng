@@ -27,6 +27,9 @@ public:
   void setColors(const float *colorComponents, int colorCount);
   void setColors(const std::vector<vec4> &colors);
 
+  void setWeights(const std::vector<vec2> &weights);
+  void setWeights(const float *weightComponents, int count);
+
   void setTexCoord0(const std::vector<vec2> &texcoords);
   void setTexCoord0(const float *texcoordComponents, int count);
 

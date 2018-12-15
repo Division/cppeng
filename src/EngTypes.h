@@ -28,6 +28,9 @@ typedef std::shared_ptr<Camera> CameraPtr;
 class Shader;
 typedef std::shared_ptr<Shader> ShaderPtr;
 
+class SkinnedMeshObject;
+typedef std::shared_ptr<SkinnedMeshObject> SkinnedMeshObjectPtr;
+
 //class MaterialTexutre;
 //typedef std::shared_ptr<MaterialTexutre> MaterialTexutrePtr;
 

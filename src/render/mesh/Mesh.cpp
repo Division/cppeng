@@ -115,6 +115,20 @@ void Mesh::setColors(const std::vector<vec4> &colors) {
   _hasColors = true;
 }
 
+void Mesh::setWeights(const std::vector<vec2> &weights) {
+
+}
+
+void Mesh::setWeights(const float *weightComponents, int count) {
+  // TODO: fill _jointIndices and _weights
+
+//  int size = JOINT_INDEX_SIZE + WEIGHT_SIZE;
+//  _weights.resize(count * size);
+//  memcpy(&_weights[0], weightComponents, sizeof(float) * size);
+//
+//  _hasWeights = true;
+}
+
 void Mesh::setTexCoord0(const float *components, int count) {
   _texCoord0.resize(count * 2);
   memcpy(&_texCoord0[0], components, sizeof(vec2) * count);

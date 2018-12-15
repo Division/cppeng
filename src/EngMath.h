@@ -13,6 +13,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/compatibility.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include "utils/Math.h"
 

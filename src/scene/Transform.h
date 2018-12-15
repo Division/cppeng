@@ -7,6 +7,7 @@
 
 #include "EngMath.h"
 #include <vector>
+#include <functional>
 
 class GameObject;
 class Transform;

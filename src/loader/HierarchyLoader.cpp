@@ -7,7 +7,7 @@
 
 GameObjectPtr
 loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy, const MaterialPicker *materialPicker) {
-  if (!hierarchy) {
+  if (!hierarchy && bundle) {
     hierarchy = &bundle->hierarchy();
   }
 
@@ -31,6 +31,7 @@ loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy, con
   object->transform()->setMatrix(hierarchy->transform);
   object->name(hierarchy->name);
 
+
 //  ENGLog("Added object with name %s", object->name().c_str());
 
   for (auto &childHierarchy : hierarchy->children) {
@@ -39,6 +40,23 @@ loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy, con
   }
 
   return object;
+}
+
+SkinnedMeshObjectPtr loader::loadSkinnedMesh(ModelBundlePtr bundle, SkinningDataPtr skinningData) {
+  auto skinning = skinningData ? skinningData : bundle->getDefaultSkinning();
+  auto skinnedMeshObject = CreateGameObject<SkinnedMeshObject>();
+
+  auto hierarchy = bundle->findHierarchy(skinning->name);
+  if (!hierarchy) {
+    throw std::runtime_error("Skinned mesh hierarchy not found");
+  }
+
+  skinnedMeshObject->transform()->setMatrix(hierarchy->transform);
+  skinnedMeshObject->skinningData(skinning);
+  skinnedMeshObject->mesh(bundle->getMesh(hierarchy->geometry));
+  skinnedMeshObject->material(std::make_shared<MaterialLighting>());
+
+  return skinnedMeshObject;
 }
 
 MaterialPtr loader::MaterialPicker::getMaterial(const HierarchyData *hierarchy) const {

@@ -2,6 +2,8 @@
 // Created by Sidorenko Nikita on 4/5/18.
 //
 
+#include <vector>
+#include <string>
 #include "ModelLoader.h"
 #include "system/Logging.h"
 #include "resources/ModelBundle.h"
@@ -24,6 +26,7 @@ const std::map<std::string, int> ATTRIB_COUNT = {
 };
 
 void loadGeometry(std::istream &stream, json geometryJson, ModelBundlePtr bundle);
+void loadAnimation(std::istream &stream, json animationJson, ModelBundlePtr bundle);
 template <typename T> void loadArray(std::istream &stream, std::vector<T> &data, int count);
 
 ModelBundlePtr loader::loadModel(std::istream &stream, const std::string &url) {
@@ -31,13 +34,21 @@ ModelBundlePtr loader::loadModel(std::istream &stream, const std::string &url) {
 
   uint16 headerSize = 0;
   stream.read((char *)&headerSize, sizeof(headerSize));
-  std::string headerString;
 
-  headerString.resize(headerSize);
   headerSize = swap_endian<uint16>(headerSize);
+//  std::vector<char> headerChars;
+//  headerChars.resize(headerSize + 1);
+//  headerChars[headerSize] = 0;
+//  stream.read(&headerChars[0], headerSize);
+//  std::string headerString(&headerChars[0]);
+
+  std::string headerString;
+  headerString.resize(headerSize);
   stream.read(&headerString[0], headerSize);
+
+
+//  ENGLog("JSON: \n%i\n %s", headerString.length(), headerString.c_str());
   json header = json::parse(headerString);
-//  ENGLog("JSON size %i", headerSize);
 //  ENGLog("JSON:\n%s", header.dump(2).c_str());
 
   if (header.find("hierarchy") != header.end()) {
@@ -46,6 +57,10 @@ ModelBundlePtr loader::loadModel(std::istream &stream, const std::string &url) {
 
   if (header.find("geometry") != header.end()) {
     loadGeometry(stream, header["geometry"], bundle);
+  }
+
+  if (header.find("animation") != header.end()) {
+    loadAnimation(stream, header["animation"], bundle);
   }
 
   return bundle;
@@ -84,7 +99,7 @@ void loadGeometry(std::istream &stream, json geometryJson, ModelBundlePtr bundle
       }
 
       if (attribID == ATTRIB_WEIGHT) {
-//        mesh->setWeights(&attribData[0], vertexCount);
+        mesh->setWeights(&attribData[0], vertexCount);
       }
     }
 
@@ -101,6 +116,30 @@ void loadGeometry(std::istream &stream, json geometryJson, ModelBundlePtr bundle
 
     mesh->createBuffer();
     bundle->addMesh(name, mesh);
+  }
+}
+
+void loadAnimation(std::istream &stream, json animationJson, ModelBundlePtr bundle) {
+  if (animationJson.find("skinning") != animationJson.end()) {
+    bundle->loadSkinning(animationJson["skinning"]);
+  }
+
+  std::vector<float> tempAnimations;
+
+  if (animationJson.find("objects") != animationJson.end()) {
+    auto &animatedObjects = animationJson["objects"];
+    auto size = animatedObjects.size();
+
+    for (int i = 0; i < size; i++) {
+      auto animationData = std::make_shared<AnimationData>();
+      animationData->loadFromJSON(animatedObjects.at(i));
+      bundle->addAnimationData(animationData);
+
+      tempAnimations.resize((unsigned long)animationData->getElementCount());
+      loadArray<float>(stream, tempAnimations, (int)tempAnimations.size());
+      animationData->loadFrames(tempAnimations);
+    }
+
   }
 }
 

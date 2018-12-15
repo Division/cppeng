@@ -28,16 +28,9 @@ UBOStruct::Light LightObject::getLightStruct() const {
   result.linearAttenuation = linearAttenuation();
   result.color = color();
 
-  switch (_type) {
-    case LightObjectType::Point:
-      result.coneAngle = 0;
-      break;
-
-    case LightObjectType::Spot:
-      result.coneAngle = cosf(RAD(_coneAngle) / 2.0f);
-      result.direction = glm::normalize(transform()->forward());
-      break;
-  }
+  // Assign for point light as well because point light shadow is calculated like spotlight shadow
+  result.coneAngle = cosf(RAD(_coneAngle) / 2.0f);
+  result.direction = glm::normalize(transform()->forward());
 
   if (castShadows()) {
     result.shadowmapScale = vec2(_viewport.z, _viewport.w) / SceneRenderer::shadowAtlasSize();
