@@ -12,26 +12,26 @@
 
 class Material {
 public:
-  Material();
+  Material() = default;
   virtual ~Material() = default;
 
   const ShaderPtr shader() const { return _shader; }
+  const ShaderPtr shaderSkinning() const { return _shaderSkinning; }
+  const ShaderPtr shaderDepthOnly() const { return _shaderDepthOnly; }
+  const ShaderPtr shaderDepthOnlySkinning() const { return _shaderDepthOnlySkinning; }
 
   bool hasTransformBlock() { return _bindings.hasTransform; }
   void setTransformBlock(const UBOStruct::TransformStruct &value) { _bindings.transform.data = value; }
   const UBOStruct::TransformStruct &getTransformStruct() { return _bindings.transform.data; }
 
-  void setView(const mat4 &viewMatrix);
-  void setProjection(const mat4 &projection);
-  void uploadBindings() const;
+  void uploadBindings(ShaderPtr shader) const;
   void activateTextures() const;
 
 protected:
-  int _modelViewBinding = -1;
-  int _projectionBinding = -1;
-  int _normalMatrixBinding = -1;
-  int _viewMatrixBinding = -1;
+  bool _supportsSkinning = true; // by default skinning is OK
 
+  // Bindings are mostly used for the textures and fast shader debug
+  // Uniforms usually stored in UBO
   int _addMat4Binding(UniformName uniform);
   int _addMat3Binding(UniformName uniform);
   int _addVec4Binding(UniformName uniform);
@@ -41,8 +41,14 @@ protected:
   int _addIntBinding(UniformName uniform);
   int _addTextureBinding(UniformName uniform);
 
+  void _setup(ShaderCapsSetPtr caps);
+
   MaterialBingings _bindings;
+
   ShaderPtr _shader;
+  ShaderPtr _shaderSkinning;
+  ShaderPtr _shaderDepthOnly;
+  ShaderPtr _shaderDepthOnlySkinning;
 };
 
 typedef std::shared_ptr<Material> MaterialPtr;

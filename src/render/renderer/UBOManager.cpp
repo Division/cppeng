@@ -27,6 +27,12 @@ UBOManager::UBOManager() {
     engine::GLCaps::uboOffsetAlignment()
   );
 
+  _skinningMatrices = std::make_shared<MultiVertexBufferObject>(
+      GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW,
+      engine::GLCaps::maxUBOSize(),
+      engine::GLCaps::uboOffsetAlignment()
+  );
+
   _light = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, lightMaxSize);
   _projector = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, projectorMaxSize);
   _camera = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW);
@@ -112,11 +118,27 @@ void UBOManager::upload(bool includeLighting) {
   _camera->current()->upload();
 }
 
-void UBOManager::setupForRender(RenderOperation *rop) {
+void UBOManager::setupForRender(RenderOperation *rop, RenderMode mode) {
   MaterialPtr material = rop->material;
-  material->shader()->bind();
-  material->uploadBindings();
-  material->activateTextures();
+
+  bool isSkinning = false;
+  bool isDepthOnly = mode == RenderMode::DepthOnly;
+
+  ShaderPtr shader;
+
+  if (isDepthOnly) {
+    shader = isSkinning ? material->shaderDepthOnlySkinning() : material->shaderDepthOnly();
+  } else {
+    shader = isSkinning ? material->shaderSkinning() : material->shader();
+  }
+
+  shader->bind();
+
+  // For now depth only pass doesn't need shader bingings
+  if (!isDepthOnly) {
+    material->uploadBindings(shader);
+    material->activateTextures();
+  }
 
   if (material->hasTransformBlock()) {
     auto address = rop->transformBlockOffset;

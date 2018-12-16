@@ -21,6 +21,9 @@ public:
   explicit Mesh(bool keepData = true, int componentCount = 3, GLenum bufferUsage = GL_STATIC_DRAW);
   virtual ~Mesh();
 
+  static const int JOINTS_MAX = 60;
+  static const int JOINT_PER_VERTEX_MAX = 3;
+
   void setVertices(const vec3 *vertices, int vertexCount);
   void setVertices(const float *vertexComponents, int vertexCount);
   void setVertices(const std::vector<vec3> &vertices);

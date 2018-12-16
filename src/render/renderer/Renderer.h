@@ -57,7 +57,6 @@ private:
   std::unique_ptr<LightGrid> _lightGrid;
   std::shared_ptr<Texture> _projectorTexture; // usually a spritesheet
   unsigned int _projectorTextureUniform = 0;
-  std::shared_ptr<Material> _depthPrePassMaterial;
 
   std::vector<RenderOperation> _queues[(int)RenderQueue::Count];
   unsigned int _ropCounter;

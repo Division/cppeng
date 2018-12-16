@@ -9,6 +9,7 @@
 #include "render/material/Material.h"
 #include "EngTypes.h"
 #include "RenderOperation.h"
+#include "IRenderer.h"
 
 class SwappableVertexBufferObject;
 class MultiVertexBufferObject;
@@ -23,7 +24,7 @@ public:
   void setTransformBlock(RenderOperation *rop);
   void swap();
   void upload(bool includeLighting);
-  void setupForRender(RenderOperation *rop);
+  void setupForRender(RenderOperation *rop, RenderMode mode);
   void updateLights(const std::vector<LightObjectPtr> &lights);
   void updateProjectors(const std::vector<ProjectorPtr> &projectors);
   int appendCamera(std::shared_ptr<ICameraParamsProvider> camera);
@@ -33,6 +34,9 @@ public:
 private:
   // Data related to objects transformation
   std::shared_ptr<MultiVertexBufferObject> _transform;
+
+  // Skinned mesh matrices
+  std::shared_ptr<MultiVertexBufferObject> _skinningMatrices;
 
   // Regular light sources (point, spot, directional)
   std::shared_ptr<SwappableVertexBufferObject> _light;

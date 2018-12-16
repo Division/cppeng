@@ -24,6 +24,7 @@ enum class ShaderCaps : int {
   TerrainLayer1,
   TerrainLayer2,
   ProjectedTexture,
+  Skinning,
   Count
 };
 

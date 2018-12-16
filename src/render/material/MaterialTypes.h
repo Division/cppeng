@@ -11,21 +11,6 @@
 
 // Note: materials should not be instantiated every frame
 
-class MaterialPostEffect: public Material {
-public:
-  MaterialPostEffect(ShaderPtr shader);
-  void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
-  TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
-
-private:
-  int _texture0Binding = -1;
-};
-
-class MaterialDepthPrepass: public Material {
-public:
-  MaterialDepthPrepass();
-};
-
 class MaterialSingleColor: public Material {
 public:
   MaterialSingleColor();
@@ -83,7 +68,7 @@ protected:
   int _specularmapBinging;
 };
 
-// This material is used for testing only
+// NOTE: this material is used for testing only
 // Actual projection rendering is built into the render pipeline
 class MaterialTextureProjection: public Material {
 public:

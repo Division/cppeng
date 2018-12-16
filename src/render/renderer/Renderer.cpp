@@ -32,7 +32,6 @@ Renderer::Renderer(DebugDrawPtr debugDraw) {
   _uboManager = std::make_unique<UBOManager>();
   _debugDraw = debugDraw;
   _lightGrid->setDebugDraw(_debugDraw);
-  _depthPrePassMaterial = std::make_shared<MaterialDepthPrepass>();
 }
 
 Renderer::~Renderer() {
@@ -171,13 +170,12 @@ void Renderer::_prepareQueues(std::shared_ptr<Scene> scene, CameraPtr camera) {
 }
 
 void Renderer::_processRenderPipeline(RenderMode mode) {
-
   // For UI pass just render everything and exit function
   if (mode == RenderMode::UI) {
     glDisable(GL_CULL_FACE);
     auto &uiQueue = _queues[(int)RenderQueue::UI];
     for (auto &rop : uiQueue) {
-      _uboManager->setupForRender(&rop);
+      _uboManager->setupForRender(&rop, mode);
       renderMesh(rop.mesh, rop.mode);
     }
     glEnable(GL_CULL_FACE);
@@ -198,16 +196,8 @@ void Renderer::_processRenderPipeline(RenderMode mode) {
   // Opaque
   auto &opaqueQueue = _queues[(int)RenderQueue::Opaque];
   for (auto &rop : opaqueQueue) {
-    if (isDepthOnly) { // For depth only pass substitute the material with the simplest shader
-      tempMaterial = rop.material;
-      rop.material = _depthPrePassMaterial;
-      rop.material->setTransformBlock(tempMaterial->getTransformStruct());
-    }
-    _uboManager->setupForRender(&rop);
+    _uboManager->setupForRender(&rop, mode);
     renderMesh(rop.mesh, rop.mode);
-    if (isDepthOnly) { // and restore back
-      rop.material = tempMaterial;
-    }
   }
   // ---------------
 
@@ -219,12 +209,11 @@ void Renderer::_processRenderPipeline(RenderMode mode) {
   auto &debugQueue = _queues[(int)RenderQueue::Debug];
   glDisable(GL_DEPTH_TEST);
   for (auto &rop : debugQueue) {
-    _uboManager->setupForRender(&rop);
+    _uboManager->setupForRender(&rop, mode);
     renderMesh(rop.mesh, rop.mode);
   }
   glEnable(GL_DEPTH_TEST);
   // ---------------
-
 }
 
 void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue) {

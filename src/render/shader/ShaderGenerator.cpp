@@ -39,6 +39,7 @@ const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
     { ShaderCaps::TerrainLayer1, "TERRAIN_LAYER1" },
     { ShaderCaps::TerrainLayer2, "TERRAIN_LAYER2" },
     { ShaderCaps::ProjectedTexture, "PROJECTED_TEXTURE" },
+    { ShaderCaps::Skinning, "SKINNING" },
 };
 
 const auto ROOT_TEMPLATE = TEMPLATE_LIST[0];

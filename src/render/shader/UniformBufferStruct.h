@@ -6,6 +6,7 @@
 #define CPPWRAPPER_UNIFORMBUFFERSTRUCT_H
 
 #include "EngMath.h"
+#include "render/mesh/Mesh.h"
 
 // Data structures shared between shaders
 namespace UBOStruct {
@@ -13,6 +14,10 @@ namespace UBOStruct {
   struct TransformStruct {
     mat4 transform; // offset = 0, size = 64
     mat4 normalMatrix; // offset = 64, alignment = 16, size = 64
+  };
+
+  struct SkinningMatrices {
+    mat4 matrices[Mesh::JOINTS_MAX];
   };
 
   struct Light {

@@ -8,8 +8,8 @@
 #include "render/shader/Shader.h"
 #include "render/buffer/VertexBufferObject.h"
 
-const int JOINT_PER_VERTEX_MAX = 3;
-const int JOINTS_MAX = 30;
+const int JOINT_PER_VERTEX_MAX = Mesh::JOINT_PER_VERTEX_MAX;
+const int JOINTS_MAX = Mesh::JOINTS_MAX;
 
 const int VERTEX_SIZE = 3;
 const int NORMAL_SIZE = 3;
@@ -361,6 +361,18 @@ void Mesh::_prepareVAO() {
     offset = BUFFER_OFFSET(this->texCoordOffsetBytes());
     glEnableVertexAttribArray(attribIndex);
     glVertexAttribPointer(attribIndex, TEXCOORD_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+  }
+
+  if (_hasWeights) {
+    attribIndex = (GLuint)ShaderAttrib::JointWeights;
+    offset = BUFFER_OFFSET(this->weightOffsetBytes());
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribPointer(attribIndex, WEIGHT_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+
+    attribIndex = (GLuint)ShaderAttrib::JointIndices;
+    offset = BUFFER_OFFSET(this->jointIndexOffsetBytes());
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribPointer(attribIndex, JOINT_INDEX_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
   }
 
   glBindVertexArray(0);

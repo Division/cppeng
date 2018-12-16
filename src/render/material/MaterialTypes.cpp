@@ -6,88 +6,40 @@
 #include "EngineMain.h"
 #include "render/renderer/Renderer.h"
 
-MaterialPostEffect::MaterialPostEffect(ShaderPtr shader) {
-  _shader = shader;
-  _texture0Binding = _addTextureBinding(UniformName::Texture0);
-  _shader->addUniform(UniformName::Texture0);
-}
-
-MaterialDepthPrepass::MaterialDepthPrepass() {
-  auto engine = getEngine();
-  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>(); // empty caps
-  _shader = engine->getShaderWithCaps(caps);
-  _shader->addUniformBlock(UniformBlockName::Transform);
-  _shader->addUniformBlock(UniformBlockName::Camera);
-};
-
 MaterialSingleColor::MaterialSingleColor() {
-  auto engine = getEngine();
-
-  _colorBinging = _addVec4Binding(UniformName::Color);
-
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Color);
-  _shader = engine->getShaderWithCaps(caps);
+  _setup(caps);
 
-  // Manually create uniforms for now
-  _shader->addUniform(UniformName::Color);
-  _shader->addUniformBlock(UniformBlockName::Transform);
-  _shader->addUniformBlock(UniformBlockName::Camera);
-
+  _colorBinging = _addVec4Binding(UniformName::Color);
   color(vec4(1, 1, 1, 1));
 }
 
 MaterialDebug::MaterialDebug() {
-  auto engine = getEngine();
-
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::PointSize);
   caps->addCap(ShaderCaps::VertexColor);
-  _shader = engine->getShaderWithCaps(caps);
-
-  _shader->addUniformBlock(UniformBlockName::Transform);
-  _shader->addUniformBlock(UniformBlockName::Camera);
+  _setup(caps);
 }
 
 MaterialTexture::MaterialTexture() {
-  auto engine = getEngine();
-
-  _texture0Binding = _addTextureBinding(UniformName::Texture0);
-//  _texture1Binding = _addTextureBinding(UniformName::Texture1);
-
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Texture0);
-  _shader = engine->getShaderWithCaps(caps);
+  _setup(caps);
 
-  // Manually create uniforms for now
-  _shader->addUniform(UniformName::Texture0);
-//  _shader->addUniform(UniformName::Texture1);
-//  _shader->addUniform(UniformName::ProjectorTexture);
-  _shader->addUniformBlock(UniformBlockName::Transform);
-  _shader->addUniformBlock(UniformBlockName::Camera);
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
 }
 
 MaterialLighting::MaterialLighting() {
-  auto engine = getEngine();
-
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Lighting);
-  _shader = engine->getShaderWithCaps(caps);
-
-  // Manually create uniforms for now
-  _shader->addUniform(UniformName::LightGrid);
-  _shader->addUniform(UniformName::LightIndices);
-  _shader->addUniform(UniformName::ProjectorTexture);
-  _shader->addUniform(UniformName::ShadowMap);
-
-  _shader->addUniformBlock(UniformBlockName::Transform);
-  _shader->addUniformBlock(UniformBlockName::Light);
-  _shader->addUniformBlock(UniformBlockName::Projector);
-  _shader->addUniformBlock(UniformBlockName::Camera);
+  _setup(caps);
 }
 
 MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
   auto engine = getEngine();
+
+  _supportsSkinning = false; // no skinning for terrain
 
   _diffuseBindings.resize(layerCount);
   _normalMapBindings.resize(layerCount);
@@ -101,6 +53,10 @@ MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
     _specularmapBinging = _addTextureBinding(UniformName::SpecularMap);
   }
 
+  if (layerCount > 1) {
+    _splatmapBinging = _addTextureBinding(UniformName::TerrainSplatmap);
+  }
+
   for (int i = 0; i < layerCount; i++) {
     auto capsOffset = (int)ShaderCaps::TerrainLayer0 + i;
     caps->addCap((ShaderCaps)capsOffset);
@@ -112,36 +68,11 @@ MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
     _normalMapBindings[i] = _addTextureBinding((UniformName)normalMapOffset);
   }
 
-  _shader = engine->getShaderWithCaps(caps);
-
-  if (specularmap) {
-    _shader->addUniform(UniformName::SpecularMap);
-  }
-
-  for (int i = 0; i < layerCount; i++) {
-    auto diffuseOffset = (int)UniformName::TerrainDiffuse0 + i;
-    _shader->addUniform((UniformName)diffuseOffset);
-
-    auto normalMapOffset = (int)UniformName::TerrainNormal0 + i;
-    _shader->addUniform((UniformName)normalMapOffset);
-  }
-
-  if (layerCount > 1) {
-    _splatmapBinging = _addTextureBinding(UniformName::TerrainSplatmap);
-    _shader->addUniform(UniformName::TerrainSplatmap);
-  }
-
-  _shader->addUniform(UniformName::LightGrid);
-  _shader->addUniform(UniformName::LightIndices);
-  _shader->addUniform(UniformName::ProjectorTexture);
-  _shader->addUniform(UniformName::ShadowMap);
-
-  _shader->addUniformBlock(UniformBlockName::Transform);
-  _shader->addUniformBlock(UniformBlockName::Light);
-  _shader->addUniformBlock(UniformBlockName::Projector);
-  _shader->addUniformBlock(UniformBlockName::Camera);
+  _setup(caps);
 }
 
+// NOTE: test only material
+// Actual projection rendering is built into the render pipeline
 MaterialTextureProjection::MaterialTextureProjection() {
   auto engine = getEngine();
 
@@ -151,9 +82,9 @@ MaterialTextureProjection::MaterialTextureProjection() {
   _shader = engine->getShaderWithCaps(caps);
 
   _projectedTextureBinding = _addTextureBinding(UniformName::ProjectedTexture);
-  _projectedTextureMatrixBinding= _addMat4Binding(UniformName::ProjectedTextureMatrix);
+  _projectedTextureMatrixBinding = _addMat4Binding(UniformName::ProjectedTextureMatrix);
 
-  // Manually create uniforms for now
+  // Manually create uniforms
   _shader->addUniform(UniformName::LightGrid);
   _shader->addUniform(UniformName::LightIndices);
   _shader->addUniform(UniformName::ProjectedTexture);

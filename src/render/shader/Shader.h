@@ -28,7 +28,9 @@ enum class ShaderAttrib : int {
   Tangent,
   TexCoord0,
   VertexColor,
-  TexCoord1
+  TexCoord1,
+  JointWeights,
+  JointIndices
 };
 
 extern const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES;
@@ -57,7 +59,6 @@ private:
   std::unique_ptr<UniformBlock> _uniformBlocks[(int)UniformBlockName::Count];
   GLuint _program;
   std::vector<ICleanable *> _dirtyUniforms;
-
 };
 
 typedef std::shared_ptr<Shader> ShaderPtr;

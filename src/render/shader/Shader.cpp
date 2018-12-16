@@ -7,12 +7,14 @@
 #include <memory>
 
 const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
-    { ShaderAttrib::Position, "aPosition" },
-    { ShaderAttrib::Normal, "aNormal" },
-    { ShaderAttrib::Tangent, "aTangent" },
-    { ShaderAttrib::Bitangent, "aBitangent" },
-    { ShaderAttrib::TexCoord0, "aTexCoord0" },
-    { ShaderAttrib::VertexColor, "aVertexColor" },
+  { ShaderAttrib::Position, "aPosition" },
+  { ShaderAttrib::Normal, "aNormal" },
+  { ShaderAttrib::Tangent, "aTangent" },
+  { ShaderAttrib::Bitangent, "aBitangent" },
+  { ShaderAttrib::TexCoord0, "aTexCoord0" },
+  { ShaderAttrib::VertexColor, "aVertexColor" },
+  { ShaderAttrib::JointWeights, "aJointWeights" },
+  { ShaderAttrib::JointIndices, "aJointIndices" }
 };
 
 const std::string VERTEX_STR = "vertex";

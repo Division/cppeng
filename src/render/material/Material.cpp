@@ -4,14 +4,33 @@
 
 #include "Material.h"
 #include "system/Logging.h"
+#include <vector>
+#include "EngineMain.h"
+#include <unordered_set>
 
-void Material::setProjection(const mat4 &projection) {
-  _bindings.mat4Bindings[_projectionBinding].matrix = projection;
-}
+// Data structures needed to automatically setup shader uniforms and uniform blocks by the ShaderCapsSet
 
-void Material::setView(const mat4 &viewMatrix) {
-  _bindings.mat4Bindings[_viewMatrixBinding].matrix = viewMatrix;
-}
+struct ShaderConfig {
+  std::vector<UniformName > uniforms;
+  std::vector<UniformBlockName> uniformBlocks;
+};
+
+const std::vector<UniformBlockName> DEFAULT_UBO = { UniformBlockName::Transform, UniformBlockName::Camera };
+
+const std::map<ShaderCaps, ShaderConfig> UNIFORMS_PER_CAP = {
+    { ShaderCaps::Color, { { UniformName::Color }, DEFAULT_UBO } },
+    { ShaderCaps::Lighting, {
+      { UniformName::ShadowMap, UniformName::LightGrid, UniformName::LightIndices, UniformName::ProjectorTexture},
+      { UniformBlockName::Transform, UniformBlockName::Camera, UniformBlockName::Light, UniformBlockName::Projector }
+    } },
+    { ShaderCaps::NormalMap, { { UniformName::NormalMap }, DEFAULT_UBO } },
+    { ShaderCaps::Texture0, { { UniformName::Texture0 }, DEFAULT_UBO } },
+    { ShaderCaps::VertexColor, { {}, DEFAULT_UBO } },
+    { ShaderCaps::SpecularMap, { { UniformName::SpecularMap }, {} } },
+    { ShaderCaps::TerrainLayer0, { { UniformName::TerrainDiffuse0, UniformName::TerrainNormal0 }, { DEFAULT_UBO } } },
+    { ShaderCaps::TerrainLayer1, { { UniformName::TerrainDiffuse1, UniformName::TerrainNormal1, UniformName::TerrainSplatmap }, {} } },
+    { ShaderCaps::TerrainLayer2, { { UniformName::TerrainDiffuse2, UniformName::TerrainNormal2, UniformName::TerrainSplatmap }, {} } }
+};
 
 int Material::_addMat4Binding(UniformName uniform) {
   _bindings.mat4Bindings.emplace_back(Mat4Binding(uniform));
@@ -62,43 +81,91 @@ int Material::_addTextureBinding(UniformName uniform) {
 }
 
 
-void Material::uploadBindings() const {
-  if (!_shader) {
+void Material::uploadBindings(ShaderPtr shader) const {
+  if (!shader) {
     return;
   }
 
   for (auto &binding : _bindings.mat4Bindings) {
-    _shader->getUniform(binding.uniform)->setMat4(binding.matrix);
+    shader->getUniform(binding.uniform)->setMat4(binding.matrix);
   }
 
   for (auto &binding : _bindings.mat3Bindings) {
-    _shader->getUniform(binding.uniform)->setMat3(binding.matrix);
+    shader->getUniform(binding.uniform)->setMat3(binding.matrix);
   }
 
   for (auto &binding : _bindings.vec4Bindings) {
-    _shader->getUniform(binding.uniform)->setVec4(binding.v);
+    shader->getUniform(binding.uniform)->setVec4(binding.v);
   }
 
   for (auto &binding : _bindings.vec3Bindings) {
-    _shader->getUniform(binding.uniform)->setVec3(binding.v);
+    shader->getUniform(binding.uniform)->setVec3(binding.v);
   }
 
   for (auto &binding : _bindings.vec2Bindings) {
-    _shader->getUniform(binding.uniform)->setVec2(binding.v);
+    shader->getUniform(binding.uniform)->setVec2(binding.v);
   }
 
   for (auto &binding : _bindings.floatBindings) {
-//    _shader->getUniform(binding.uniform)->set(binding.v);
+//    shader->getUniform(binding.uniform)->set(binding.v);
   }
 
   for (auto &binding : _bindings.intBindings) {
-    _shader->getUniform(binding.uniform)->setInt(binding.value);
+    shader->getUniform(binding.uniform)->setInt(binding.value);
   }
 
 }
 
-Material::Material() {
+void Material::_setup(ShaderCapsSetPtr caps) {
+  if (caps->hasCap(ShaderCaps::Skinning)) {
+    throw std::runtime_error("Materials must not specify ShaderCaps::Skinning");
+  }
 
+  std::unordered_set<UniformName> uniforms;
+  std::unordered_set<UniformBlockName> uniformBlocks;
+
+  auto appendUniforms = [&](ShaderCaps cap) {
+    auto &config = UNIFORMS_PER_CAP.at(cap);
+    for (auto &name : config.uniforms) {
+      uniforms.insert(name);
+    }
+    for (auto &name : config.uniformBlocks) {
+      uniformBlocks.insert(name);
+    }
+  };
+
+  // Auto adding uniforms and blocks
+  for (auto iterator : UNIFORMS_PER_CAP) {
+    if (caps->hasCap(iterator.first)) { appendUniforms(iterator.first); }
+  }
+
+  auto engine = getEngine();
+
+  _shader = engine->getShaderWithCaps(caps);
+//  caps->addCap(ShaderCaps::Skinning);
+//  _shaderSkinning = engine->getShaderWithCaps(caps);
+//  _shaderSkinning->addUniformBlock(UniformBlockName::SkinningMatrices);
+
+  for (auto name : uniforms) {
+    _shader->addUniform(name);
+//    _shaderSkinning->addUniform(name);
+  }
+
+  for (auto name : uniformBlocks) {
+    _shader->addUniformBlock(name);
+//    _shaderSkinning->addUniformBlock(name);
+  }
+
+  ShaderCapsSetPtr depthOnlyCaps = std::make_shared<ShaderCapsSet>(); // empty caps
+  _shaderDepthOnly = engine->getShaderWithCaps(depthOnlyCaps);
+  _shaderDepthOnly->addUniformBlock(UniformBlockName::Transform);
+  _shaderDepthOnly->addUniformBlock(UniformBlockName::Camera);
+//
+//  depthOnlyCaps->addCap(ShaderCaps::Skinning);
+//  _shaderDepthOnlySkinning = engine->getShaderWithCaps(depthOnlyCaps);
+//  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::Transform);
+//  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::Camera);
+//  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::SkinningMatrices);
 }
 
 void Material::activateTextures() const {
