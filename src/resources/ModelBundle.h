@@ -41,14 +41,14 @@ struct AnimationData {
   quat getRotation(int frame) { return rotations[frame]; }
   vec3 getScale(int frame) { return scales[frame]; }
 
-  mat4 getMatrix(int frame, float time) {
-    auto m1 = getMatrix(frame % frameCount);
-    auto m2 = getMatrix((frame + 1) % frameCount);
+  mat4 getMatrix(int frame1, int frame2, float time) {
+    auto m1 = getMatrix(frame1 % frameCount);
+    auto m2 = getMatrix(frame2 % frameCount);
     return m1 + (m2 - m1) * time;
   }
-  vec3 getPosition(int frame, float time) { return glm::lerp(getPosition(frame % frameCount), getPosition((frame + 1) % frameCount), time); }
-  quat getRotation(int frame, float time) { return glm::slerp(getRotation(frame % frameCount), getRotation((frame + 1) % frameCount), time); }
-  vec3 getScale(int frame, float time) { return glm::lerp(getScale(frame % frameCount), getScale((frame + 1) % frameCount), time); }
+  vec3 getPosition(int frame1, int frame2, float time) { return glm::lerp(getPosition(frame1 % frameCount), getPosition(frame2 % frameCount), time); }
+  quat getRotation(int frame1, int frame2, float time) { return glm::slerp(getRotation(frame1 % frameCount), getRotation(frame2 % frameCount), time); }
+  vec3 getScale(int frame1, int frame2, float time) { return glm::lerp(getScale(frame1 % frameCount), getScale(frame2 % frameCount), time); }
 
   void loadFrames(std::vector<float> &frames);
   int getStride() const;
@@ -77,6 +77,7 @@ public:
 
   void addMesh(std::string name, MeshPtr mesh);
   void addAnimationData(AnimationDataPtr animationData);
+  AnimationDataPtr getAnimationData(const std::string &name) { return _animations.count(name) ? _animations.at(name) : nullptr; }
 
   void loadHiererchy(const json &hierarchyData);
   void loadSkinning(const json &skinningData);

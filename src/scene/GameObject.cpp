@@ -7,13 +7,17 @@
 GameObjectID GameObject::instanceCounter = 0;
 IGameObjectManager *GameObject::_defaultManager = nullptr;
 
-GameObject::GameObject() : _transform(this) {
+GameObject::GameObject() : _animation(std::make_shared<AnimationController>()) {
   _id = ++instanceCounter;
 }
 
 void GameObject::_setManager(IGameObjectManager *manager) {
   _manager = manager;
-  _transform._manager = manager;
+  _transform->_manager = manager;
+}
+
+void GameObject::start() {
+
 }
 
 void GameObject::update(float dt) {
@@ -28,9 +32,15 @@ void GameObject::render(IRenderer &renderer) {
 
 }
 
+void GameObject::_processAnimations(float dt) {
+  if (_animation->autoUpdate() && _animation->hasAnimation()) {
+    _animation->update(dt);
+  }
+}
+
 void GameObject::_destroy() {
   // Also destroy children
-  for (auto &transform : _transform._children) {
+  for (auto &transform : _transform->_children) {
     transform->parent(nullptr);
     GameObjectPtr child(transform->gameObject());
     DestroyGameObject(child);
@@ -38,10 +48,10 @@ void GameObject::_destroy() {
 
   _destroyed = true;
   _active = false;
-  _transform._parent = nullptr;
+  _transform->_parent.reset();
   _manager = nullptr;
 
-  _transform._children.clear();
+  _transform->_children.clear();
 }
 
 void DestroyGameObject(GameObjectPtr object) {
@@ -51,3 +61,4 @@ void DestroyGameObject(GameObjectPtr object) {
     ENGLog("Error: can't _destroy object with null _manager");
   }
 }
+

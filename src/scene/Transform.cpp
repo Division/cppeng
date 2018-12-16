@@ -32,7 +32,7 @@ void Transform::_updateTransform(const mat4 *parentTransform, bool parentUpdated
   _dirty = false;
 }
 
-void Transform::_addChild(Transform *child) {
+void Transform::_addChild(std::shared_ptr<Transform> child) {
   bool found = false;
   for (auto &transform : _children) {
     if (transform->gameObject()->id() == child->gameObject()->id()) {
@@ -46,7 +46,7 @@ void Transform::_addChild(Transform *child) {
   }
 }
 
-void Transform::_removeChild(Transform *child) {
+void Transform::_removeChild(TransformPtr child) {
   for (int i = 0; i < _children.size(); i++) {
     if (_children[i]->gameObject()->id() == child->gameObject()->id()) {
       // Remove i-th element:
@@ -57,9 +57,9 @@ void Transform::_removeChild(Transform *child) {
   }
 }
 
-void Transform::setParent(Transform *transform) {
+void Transform::setParent(TransformPtr transform) {
   if (this->parent() != transform) {
-    _manager->transformChangeParent(this, this->parent(), transform);
+    _manager->transformChangeParent(shared_from_this(), this->parent(), transform);
     _dirty = true;
   }
 }
@@ -106,12 +106,26 @@ void Transform::setMatrix(const mat4 matrix) {
 }
 
 void Transform::_updateTransformUpwards(bool skipParentUpdate) const {
-  if (!skipParentUpdate && _parent) {
-    _parent->_updateTransformUpwards();
+  auto parentPtr = parent();
+
+  if (!skipParentUpdate && parentPtr) {
+    parentPtr->_updateTransformUpwards();
   }
 
   if (_dirty) {
-    mat4 *matrix = _parent ? &_parent->_worldMatrix : nullptr;
+    mat4 *matrix = parentPtr ? &parentPtr->_worldMatrix : nullptr;
     _updateTransform(matrix, false, true);
+  }
+}
+
+void Transform::forEachChild(bool recursive, std::function<void(std::shared_ptr<Transform>)> callback) const {
+  for (auto &child : _children) {
+    callback(child);
+  }
+
+  if (recursive) {
+    for (auto &child : _children) {
+      child->forEachChild(true, callback);
+    }
   }
 }

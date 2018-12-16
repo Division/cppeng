@@ -8,28 +8,34 @@
 #include "EngMath.h"
 #include <vector>
 #include <functional>
+#include <memory>
 
 class GameObject;
 class Transform;
 
 class ITransformManager {
 public:
-  virtual void transformChangeParent(Transform *transform, Transform *oldParent, Transform *newParent) = 0;
+  virtual void transformChangeParent(std::shared_ptr<Transform> transform, std::shared_ptr<Transform> oldParent,
+                                     std::shared_ptr<Transform> newParent) = 0;
 };
 
-class Transform {
+class Transform : public std::enable_shared_from_this<Transform> {
+private:
+  explicit Transform(std::shared_ptr<GameObject> object) : _gameObject(object) {};
+
 public:
+  Transform(const Transform &t) = delete;
+
+  template <typename T> friend std::shared_ptr<T> CreateGameObject();
   friend class GameObject;
   friend class Scene;
 
-  explicit Transform(GameObject *object) : _gameObject(object) {};
+  std::shared_ptr<GameObject> gameObject() { return _gameObject.lock(); }
+  std::shared_ptr<Transform> parent() { return _parent.lock(); }
+  const std::shared_ptr<Transform> parent() const { return _parent.lock(); }
 
-  GameObject *gameObject() { return _gameObject; }
-  Transform *parent() { return _parent; }
-  const Transform *parent() const { return _parent; }
-
-  void parent(Transform *transform) { setParent(transform); };
-  void setParent(Transform *transform);
+  void parent(std::shared_ptr<Transform> transform) { setParent(transform); };
+  void setParent(std::shared_ptr<Transform> transform);
 
   const vec3 left() const;
   const vec3 right() const;
@@ -53,9 +59,11 @@ public:
 
   void setDirty() { _dirty = true; }
 
-  const std::vector<Transform *> * const children() const { return &_children; }
+  const auto const children() const { return &_children; }
 
-  Transform *rootTransform() { if (_parent) return _parent->rootTransform(); else return this; }
+  std::shared_ptr<Transform> rootTransform() { if (parent()) return parent()->rootTransform(); else return shared_from_this(); }
+
+  void forEachChild(bool recursive, std::function<void(std::shared_ptr<Transform>)> callback) const;
 
   void setPosition(const vec3 &position) { _position = position; setDirty(); }
   void setRotation(const quat &rotation) { _rotation = rotation; setDirty(); }
@@ -69,9 +77,9 @@ private:
   mutable mat4 _localMatrix;
   mutable mat4 _worldMatrix;
 
-  GameObject *_gameObject;
-  Transform *_parent = nullptr;
-  std::vector<Transform *> _children;
+  std::weak_ptr<GameObject> _gameObject;
+  std::weak_ptr<Transform> _parent;
+  std::vector<std::shared_ptr<Transform>> _children;
   ITransformManager *_manager = nullptr;
 
   mutable bool _dirty = true;
@@ -80,9 +88,10 @@ private:
   void _updateTransform(const mat4 *parentTransform, bool parentUpdated, bool skipChildren = false) const;
   void _updateTransformUpwards(bool skipParentUpdate = false) const;
 
-  void _removeChild(Transform *child);
-  void _addChild(Transform *child);
+  void _removeChild(std::shared_ptr<Transform> child);
+  void _addChild(std::shared_ptr<Transform> child);
 };
 
+typedef std::shared_ptr<Transform> TransformPtr;
 
 #endif //CPPWRAPPER_TRANSFORM_H

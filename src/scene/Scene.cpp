@@ -35,6 +35,8 @@ void Scene::addGameObject(GameObjectPtr object) {
 }
 
 void Scene::_processAddedObject(GameObjectPtr object) {
+  _startList.push_back(object);
+
   // Object is camera
   if (IS_CAMERA(object)) {
     CameraPtr camera = std::dynamic_pointer_cast<Camera>(object);
@@ -114,7 +116,7 @@ void Scene::destroyGameObject(GameObjectPtr object) {
   }
 }
 
-void Scene::transformChangeParent(Transform *transform, Transform *oldParent, Transform *newParent) {
+void Scene::transformChangeParent(TransformPtr transform, TransformPtr oldParent, TransformPtr newParent) {
   if (oldParent) {
     oldParent->_removeChild(transform);
   }
@@ -130,9 +132,22 @@ void Scene::transformChangeParent(Transform *transform, Transform *oldParent, Tr
 }
 
 void Scene::update(float dt) {
+  if (!_startList.empty()) {
+    for (auto &object : _startList) {
+      object->start();
+    }
+    _startList.clear();
+  }
+
   for (auto &object : _gameObjects) {
     if (object->active()) {
       object->update(dt);
+    }
+  }
+
+  for (auto &object : _gameObjects) {
+    if (object->active()) {
+      object->_processAnimations(dt);
     }
   }
 

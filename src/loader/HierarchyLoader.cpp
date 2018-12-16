@@ -31,6 +31,12 @@ loader::loadHierarchy(ModelBundlePtr bundle, const HierarchyData *hierarchy, con
   object->transform()->setMatrix(hierarchy->transform);
   object->name(hierarchy->name);
 
+  if (bundle) {
+    auto animationData = bundle->getAnimationData(object->name());
+    if (animationData) {
+      object->animation()->animationData(animationData);
+    }
+  }
 
 //  ENGLog("Added object with name %s", object->name().c_str());
 
@@ -52,7 +58,7 @@ SkinnedMeshObjectPtr loader::loadSkinnedMesh(ModelBundlePtr bundle, SkinningData
   }
 
   skinnedMeshObject->transform()->setMatrix(hierarchy->transform);
-  skinnedMeshObject->skinningData(skinning);
+  skinnedMeshObject->setSkinningData(bundle, skinning);
   skinnedMeshObject->mesh(bundle->getMesh(hierarchy->geometry));
   skinnedMeshObject->material(std::make_shared<MaterialLighting>());
 

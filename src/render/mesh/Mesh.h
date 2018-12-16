@@ -12,6 +12,8 @@
 
 using namespace glm;
 
+extern const int JOINT_PER_VERTEX_MAX;
+
 class VertexBufferObject;
 
 class Mesh {
@@ -50,11 +52,23 @@ public:
   int strideBytes() const { return _strideBytes; };
   int faceCount() const {return _faceCount; }
   int indexCount() const { return _faceCount * _componentCount; }
+  int vertexCount() const { return _vertexCount; }
   vec3 getVertex(int index) const {
     if (!_hasVertices || !_keepData) { return vec3(); }
     else { return vec3(_vertices[index * 3], _vertices[index * 3 + 1], _vertices[index * 3 + 2]); };
   }
-
+  vec4 getWeights(int index) const {
+    if (!_hasWeights|| !_keepData) { return vec4(); }
+    else { return vec4(_weights[index * JOINT_PER_VERTEX_MAX], _weights[index * JOINT_PER_VERTEX_MAX + 1], _weights[index * JOINT_PER_VERTEX_MAX + 2], 0); };
+  }
+  ivec4 getJointIndices(int index) const {
+    if (!_hasWeights|| !_keepData) { return ivec4(); }
+    else { return ivec4(lround(_jointIndices[index * JOINT_PER_VERTEX_MAX]),
+                        lround(_jointIndices[index * JOINT_PER_VERTEX_MAX + 1]),
+                        lround(_jointIndices[index * JOINT_PER_VERTEX_MAX + 2]),
+                        0);
+    };
+  }
 
   bool hasVertices() const { return _hasVertices; }
   bool hasIndices() const { return _hasIndices; }

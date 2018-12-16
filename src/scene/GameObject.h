@@ -10,6 +10,7 @@
 #include "render/renderer/IRenderer.h"
 #include "system/Logging.h"
 #include <string>
+#include "AnimationController.h"
 
 class GameObject;
 typedef std::shared_ptr<GameObject> GameObjectPtr;
@@ -23,7 +24,12 @@ public:
 };
 
 class GameObject {
+protected:
+  GameObject();
+
 public:
+  GameObject(const GameObject &g) = delete;
+
   friend class Scene;
   template <typename T> friend std::shared_ptr<T> CreateGameObject();
   friend void DestroyGameObject(GameObjectPtr object);
@@ -38,22 +44,26 @@ public:
   void active(const bool active) { _active = active; }
   bool destroyed() const { return _destroyed; }
 
-  // TODO: change to TransformPtr
-  const Transform *transform() const { return &_transform; }
-  Transform *transform() { return &_transform; }
+  AnimationControllerPtr animation() { return _animation; }
+  const AnimationControllerPtr animation() const { return _animation; }
 
+  const TransformPtr transform() const { return _transform; }
+  TransformPtr transform() { return _transform; }
+
+  virtual void start(); // called only once just before the first update()
   virtual void update(float dt);
   virtual void render(IRenderer &renderer);
   virtual void postUpdate(); // called after update() is executed on all scene objects and transforms are updated
 
 protected:
-  GameObject();
+  void _processAnimations(float dt); // called after update, but before postUpdate and transforms calculation
 
   std::string _name;
 
+  AnimationControllerPtr _animation;
   bool _active = true;
   bool _destroyed = false;
-  Transform _transform;
+  TransformPtr _transform;
   IGameObjectManager *_manager;
   void _setManager (IGameObjectManager *manager);
   GameObjectID _id;
@@ -67,7 +77,9 @@ private:
 
 template <typename T>
 std::shared_ptr<T> CreateGameObject() {
-  std::shared_ptr<T> object = std::shared_ptr<T>(new T());
+  auto object = std::shared_ptr<T>(new T());
+  object->_transform = std::shared_ptr<Transform>(new Transform(object));
+  object->_animation->_gameObject = object;
 
   if (GameObject::_defaultManager) {
     object->_setManager(GameObject::_defaultManager);

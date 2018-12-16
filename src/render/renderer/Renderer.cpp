@@ -217,10 +217,12 @@ void Renderer::_processRenderPipeline(RenderMode mode) {
 
   // Debug
   auto &debugQueue = _queues[(int)RenderQueue::Debug];
+  glDisable(GL_DEPTH_TEST);
   for (auto &rop : debugQueue) {
     _uboManager->setupForRender(&rop);
     renderMesh(rop.mesh, rop.mode);
   }
+  glEnable(GL_DEPTH_TEST);
   // ---------------
 
 }

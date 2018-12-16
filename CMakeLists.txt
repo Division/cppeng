@@ -107,7 +107,7 @@ set(ENGINE_SOURCES
         src/render/shader/ShaderCaps.h
         src/render/shader/ShaderCaps.cpp
         src/render/renderer/ICameraParamsProvider.h
-        src/render/buffer/MultiVertexBufferObject.cpp src/render/buffer/MultiVertexBufferObject.h src/render/buffer/MultiVBOAddress.h src/utils/Performance.h src/utils/Performance.cpp src/render/buffer/FrameBufferObject.cpp src/render/buffer/FrameBufferObject.h src/render/effect/PostEffect.cpp src/render/effect/PostEffect.h src/render/shading/ShadowMap.cpp src/render/shading/ShadowMap.h src/render/shading/IShadowCaster.h src/objects/SkinnedMeshObject.cpp src/objects/SkinnedMeshObject.h src/resources/SkinningData.cpp src/resources/SkinningData.h src/resources/HierarchyData.cpp src/resources/HierarchyData.h src/loader/ModelLoaderUtils.cpp)
+        src/render/buffer/MultiVertexBufferObject.cpp src/render/buffer/MultiVertexBufferObject.h src/render/buffer/MultiVBOAddress.h src/utils/Performance.h src/utils/Performance.cpp src/render/buffer/FrameBufferObject.cpp src/render/buffer/FrameBufferObject.h src/render/effect/PostEffect.cpp src/render/effect/PostEffect.h src/render/shading/ShadowMap.cpp src/render/shading/ShadowMap.h src/render/shading/IShadowCaster.h src/objects/SkinnedMeshObject.cpp src/objects/SkinnedMeshObject.h src/resources/SkinningData.cpp src/resources/SkinningData.h src/resources/HierarchyData.cpp src/resources/HierarchyData.h src/loader/ModelLoaderUtils.cpp src/scene/AnimationController.cpp src/scene/AnimationController.h)
 
 add_library(cppeng ${ENGINE_SOURCES})
 

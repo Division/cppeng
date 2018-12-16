@@ -51,12 +51,12 @@ void AnimationData::loadFrames(std::vector<float> &frames) {
     if (hasPosition) {
       positions.resize(frameCount);
       memcpy(&positions[0], &frames[addedCount], sizeof(vec3) * frameCount);
-      addedCount += sizeof(vec3) * frameCount;
+      addedCount += sizeof(vec3) * frameCount / sizeof(float);
     }
     if (hasRotation) {
       rotations.resize(frameCount);
       memcpy(&rotations[0], &frames[addedCount], sizeof(quat) * frameCount);
-      addedCount += sizeof(quat) * frameCount;
+      addedCount += sizeof(quat) * frameCount / sizeof(float);
     }
     if (hasScale) {
       scales.resize(frameCount);

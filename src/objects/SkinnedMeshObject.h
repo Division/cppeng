@@ -10,19 +10,24 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <memory>
 
 class SkinnedMeshObject : public MeshObject {
 public:
   SkinnedMeshObject() = default;
 
-  void skinningData(SkinningDataPtr skinningData);
+  void setSkinningData(ModelBundlePtr bundle, SkinningDataPtr skinningData);
   SkinningDataPtr skinningData() const { return _skinningData; };
+
+  void start() override;
+  void postUpdate() override;
 
 protected:
   GameObjectPtr _rootJoint = nullptr;
   SkinningDataPtr _skinningData;
   std::unordered_map<std::string, GameObjectPtr> _jointMap;
   std::vector<GameObjectPtr> _jointList;
+  std::vector<mat4> _matrices;
 };
 
 

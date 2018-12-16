@@ -70,7 +70,7 @@ void loadGeometry(std::istream &stream, json geometryJson, ModelBundlePtr bundle
   std::vector<float> attribData;
   std::vector<unsigned short> indices;
   for (auto &geom : geometryJson) {
-    MeshPtr mesh = std::make_shared<Mesh>();
+    MeshPtr mesh = std::make_shared<Mesh>(true);
     int indexCount = geom["indexCount"];
     int vertexCount = geom["vertexCount"];
     auto attributes = geom["attributes"];
@@ -139,7 +139,6 @@ void loadAnimation(std::istream &stream, json animationJson, ModelBundlePtr bund
       loadArray<float>(stream, tempAnimations, (int)tempAnimations.size());
       animationData->loadFrames(tempAnimations);
     }
-
   }
 }
 
