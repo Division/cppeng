@@ -135,37 +135,37 @@ void Material::_setup(ShaderCapsSetPtr caps) {
   };
 
   // Auto adding uniforms and blocks
-  for (auto iterator : UNIFORMS_PER_CAP) {
+  for (auto &iterator : UNIFORMS_PER_CAP) {
     if (caps->hasCap(iterator.first)) { appendUniforms(iterator.first); }
   }
 
   auto engine = getEngine();
 
   _shader = engine->getShaderWithCaps(caps);
-//  caps->addCap(ShaderCaps::Skinning);
-//  _shaderSkinning = engine->getShaderWithCaps(caps);
-//  _shaderSkinning->addUniformBlock(UniformBlockName::SkinningMatrices);
+  caps->addCap(ShaderCaps::Skinning);
+  _shaderSkinning = engine->getShaderWithCaps(caps);
+  _shaderSkinning->addUniformBlock(UniformBlockName::SkinningMatrices);
 
   for (auto name : uniforms) {
     _shader->addUniform(name);
-//    _shaderSkinning->addUniform(name);
+    _shaderSkinning->addUniform(name);
   }
 
   for (auto name : uniformBlocks) {
     _shader->addUniformBlock(name);
-//    _shaderSkinning->addUniformBlock(name);
+    _shaderSkinning->addUniformBlock(name);
   }
 
   ShaderCapsSetPtr depthOnlyCaps = std::make_shared<ShaderCapsSet>(); // empty caps
   _shaderDepthOnly = engine->getShaderWithCaps(depthOnlyCaps);
   _shaderDepthOnly->addUniformBlock(UniformBlockName::Transform);
   _shaderDepthOnly->addUniformBlock(UniformBlockName::Camera);
-//
-//  depthOnlyCaps->addCap(ShaderCaps::Skinning);
-//  _shaderDepthOnlySkinning = engine->getShaderWithCaps(depthOnlyCaps);
-//  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::Transform);
-//  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::Camera);
-//  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::SkinningMatrices);
+
+  depthOnlyCaps->addCap(ShaderCaps::Skinning);
+  _shaderDepthOnlySkinning = engine->getShaderWithCaps(depthOnlyCaps);
+  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::Transform);
+  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::Camera);
+  _shaderDepthOnlySkinning->addUniformBlock(UniformBlockName::SkinningMatrices);
 }
 
 void Material::activateTextures() const {

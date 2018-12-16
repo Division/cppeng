@@ -63,11 +63,13 @@ private:
   int _mainCameraOffset = 0;
   int _2dCameraOffset = 0;
 
+  std::vector<RenderOperation *>_skinningRops;
 private:
   void _prepareQueues(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
   void _processRenderPipeline(RenderMode mode);
   void _renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera);
   void setupAndUploadUBO(RenderOperation *rop);
+  void _uploadSkinning(RenderOperation *rop);
 };
 
 

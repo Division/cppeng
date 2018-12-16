@@ -17,7 +17,9 @@ struct RenderOperation {
   mat4 modelMatrix;
   GLenum mode = GL_TRIANGLES;
   unsigned int index;
+  bool isSkinning = false;
   MultiVBOAddress transformBlockOffset; // signed int to use -1 as unready marker
+  MultiVBOAddress skinningOffset;
   int renderOrder;
   std::string debugInfo;
 
@@ -26,6 +28,7 @@ struct RenderOperation {
     material = nullptr;
     modelMatrix = mat4();
     index = 0;
+    isSkinning = false;
     renderOrder = 0;
     debugInfo = "";
   }

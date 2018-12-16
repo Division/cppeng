@@ -22,6 +22,10 @@ public:
   // Transform uniform block
   bool hasTransform = true;
   TransformBinding transform;
+
+  // Skinning matrices uniform block
+  bool hasSkinning = false;
+  SkinningMatricesBinding skinningMatrices;
 };
 
 

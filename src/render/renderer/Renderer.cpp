@@ -56,7 +56,15 @@ void Renderer::setupAndUploadUBO(RenderOperation *rop) {
     rop->material->setTransformBlock(transformStruct);
   }
 
+  if (rop->isSkinning) {
+    _skinningRops.push_back(rop);
+  }
+
   _uboManager->setTransformBlock(rop);
+}
+
+void Renderer::_uploadSkinning(RenderOperation *rop) {
+  _uboManager->setSkinningMatrices(rop);
 }
 
 // Executed once per frame. Upload most of the UBO.
@@ -106,6 +114,8 @@ void Renderer::populateQueues(std::shared_ptr<Scene> scene, ICameraParamsProvide
     object->render(*this);
   }
 
+  _skinningRops.clear();
+
   _uboManager->map();
   for (auto &queue : _queues) {
     for (auto &rop : queue) {
@@ -113,6 +123,12 @@ void Renderer::populateQueues(std::shared_ptr<Scene> scene, ICameraParamsProvide
     }
   }
   _uboManager->unmap();
+
+  _uboManager->mapSkinning();
+  for (auto rop : _skinningRops) {
+    _uploadSkinning(rop);
+  }
+  _uboManager->unmapSkinning();
 }
 
 void Renderer::renderScene(RenderPassPtr view) {

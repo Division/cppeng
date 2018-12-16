@@ -5,6 +5,7 @@
 #include "SkinnedMeshObject.h"
 #include "loader/HierarchyLoader.h"
 #include "EngineMain.h"
+#include <iostream>
 
 void SkinnedMeshObject::setSkinningData(ModelBundlePtr bundle, SkinningDataPtr skinningData) {
   if (_rootJoint) {
@@ -55,19 +56,38 @@ void SkinnedMeshObject::postUpdate() {
     _matrices[i] = _jointList[i]->transform()->worldMatrix() * _skinningData->bindPoses[i];
   }
 
-  for (int i = 0; i < _mesh->vertexCount(); i++) {
-    vec3 vertex = _mesh->getVertex(i);
-    vec4 weight = _mesh->getWeights(i);
-    vec4 jointIndices = _mesh->getJointIndices(i);
+//  for (int i = 0; i < _mesh->vertexCount(); i++) {
+//    vec3 vertex = _mesh->getVertex(i);
+//    vec4 weight = _mesh->getWeights(i);
+//    vec4 jointIndices = _mesh->getJointIndices(i);
+//
+//    mat4 matrix = _matrices[jointIndices.x] * weight.x + _matrices[jointIndices.y] * weight.y + _matrices[jointIndices.z] * weight.z;
+//    vertex = vec3(matrix * vec4(vertex, 1));
+//    getEngine()->debugDraw()->drawPoint(vertex, vec3(1, 1, 1));
+//  }
+//
+//  transform()->forEachChild(true, [&](TransformPtr transform) {
+//    if (transform->parent()->gameObject()->id() == this->id()) { return; }
+//    getEngine()->debugDraw()->drawLine(transform->worldPosition(), transform->parent()->worldPosition(), vec4(1, 0, 0, 1));
+////    getEngine()->debugDraw()->drawPoint(transform->worldPosition(), vec3(1, 1, 1));
+//  });
+}
 
-    mat4 matrix = _matrices[jointIndices.x] * weight.x + _matrices[jointIndices.y] * weight.y + _matrices[jointIndices.z] * weight.z;
-    vertex = vec3(matrix * vec4(vertex, 1));
-    getEngine()->debugDraw()->drawPoint(vertex, vec3(1, 1, 1));
+void SkinnedMeshObject::render(IRenderer &renderer) {
+  if (!_mesh || !_material) {
+    return;
   }
 
-  transform()->forEachChild(true, [&](TransformPtr transform) {
-    if (transform->parent()->gameObject()->id() == this->id()) { return; }
-    getEngine()->debugDraw()->drawLine(transform->worldPosition(), transform->parent()->worldPosition(), vec4(1, 0, 0, 1));
-//    getEngine()->debugDraw()->drawPoint(transform->worldPosition(), vec3(1, 1, 1));
-  });
+  UBOStruct::SkinningMatrices skinningMatrices;
+  memcpy(&skinningMatrices.matrices[0], &_matrices[0], sizeof(mat4) * _matrices.size());
+  _material->setSkinningMatrices(skinningMatrices);
+
+  RenderOperation rop;
+  rop.mesh = _mesh;
+  rop.material = _material;
+  rop.modelMatrix = transform()->worldMatrix();
+  rop.renderOrder = renderOrder;
+  rop.debugInfo = name();
+  rop.isSkinning = true;
+  renderer.addRenderOperation(rop, _renderQueue);
 }

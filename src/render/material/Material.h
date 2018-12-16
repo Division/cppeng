@@ -24,6 +24,10 @@ public:
   void setTransformBlock(const UBOStruct::TransformStruct &value) { _bindings.transform.data = value; }
   const UBOStruct::TransformStruct &getTransformStruct() { return _bindings.transform.data; }
 
+  bool hasSkinning() { return _bindings.hasSkinning; }
+  void setSkinningMatrices(const UBOStruct::SkinningMatrices &value) { _bindings.skinningMatrices.data = value; }
+  const UBOStruct::SkinningMatrices &getSkinningMatrices() { return _bindings.skinningMatrices.data; }
+
   void uploadBindings(ShaderPtr shader) const;
   void activateTextures() const;
 

@@ -69,4 +69,10 @@ struct TransformBinding: public UniformBlockBinding {
   UBOStruct::TransformStruct data;
 };
 
+struct SkinningMatricesBinding: public UniformBlockBinding {
+  explicit SkinningMatricesBinding() : UniformBlockBinding(UniformBlockName::SkinningMatrices) {}
+  int jointCount = 0;
+  UBOStruct::SkinningMatrices data;
+};
+
 #endif //CPPWRAPPER_UNIFORMBINDING_H

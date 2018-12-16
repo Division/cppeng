@@ -19,6 +19,7 @@ public:
   void setSkinningData(ModelBundlePtr bundle, SkinningDataPtr skinningData);
   SkinningDataPtr skinningData() const { return _skinningData; };
 
+  void render(IRenderer &renderer) override;
   void start() override;
   void postUpdate() override;
 

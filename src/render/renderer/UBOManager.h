@@ -22,6 +22,7 @@ class UBOManager {
 public:
   UBOManager();
   void setTransformBlock(RenderOperation *rop);
+  void setSkinningMatrices(RenderOperation *rop);
   void swap();
   void upload(bool includeLighting);
   void setupForRender(RenderOperation *rop, RenderMode mode);
@@ -31,6 +32,8 @@ public:
   void activateCamera(unsigned int offset);
   void map();
   void unmap();
+  void mapSkinning();
+  void unmapSkinning();
 private:
   // Data related to objects transformation
   std::shared_ptr<MultiVertexBufferObject> _transform;

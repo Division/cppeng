@@ -91,8 +91,16 @@ void UBOManager::setTransformBlock(RenderOperation *rop) {
   }
 }
 
+void UBOManager::setSkinningMatrices(RenderOperation *rop) {
+  MaterialPtr material = rop->material;
+  auto &skinningMatrices = material->getSkinningMatrices();
+  auto address = _skinningMatrices->appendData((void *) &skinningMatrices, sizeof(skinningMatrices));
+  rop->skinningOffset = address;
+}
+
 void UBOManager::swap() {
   _transform->swapBuffers();
+  _skinningMatrices->swapBuffers();
 
   _light->swap();
   _light->current()->resize(0);
@@ -121,7 +129,7 @@ void UBOManager::upload(bool includeLighting) {
 void UBOManager::setupForRender(RenderOperation *rop, RenderMode mode) {
   MaterialPtr material = rop->material;
 
-  bool isSkinning = false;
+  bool isSkinning = rop->isSkinning;
   bool isDepthOnly = mode == RenderMode::DepthOnly;
 
   ShaderPtr shader;
@@ -149,6 +157,14 @@ void UBOManager::setupForRender(RenderOperation *rop, RenderMode mode) {
   } else {
     ENGLog("No transform");
   }
+
+  if (rop->isSkinning) {
+    auto address = rop->skinningOffset;
+    auto size = sizeof(UBOStruct::SkinningMatrices);
+    auto slot = (GLuint)UniformBlockName::SkinningMatrices;
+    auto vbo = _skinningMatrices->getVBO(address.index);
+    glBindBufferRange(GL_UNIFORM_BUFFER, slot, vbo, address.offset, size);
+  }
 }
 
 void UBOManager::activateCamera(unsigned int offset) {
@@ -167,4 +183,12 @@ void UBOManager::map() {
 
 void UBOManager::unmap() {
   _transform->unmap();
+}
+
+void UBOManager::mapSkinning() {
+  _skinningMatrices->map();
+}
+
+void UBOManager::unmapSkinning() {
+  _skinningMatrices->unmap();
 }
