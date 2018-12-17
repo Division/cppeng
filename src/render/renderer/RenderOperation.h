@@ -20,7 +20,7 @@ struct RenderOperation {
   bool isSkinning = false;
   MultiVBOAddress transformBlockOffset; // signed int to use -1 as unready marker
   MultiVBOAddress skinningOffset;
-  int renderOrder;
+  int renderOrder = 0;
   std::string debugInfo;
 
   void reset () {

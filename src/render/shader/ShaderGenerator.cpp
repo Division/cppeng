@@ -121,6 +121,7 @@ ShaderPtr ShaderGenerator::getShaderWithCaps(std::shared_ptr<ShaderCapsSet> caps
     loader::loadShader(stream, &vertexSource, &fragmentSource);
     result = std::make_shared<Shader>(vertexSource, fragmentSource);
     shaderCache[caps->getBitmask()] = result;
+    result->setupUniformsForCaps(caps);
   } else {
     result = iterator->second;
   }

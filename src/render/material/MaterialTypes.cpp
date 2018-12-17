@@ -71,7 +71,7 @@ MaterialTerrain::MaterialTerrain(int layerCount, bool specularmap) {
   _setup(caps);
 }
 
-// NOTE: test only material
+// NOTE: material for testing
 // Actual projection rendering is built into the render pipeline
 MaterialTextureProjection::MaterialTextureProjection() {
   auto engine = getEngine();

@@ -50,6 +50,8 @@ public:
   Uniform *addUniform (UniformName type);
   Uniform *getUniform(UniformName type);
 
+  void setupUniformsForCaps(ShaderCapsSetPtr caps);
+
 private:
   GLuint _compileShader(const std::string &vertexSource, const std::string &fragmentSource);
   GLuint _loadShader(const std::string &source, GLenum type);

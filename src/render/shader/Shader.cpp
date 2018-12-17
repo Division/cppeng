@@ -6,6 +6,29 @@
 #include <system/Logging.h>
 #include <memory>
 
+struct ShaderConfig {
+  std::vector<UniformName > uniforms;
+  std::vector<UniformBlockName> uniformBlocks;
+};
+
+const std::vector<UniformBlockName> DEFAULT_UBO = { UniformBlockName::Transform, UniformBlockName::Camera };
+
+const std::map<ShaderCaps, ShaderConfig> UNIFORMS_PER_CAP = {
+    { ShaderCaps::Color, { { UniformName::Color }, DEFAULT_UBO } },
+    { ShaderCaps::Lighting, {
+      { UniformName::ShadowMap, UniformName::LightGrid, UniformName::LightIndices, UniformName::ProjectorTexture},
+      { UniformBlockName::Transform, UniformBlockName::Camera, UniformBlockName::Light, UniformBlockName::Projector }
+    } },
+    { ShaderCaps::NormalMap, { { UniformName::NormalMap }, DEFAULT_UBO } },
+    { ShaderCaps::Texture0, { { UniformName::Texture0 }, DEFAULT_UBO } },
+    { ShaderCaps::VertexColor, { {}, DEFAULT_UBO } },
+    { ShaderCaps::SpecularMap, { { UniformName::SpecularMap }, {} } },
+    { ShaderCaps::TerrainLayer0, { { UniformName::TerrainDiffuse0, UniformName::TerrainNormal0 }, { DEFAULT_UBO } } },
+    { ShaderCaps::TerrainLayer1, { { UniformName::TerrainDiffuse1, UniformName::TerrainNormal1, UniformName::TerrainSplatmap }, {} } },
+    { ShaderCaps::TerrainLayer2, { { UniformName::TerrainDiffuse2, UniformName::TerrainNormal2, UniformName::TerrainSplatmap }, {} } },
+    { ShaderCaps::Skinning, { {}, { UniformBlockName::SkinningMatrices, UniformBlockName::Transform, UniformBlockName::Camera } } }
+};
+
 const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
   { ShaderAttrib::Position, "aPosition" },
   { ShaderAttrib::Normal, "aNormal" },
@@ -145,5 +168,31 @@ Uniform *Shader::addUniform(const UniformName type) {
 
 Uniform *Shader::getUniform (const UniformName type) {
   return _uniforms[(int)type].get();
+}
+
+void Shader::setupUniformsForCaps(ShaderCapsSetPtr caps) {
+  std::unordered_set<UniformName> uniforms;
+  std::unordered_set<UniformBlockName> uniformBlocks;
+
+  // Auto adding uniforms and blocks
+  for (auto &iterator : UNIFORMS_PER_CAP) {
+    if (caps->hasCap(iterator.first)) {
+      auto &config = UNIFORMS_PER_CAP.at(iterator.first);
+      for (auto &name : config.uniforms) {
+        uniforms.insert(name);
+      }
+      for (auto &name : config.uniformBlocks) {
+        uniformBlocks.insert(name);
+      }
+    }
+  }
+
+  for (auto name : uniforms) {
+    addUniform(name);
+  }
+
+  for (auto name : uniformBlocks) {
+    addUniformBlock(name);
+  }
 }
 
