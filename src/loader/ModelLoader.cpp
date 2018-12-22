@@ -16,12 +16,14 @@ using namespace nlohmann;
 const auto ATTRIB_POSITION = "POSITION";
 const auto ATTRIB_NORMAL = "NORMAL";
 const auto ATTRIB_TEXCOORD0 = "TEXCOORD0";
+const auto ATTRIB_TEXCOORD1 = "TEXCOORD1";
 const auto ATTRIB_WEIGHT = "WEIGHT";
 
 const std::map<std::string, int> ATTRIB_COUNT = {
   { ATTRIB_POSITION, 3 },
   { ATTRIB_NORMAL, 3 },
   { ATTRIB_TEXCOORD0, 2 },
+  { ATTRIB_TEXCOORD1, 2 },
   { ATTRIB_WEIGHT, 6 }
 };
 
@@ -29,13 +31,20 @@ void loadGeometry(std::istream &stream, json geometryJson, ModelBundlePtr bundle
 void loadAnimation(std::istream &stream, json animationJson, ModelBundlePtr bundle);
 template <typename T> void loadArray(std::istream &stream, std::vector<T> &data, int count);
 
+ModelBundlePtr loader::loadModel(const std::string &filename) {
+  std::ifstream stream;
+  stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+  stream.open(filename, std::ios::in | std::ios::binary);
+  return loadModel(stream, filename);
+}
+
 ModelBundlePtr loader::loadModel(std::istream &stream, const std::string &url) {
   ModelBundlePtr bundle = std::make_shared<ModelBundle>(url);
 
-  uint16 headerSize = 0;
+  unsigned int headerSize = 0;
   stream.read((char *)&headerSize, sizeof(headerSize));
 
-  headerSize = swap_endian<uint16>(headerSize);
+  headerSize = swap_endian<unsigned int>(headerSize);
 //  std::vector<char> headerChars;
 //  headerChars.resize(headerSize + 1);
 //  headerChars[headerSize] = 0;
@@ -46,10 +55,13 @@ ModelBundlePtr loader::loadModel(std::istream &stream, const std::string &url) {
   headerString.resize(headerSize);
   stream.read(&headerString[0], headerSize);
 
-
 //  ENGLog("JSON: \n%i\n %s", headerString.length(), headerString.c_str());
   json header = json::parse(headerString);
 //  ENGLog("JSON:\n%s", header.dump(2).c_str());
+
+  if (header.find("lights") != header.end()) {
+    bundle->loadLights(header["lights"]);
+  }
 
   if (header.find("hierarchy") != header.end()) {
     bundle->loadHiererchy(header["hierarchy"]);

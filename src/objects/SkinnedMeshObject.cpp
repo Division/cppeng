@@ -19,21 +19,24 @@ void SkinnedMeshObject::setSkinningData(ModelBundlePtr bundle, SkinningDataPtr s
   _jointMap.clear();
 
   if (_skinningData) {
-    _rootJoint = loader::loadHierarchy(bundle, &_skinningData->joints);
+    _rootJoint = loader::loadHierarchy(bundle, _skinningData->joints);
     _rootJoint->transform()->parent(transform());
 
-    _animation = _rootJoint->animation();
+    if (_rootJoint->animation()->hasAnimation()) {
+      _animation = _rootJoint->animation();
+    }
 
     auto processJoint = [&](TransformPtr transform) {
       if (!_animation->hasAnimation() && transform->gameObject()->animation()->hasAnimation()) {
         _animation = transform->gameObject()->animation();
       }
 
-      _jointMap[transform->gameObject()->name()] = transform->gameObject();
+      _jointMap[transform->gameObject()->sid()] = transform->gameObject();
       transform->gameObject()->animation()->autoUpdate(false);
       _rootJoint->animation()->addChildController(transform->gameObject()->animation());
     };
 
+    _animation->autoUpdate(false);
     _jointMap[_rootJoint->name()] = _rootJoint;
     _rootJoint->transform()->forEachChild(true, processJoint);
 
@@ -45,6 +48,10 @@ void SkinnedMeshObject::setSkinningData(ModelBundlePtr bundle, SkinningDataPtr s
   } else {
     _animation = std::make_shared<AnimationController>();
   }
+}
+
+void SkinnedMeshObject::_processAnimations(float dt) {
+  _animation->update(dt);
 }
 
 void SkinnedMeshObject::start() {
@@ -66,10 +73,10 @@ void SkinnedMeshObject::postUpdate() {
 //    getEngine()->debugDraw()->drawPoint(vertex, vec3(1, 1, 1));
 //  }
 //
+
 //  transform()->forEachChild(true, [&](TransformPtr transform) {
 //    if (transform->parent()->gameObject()->id() == this->id()) { return; }
 //    getEngine()->debugDraw()->drawLine(transform->worldPosition(), transform->parent()->worldPosition(), vec4(1, 0, 0, 1));
-////    getEngine()->debugDraw()->drawPoint(transform->worldPosition(), vec3(1, 1, 1));
 //  });
 }
 

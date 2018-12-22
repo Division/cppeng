@@ -10,6 +10,8 @@ void SkinningData::loadFromJSON(const std::string &name, const json &jsonData) {
   this->name = name;
   jointNames.resize(0);
 
+  joints = std::make_shared<HierarchyData>();
+
   auto &jsonJointNames = jsonData["jointNames"];
   jointNames.reserve(jsonJointNames.size());
   for (auto &joint : jsonJointNames) {
@@ -23,5 +25,5 @@ void SkinningData::loadFromJSON(const std::string &name, const json &jsonData) {
     bindPoses[i] = loader::getMatrixFromJSON(jsonBindPoses.at(i));
   }
 
-  joints.loadFromJSON(jsonData["joints"]);
+  joints->loadFromJSON(jsonData["joints"]);
 }

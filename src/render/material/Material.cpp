@@ -106,6 +106,7 @@ void Material::_setup(ShaderCapsSetPtr caps) {
   _shaderSkinning = engine->getShaderWithCaps(caps);
 
   ShaderCapsSetPtr depthOnlyCaps = std::make_shared<ShaderCapsSet>(); // empty caps
+  depthOnlyCaps->addCap(ShaderCaps::ObjectData);
   _shaderDepthOnly = engine->getShaderWithCaps(depthOnlyCaps);
 
   depthOnlyCaps->addCap(ShaderCaps::Skinning);

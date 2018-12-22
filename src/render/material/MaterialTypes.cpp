@@ -6,6 +6,8 @@
 #include "EngineMain.h"
 #include "render/renderer/Renderer.h"
 
+
+
 MaterialSingleColor::MaterialSingleColor() {
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Color);
@@ -28,6 +30,26 @@ MaterialTexture::MaterialTexture() {
   _setup(caps);
 
   _texture0Binding = _addTextureBinding(UniformName::Texture0);
+}
+
+MaterialTextureLighting::MaterialTextureLighting() {
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Texture0);
+  caps->addCap(ShaderCaps::Lighting);
+  _setup(caps);
+
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
+}
+
+MaterialTextureBumpLighting::MaterialTextureBumpLighting() {
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Texture0);
+  caps->addCap(ShaderCaps::Lighting);
+  caps->addCap(ShaderCaps::NormalMap);
+  _setup(caps);
+
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
+  _texture0Binding = _addTextureBinding(UniformName::NormalMap);
 }
 
 MaterialLighting::MaterialLighting() {

@@ -6,6 +6,18 @@
 #include "system/Logging.h"
 #include "loader/ModelLoaderUtils.h"
 
+void LightData::loadFromJSON(const json &jsonData) {
+  type = jsonData["type"];
+  id = jsonData["id"];
+  if (jsonData.find("color") != jsonData.end()) {
+    color = vec3(jsonData["color"][0], jsonData["color"][1], jsonData["color"][2]);
+  }
+
+  if (type == "spot") {
+    coneAngle = jsonData["coneAngle"];
+  }
+}
+
 void AnimationData::loadFromJSON(const json &jsonData) {
   duration = jsonData["duration"].get<float>();
   fps = jsonData["fps"].get<int>();
@@ -65,6 +77,26 @@ void AnimationData::loadFrames(std::vector<float> &frames) {
   }
 }
 
+void AnimationData::appendAnimationData(std::shared_ptr<AnimationData> animationData, std::string &name) {
+  sequences.emplace_back(AnimationSequence{ name, frameCount, animationData->frameCount });
+
+  duration += animationData->duration;
+  frameCount += animationData->frameCount;
+
+  if (hasPosition) {
+    positions.insert(positions.end(), animationData->positions.begin(), animationData->positions.end());
+  }
+  if (hasRotation) {
+    rotations.insert(rotations.end(), animationData->rotations.begin(), animationData->rotations.end());
+  }
+  if (hasScale) {
+    scales.insert(scales.end(), animationData->scales.begin(), animationData->scales.end());
+  }
+  if (isMatrix) {
+    matrices.insert(matrices.end(), animationData->matrices.begin(), animationData->matrices.end());
+  }
+}
+
 const MeshPtr ModelBundle::getMesh(const std::string &name) const {
   MeshPtr result;
 
@@ -78,8 +110,24 @@ const MeshPtr ModelBundle::getMesh(const std::string &name) const {
   return result;
 }
 
+void ModelBundle::loadLights(const json &lightsData) {
+  for (auto &light : lightsData) {
+    auto lightData = std::make_shared<LightData>();
+    lightData->loadFromJSON(light);
+    _lights[lightData->id] = lightData;
+  }
+}
+
 void ModelBundle::loadHiererchy(const json &hierarchyData) {
-  _hierarchy.loadFromJSON(hierarchyData);
+  _hierarchy->loadFromJSON(hierarchyData);
+
+  auto addHierarchy = [&](HierarchyDataPtr hierarchy) {
+    _nameToHierarchy[hierarchy->name] = hierarchy;
+    _idToHierarchy[hierarchy->id] = hierarchy;
+  };
+
+  _hierarchy->forEachChild(true, addHierarchy);
+  addHierarchy(_hierarchy);
 }
 
 void ModelBundle::addMesh(std::string name, MeshPtr mesh) {
@@ -98,21 +146,25 @@ void ModelBundle::loadSkinning(const json &skinningData) {
   }
 }
 
-const HierarchyData *ModelBundle::findHierarchy(std::string name, const HierarchyData *root) const {
-  auto data = root ? root : &_hierarchy;
-
-  if (data->name == name) {
-    return data;
-  }
-
-  if (data) {
-    for (auto &child : data->children) {
-      auto result = findHierarchy(name, &child);
-      if (result) {
-        return result;
-      }
+void ModelBundle::appendAnimationBundle(ModelBundlePtr modelBundle, std::string name) {
+  for (auto &iterator: modelBundle->_animations) {
+    auto &srcAnim = iterator.second;
+    AnimationDataPtr anim;
+    if (!_animations.count(iterator.first)) {
+      anim = std::make_shared<AnimationData>();
+      _animations[iterator.first] = anim;
+      anim->name = srcAnim->name;
+      anim->fps = srcAnim->fps;
+      anim->hasPosition = srcAnim->hasPosition;
+      anim->hasRotation = srcAnim->hasRotation;
+      anim->hasScale = srcAnim->hasScale;
+      anim->isMatrix = srcAnim->isMatrix;
+      anim->stride = srcAnim->stride;
+      anim->name = srcAnim->name;
+    } else {
+      anim = _animations[iterator.first];
     }
-  }
 
-  return nullptr;
+    anim->appendAnimationData(srcAnim, name);
+  }
 }

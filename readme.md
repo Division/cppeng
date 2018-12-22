@@ -1,5 +1,7 @@
 `TODO`
-* GPU Skinned mesh animation
-* Shadows
-* View to be bound to each camera. Render View to a FBO, then display full screen quad result
+* scene spatial partitioning
+* frustum culling
+* fix light tiles assignment
+* better AABB calculation for spotlight/decals 
+* Decouple material and object params (e.g. skinning matrices)
 * Bloom

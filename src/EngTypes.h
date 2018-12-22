@@ -31,6 +31,12 @@ typedef std::shared_ptr<Shader> ShaderPtr;
 class SkinnedMeshObject;
 typedef std::shared_ptr<SkinnedMeshObject> SkinnedMeshObjectPtr;
 
+class ModelBundle;
+typedef std::shared_ptr<ModelBundle> ModelBundlePtr;
+
+struct AnimationData;
+typedef std::shared_ptr<AnimationData> AnimationDataPtr;
+
 //class MaterialTexutre;
 //typedef std::shared_ptr<MaterialTexutre> MaterialTexutrePtr;
 

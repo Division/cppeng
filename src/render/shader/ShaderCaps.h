@@ -13,6 +13,7 @@
 
 enum class ShaderCaps : int {
   Color = 0,
+  ObjectData,
   VertexColor,
   PointSize,
   Lighting,

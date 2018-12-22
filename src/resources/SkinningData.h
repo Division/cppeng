@@ -17,7 +17,7 @@ struct SkinningData {
   std::string name;
   std::vector<std::string> jointNames;
   std::vector<mat4> bindPoses;
-  HierarchyData joints;
+  HierarchyDataPtr joints;
 
   void loadFromJSON(const std::string &name, const json &jsonData);
 };

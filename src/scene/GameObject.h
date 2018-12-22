@@ -40,6 +40,10 @@ public:
   void name(const std::string &name) { _name = name; }
 
   int id() const { return _id; }
+
+  void sid(const std::string &sid) { _sid = sid; }
+  std::string sid() const { return _sid; }
+
   bool active() const { return _active; }
   void active(const bool active) { _active = active; }
   bool destroyed() const { return _destroyed; }
@@ -56,9 +60,10 @@ public:
   virtual void postUpdate(); // called after update() is executed on all scene objects and transforms are updated
 
 protected:
-  void _processAnimations(float dt); // called after update, but before postUpdate and transforms calculation
+  virtual void _processAnimations(float dt); // called after update, but before postUpdate and transforms calculation
 
   std::string _name;
+  std::string _sid; // sid of the HierarchyData
 
   AnimationControllerPtr _animation;
   bool _active = true;

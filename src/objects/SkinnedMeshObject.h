@@ -24,6 +24,9 @@ public:
   void postUpdate() override;
 
 protected:
+  void _processAnimations(float dt) override;
+
+protected:
   GameObjectPtr _rootJoint = nullptr;
   SkinningDataPtr _skinningData;
   std::unordered_map<std::string, GameObjectPtr> _jointMap;

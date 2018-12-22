@@ -12,11 +12,6 @@
 
 class GameObject;
 
-struct AnimationSequence {
-  int startFrame = 0;
-  int count = 0;
-};
-
 class AnimationController {
 public:
   template <typename T> friend std::shared_ptr<T> CreateGameObject();
@@ -28,7 +23,7 @@ public:
   const AnimationDataPtr animationData() const { return _animationData; }
   bool hasAnimation() const { return (bool)_animationData; }
   bool autoUpdate() const { return _autoUpdate; }
-  bool autoUpdate(bool value) { _autoUpdate = value; }
+  void autoUpdate(bool value) { _autoUpdate = value; }
 
   std::shared_ptr<GameObject> gameObject() { return _gameObject.lock(); }
   void addChildController(std::shared_ptr<AnimationController> controller) { _childControllers.push_back(controller); }

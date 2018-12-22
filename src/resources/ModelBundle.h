@@ -15,26 +15,40 @@
 #include "nlohmann/json.hpp"
 #include <system/Logging.h>
 #include "SkinningData.h"
-//#include "HierarchyData.h"
 
 using namespace nlohmann;
 
+struct LightData {
+  std::string type;
+  std::string id;
+  vec3 color = vec3(1, 1, 1);
+  float coneAngle;
+
+  void loadFromJSON(const json &jsonData);
+};
+
+struct AnimationSequence {
+  std::string name;
+  int startFrame = 0;
+  int count = 0;
+};
+
 struct AnimationData {
-  float duration;
-  int fps;
-  int frameCount;
-  bool hasPosition;
-  bool hasRotation;
-  bool hasScale;
-  bool isMatrix;
+  float duration = 0;
+  int fps = 0;
+  int frameCount = 0;
+  bool hasPosition = false;
+  bool hasRotation = false;
+  bool hasScale = false;
+  bool isMatrix = false;
+  int stride = 0;
   std::string name;
 
   std::vector<mat4> matrices;
   std::vector<vec3> positions;
   std::vector<quat> rotations;
   std::vector<vec3> scales;
-
-  int stride;
+  std::vector<AnimationSequence> sequences;
 
   mat4 getMatrix(int frame) { return matrices[frame]; }
   vec3 getPosition(int frame) { return positions[frame]; }
@@ -55,39 +69,51 @@ struct AnimationData {
   int getElementCount() const;
   int bytesPerFrame () { return stride * 4; }
 
+  void appendAnimationData(std::shared_ptr<AnimationData> animationData, std::string &name);
+
   void loadFromJSON(const json &jsonData);
 };
 
 class ModelBundle;
 typedef std::shared_ptr<ModelBundle> ModelBundlePtr;
 typedef std::shared_ptr<AnimationData> AnimationDataPtr;
+typedef std::shared_ptr<HierarchyData> HierarchyDataPtr;
+typedef std::shared_ptr<LightData> LightDataPtr;
 
 class ModelBundle {
 public:
-  explicit ModelBundle(const std::string &url) : _url(url) { ENGLog("ModelBundle create"); }
+  explicit ModelBundle(const std::string &url) : _url(url), _hierarchy(std::make_shared<HierarchyData>()) {}
   ~ModelBundle() { ENGLog("ModelBundle destroy"); }
 
   const std::string &url() const { return _url; }
   const MeshPtr getMesh(const std::string &name) const;
-  const HierarchyData &hierarchy() const { return _hierarchy; }
-  const HierarchyData *findHierarchy(std::string name, const HierarchyData *root = nullptr) const;
+  const HierarchyDataPtr hierarchy() const { return _hierarchy; }
+  const HierarchyDataPtr getHierarchyByName(const std::string &name) const { return _nameToHierarchy.count(name) ? _nameToHierarchy.at(name) : nullptr;}
+  const HierarchyDataPtr getHierarchyByID(const std::string &id) const { return _idToHierarchy.count(id) ? _idToHierarchy.at(id) : nullptr; }
 
   const SkinningDataPtr getSkinning(const std::string &name) const { return _skinning.at(name); }
   const SkinningDataPtr getDefaultSkinning() const { return _skinning.begin()->second; }
+
+  const LightDataPtr getLight(const std::string &name) const { return _lights.at(name); }
 
   void addMesh(std::string name, MeshPtr mesh);
   void addAnimationData(AnimationDataPtr animationData);
   AnimationDataPtr getAnimationData(const std::string &name) { return _animations.count(name) ? _animations.at(name) : nullptr; }
 
+  void loadLights(const json &lightsData);
   void loadHiererchy(const json &hierarchyData);
   void loadSkinning(const json &skinningData);
+  void appendAnimationBundle(ModelBundlePtr modelBundle, std::string name);
 
 private:
   std::string _url; // unique name of the resource
   std::unordered_map<std::string, MeshPtr> _meshes; // map of meshes
   std::unordered_map<std::string, SkinningDataPtr> _skinning; // map of skin data
   std::unordered_map<std::string, AnimationDataPtr> _animations; // map of meshes
-  HierarchyData _hierarchy;
+  std::unordered_map<std::string, LightDataPtr> _lights; // map of lights
+  std::unordered_map<std::string, HierarchyDataPtr> _nameToHierarchy; // map scene nodes by name
+  std::unordered_map<std::string, HierarchyDataPtr> _idToHierarchy; // map scene nodes by id
+  std::shared_ptr<HierarchyData> _hierarchy; // root hierarchy object
 };
 
 #endif //CPPWRAPPER_MODELBUNDLE_H

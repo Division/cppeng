@@ -59,7 +59,7 @@ public:
 
   void setDirty() { _dirty = true; }
 
-  const auto const children() const { return &_children; }
+  const auto children() const { return &_children; }
 
   std::shared_ptr<Transform> rootTransform() { if (parent()) return parent()->rootTransform(); else return shared_from_this(); }
 

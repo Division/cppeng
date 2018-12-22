@@ -14,6 +14,7 @@ struct ShaderConfig {
 const std::vector<UniformBlockName> DEFAULT_UBO = { UniformBlockName::Transform, UniformBlockName::Camera };
 
 const std::map<ShaderCaps, ShaderConfig> UNIFORMS_PER_CAP = {
+    { ShaderCaps::ObjectData, { {}, DEFAULT_UBO } },
     { ShaderCaps::Color, { { UniformName::Color }, DEFAULT_UBO } },
     { ShaderCaps::Lighting, {
       { UniformName::ShadowMap, UniformName::LightGrid, UniformName::LightIndices, UniformName::ProjectorTexture},

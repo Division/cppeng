@@ -43,7 +43,6 @@ void engine::GLCaps::init() {
 //  glGetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &_minMapBufferAlighment);
   _minMapBufferAlighment = 256;
 
-
   ENGLog("OpenGL Caps:");
   ENGLog("    GL_MAX_UNIFORM_BLOCK_SIZE: %i", _maxUBOSize);
   ENGLog("    GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT: %i", _uboOffsetAlignment);

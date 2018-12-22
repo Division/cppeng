@@ -10,21 +10,29 @@
 #include "EngMath.h"
 #include "nlohmann/json.hpp"
 #include "HierarchyData.h"
+#include <memory>
+#include <functional>
 
 using namespace nlohmann;
 
 struct HierarchyData {
   std::string name;
   std::string id;
+  std::string sid;
   std::string material;
   std::string geometry;
+  std::string light;
+  std::string originalNodeID;
   bool hasGeometry = false;
   bool hasMaterial = false;
+  bool isLight = false;
   mat4 transform;
-  std::vector<HierarchyData> children;
+  std::vector<std::shared_ptr<HierarchyData>> children;
+  void forEachChild(bool recursive, std::function<void(std::shared_ptr<HierarchyData>)> callback) const;
 
   void loadFromJSON(const json &jsonData);
 };
 
+typedef std::shared_ptr<HierarchyData> HierarchyDataPtr;
 
 #endif //CPPWRAPPER_HIERARCHYDATA_H
