@@ -21,10 +21,29 @@ const std::string TEMPLATE_ROOT = "resources/shaderTpl/";
 
 const std::string TEMPLATE_LIST[] = {
     "root", // First goes the root template
-    "terrain",
-    "lighting",
-    "projectedTexture",
-    "vertexColor",
+    "camera",
+    "object_params",
+    "vertex_color_fragment_main",
+    "vertex_color_fragment",
+    "vertex_color_vertex_main",
+    "vertex_color_vertex",
+    "lighting_fragment_main",
+    "lighting_fragment",
+    "lighting_vertex_main",
+    "lighting_vertex",
+    "lighting_process_point",
+    "lighting_process_spot",
+    "lighting_process_projector",
+    "lighting_process_decal",
+    "normal_mapping_fragment_main",
+    "normal_mapping_fragment",
+    "normal_mapping_vertex_main",
+    "normal_mapping_vertex",
+    "skinning_vertex_main",
+    "skinning_vertex",
+    "texture_fragment_main",
+    "texture_fragment",
+    "terrain"
 };
 
 const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
@@ -81,7 +100,7 @@ std::string ShaderGenerator::generateShaderSource(ShaderCapsSetPtr caps, const s
 
 void ShaderGenerator::setupTemplates () {
   for (auto &filename : TEMPLATE_LIST) {
-    auto path = TEMPLATE_ROOT + filename + ".tpl";
+    auto path = TEMPLATE_ROOT + filename + ".glsl";
     auto tpl = _env.parse_template(path);
     _templateMap[filename] = tpl;
   }

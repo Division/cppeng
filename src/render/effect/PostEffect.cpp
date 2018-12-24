@@ -15,9 +15,9 @@ PostEffect::PostEffect(std::shared_ptr<Renderer> renderer) {
   _renderer = renderer;
 
   auto generator = getEngine()->shaderGenerator();
-  generator->addTemplate("posteffect/root.tpl");
+  generator->addTemplate("posteffect/root.glsl");
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
-  _shader = generator->getShaderWithCaps(caps, "posteffect/root.tpl");
+  _shader = generator->getShaderWithCaps(caps, "posteffect/root.glsl");
   _shader->addUniform(UniformName::Texture0);
 
   _fullScreenQuad = std::make_shared<Mesh>();
