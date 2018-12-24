@@ -34,12 +34,9 @@ public:
   MaterialTexture();
   void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
   TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
-  void texture1(TexturePtr texture) { return; _bindings.textureBindings[_texture1Binding].texture = texture; }
-  TexturePtr texture1() const { return _bindings.textureBindings[_texture1Binding].texture; }
 
 protected:
   int _texture0Binding = -1;
-  int _texture1Binding = -1;
 };
 
 class MaterialTextureLighting: public Material {
@@ -47,28 +44,51 @@ public:
   MaterialTextureLighting();
   void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
   TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
-  void texture1(TexturePtr texture) { return; _bindings.textureBindings[_texture1Binding].texture = texture; }
-  TexturePtr texture1() const { return _bindings.textureBindings[_texture1Binding].texture; }
 
 protected:
   int _texture0Binding = -1;
-  int _texture1Binding = -1;
 };
 
-class MaterialTextureBumpLighting: public Material {
+class MaterialTextureSpecularMap: public Material {
 public:
-  MaterialTextureBumpLighting();
+  MaterialTextureSpecularMap();
   void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
   TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
-  void texture1(TexturePtr texture) { return; _bindings.textureBindings[_texture1Binding].texture = texture; }
-  TexturePtr texture1() const { return _bindings.textureBindings[_texture1Binding].texture; }
-  void normalMap(TexturePtr texture) { return; _bindings.textureBindings[_normalmapBinding].texture = texture; }
+  void specularMap(TexturePtr texture) { _bindings.textureBindings[_specularmapBinding].texture = texture; }
+  TexturePtr specularMap() const { return _bindings.textureBindings[_specularmapBinding].texture; }
+
+protected:
+  int _texture0Binding = -1;
+  int _specularmapBinding = -1;
+};
+
+class MaterialTextureBump: public Material {
+public:
+  MaterialTextureBump();
+  void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
+  TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
+  void normalMap(TexturePtr texture) { _bindings.textureBindings[_normalmapBinding].texture = texture; }
   TexturePtr normalMap() const { return _bindings.textureBindings[_normalmapBinding].texture; }
 
 protected:
   int _texture0Binding = -1;
-  int _texture1Binding = -1;
   int _normalmapBinding = -1;
+};
+
+class MaterialTextureBumpSpecular: public Material {
+public:
+  MaterialTextureBumpSpecular();
+  void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
+  TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
+  void normalMap(TexturePtr texture) { _bindings.textureBindings[_normalmapBinding].texture = texture; }
+  TexturePtr normalMap() const { return _bindings.textureBindings[_normalmapBinding].texture; }
+  void specularMap(TexturePtr texture) { _bindings.textureBindings[_specularmapBinding].texture = texture; }
+  TexturePtr specularMap() const { return _bindings.textureBindings[_specularmapBinding].texture; }
+
+protected:
+  int _texture0Binding = -1;
+  int _normalmapBinding = -1;
+  int _specularmapBinding = -1;
 };
 
 

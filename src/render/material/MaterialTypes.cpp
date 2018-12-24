@@ -7,7 +7,6 @@
 #include "render/renderer/Renderer.h"
 
 
-
 MaterialSingleColor::MaterialSingleColor() {
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Color);
@@ -41,7 +40,18 @@ MaterialTextureLighting::MaterialTextureLighting() {
   _texture0Binding = _addTextureBinding(UniformName::Texture0);
 }
 
-MaterialTextureBumpLighting::MaterialTextureBumpLighting() {
+MaterialTextureSpecularMap::MaterialTextureSpecularMap() {
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Texture0);
+  caps->addCap(ShaderCaps::Lighting);
+  caps->addCap(ShaderCaps::SpecularMap);
+  _setup(caps);
+
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
+  _specularmapBinding = _addTextureBinding(UniformName::SpecularMap);
+}
+
+MaterialTextureBump::MaterialTextureBump() {
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Texture0);
   caps->addCap(ShaderCaps::Lighting);
@@ -49,7 +59,20 @@ MaterialTextureBumpLighting::MaterialTextureBumpLighting() {
   _setup(caps);
 
   _texture0Binding = _addTextureBinding(UniformName::Texture0);
-  _texture0Binding = _addTextureBinding(UniformName::NormalMap);
+  _normalmapBinding = _addTextureBinding(UniformName::NormalMap);
+}
+
+MaterialTextureBumpSpecular::MaterialTextureBumpSpecular() {
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Texture0);
+  caps->addCap(ShaderCaps::Lighting);
+  caps->addCap(ShaderCaps::NormalMap);
+  caps->addCap(ShaderCaps::SpecularMap);
+  _setup(caps);
+
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
+  _normalmapBinding = _addTextureBinding(UniformName::NormalMap);
+  _specularmapBinding = _addTextureBinding(UniformName::SpecularMap);
 }
 
 MaterialLighting::MaterialLighting() {
