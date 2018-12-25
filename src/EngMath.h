@@ -15,6 +15,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/compatibility.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtx/norm.hpp>
 #include "utils/Math.h"
 
 #define PI M_PI

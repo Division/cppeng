@@ -5,28 +5,71 @@
 #include "AnimationController.h"
 #include "GameObject.h"
 #include <cmath>
+#include <algorithm>
 
-void AnimationController::update(float dt) {
-  if (!_isPlaying) { return; }
+const float MIN_UPDATE_WEIGHT = 0.001f;
 
+AnimationPlayback::AnimationPlayback(const AnimationSequence &sequence, AnimationDataPtr animationData)
+  : _sequence(sequence), _animationData(animationData) {
+  _timePerFrame = 1.0f / _animationData->fps;
+}
+
+void AnimationPlayback::update(float dt) {
   _animationTime += dt;
 
-  if (!_isLooping && _animationTime >= _animationData->duration) {
+  if (!_isLooping && _animationTime >= _duration) {
     _isPlaying = false;
-    _animationTime = _animationData->duration;
+    _animationTime = _duration;
   }
 
   _currentFrame = _animationTime / _timePerFrame;
-  int currentFrameInt = (int)lround(floorf(_currentFrame)) % _currentSequence.count;
-  int frame1 = (int)(_currentSequence.startFrame + currentFrameInt) % _animationData->frameCount;
-  int frame2 = (int)(_currentSequence.startFrame + currentFrameInt) % _animationData->frameCount;
-  float delta = _currentFrame - floorf(_currentFrame);
+  int currentFrameInt = (int)lround(floorf(_currentFrame)) % _sequence.count;
+  _currentFrameA = (_sequence.startFrame + currentFrameInt) % _animationData->frameCount;
+  _currentFrameB = (_sequence.startFrame + currentFrameInt) % _animationData->frameCount;
+  _currentDelta = _currentFrame - floorf(_currentFrame);
+}
 
-  applyAnimationFrame(frame1, frame2, delta);
+void AnimationPlayback::play(bool loop, bool resetTime) {
+  if (!this->_animationData) {
+    ENGLog("Attempt to play with null AnimationData");
+    return;
+  }
+
+  _weight = 1;
+  _isPlaying = true;
+  _isLooping = loop;
+  _animationTime = 0;
+}
+
+void AnimationPlayback::stop() {
+  _isPlaying = false;
+  _isLooping = false;
+  _weight = 0;
+}
+
+
+void AnimationController::update(float dt) {
+  _activePlaybacks.clear();
+  float totalWeight = 0;
+
+  for (auto &iterator : _playbacks) {
+    auto &p = iterator.second;
+
+    if (p->isPlaying()) {
+      p->update(dt);
+    }
+
+    if (p->weight() > MIN_UPDATE_WEIGHT) {
+      totalWeight += p->weight();
+      _activePlaybacks.push_back(p);
+    }
+  }
+
+  applyWeightedPlaybacks(_activePlaybacks, totalWeight);
 
   for (auto &child : _childControllers) {
     if (child->animationData()) {
-      child->applyAnimationFrame(frame1, frame2, delta);
+      child->applyWeightedPlaybacks(_activePlaybacks, totalWeight);
     }
   }
 }
@@ -36,15 +79,16 @@ void AnimationController::play(std::string animationName, bool loop) {
     ENGLog("Attempt to play with null AnimationData");
     return;
   }
-  _currentSequence = _sequences.at(animationName);
-  _isPlaying = true;
-  _isLooping = loop;
-  _animationTime = 0;
+
+  for (auto &iterator : _playbacks) {
+    iterator.second->stop();
+  }
+  _playbacks.at(animationName)->play(loop, true);
+  _playbacks.at(animationName)->weight(1);
 }
 
 void AnimationController::animationData(AnimationDataPtr value) {
   _animationData = value;
-  _timePerFrame = 1.0f / _animationData->fps;
   _sequences.clear();
 
   if (!value->sequences.empty()) {
@@ -52,23 +96,47 @@ void AnimationController::animationData(AnimationDataPtr value) {
 
     for (auto &sequence : value->sequences) {
       _sequences[sequence.name] = sequence;
+      _playbacks[sequence.name] = std::make_shared<AnimationPlayback>(sequence, value);
     }
   } else {
     _sequences["default"] = { "default", 0, _animationData->frameCount };
   }
+
+  _playbacks["default"] = std::make_shared<AnimationPlayback>(_sequences["default"], value);
 }
 
-void AnimationController::applyAnimationFrame(int frame1, int frame2, float delta) {
-  auto obj = gameObject();
-
-  if (_animationData->isMatrix) {
-    obj->transform()->setMatrix(_animationData->getMatrix(frame1, frame2, delta));
-  } else {
-    obj->transform()->position(_animationData->getPosition(frame1, frame2, delta));
-    if (_animationData->hasScale) {
-      obj->transform()->scale(_animationData->getScale(frame1, frame2, delta));
-    }
-    obj->transform()->rotation(_animationData->getRotation(frame1, frame2, delta));
+void AnimationController::applyWeightedPlaybacks(std::vector<AnimationPlaybackPtr> &playbacks, float totalWeight) {
+  if (totalWeight < 0.001) {
+    return;
   }
 
+  mat4 m(0);
+  vec3 scale;
+  vec3 position;
+  quat rotation(0, 0, 0, 0);
+  for (auto &p : playbacks) {
+    auto weight = p->weight();
+    weight /= totalWeight;
+
+    auto frameA = p->frameA();
+    auto frameB = p->frameB();
+    auto delta = p->delta();
+
+    if (_animationData->isMatrix) {
+      m += _animationData->getMatrix(frameA, frameB, delta) * weight;
+    } else {
+      scale += _animationData->getScale(frameA, frameB, delta) * weight;
+      position += _animationData->getPosition(frameA, frameB, delta) * weight;
+      rotation += _animationData->getRotation(frameA, frameB, delta) * weight;
+    }
+  }
+
+  auto obj = gameObject();
+  if (_animationData->isMatrix) {
+    obj->transform()->setMatrix(m);
+  } else {
+    obj->transform()->position(position);
+    obj->transform()->scale(scale);
+    obj->transform()->rotation(rotation);
+  }
 }
