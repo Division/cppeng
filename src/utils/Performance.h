@@ -10,6 +10,8 @@
 #include <string>
 #include <iostream>
 #include "system/Logging.h"
+#include "EngineMain.h"
+#include "render/renderer/SceneRenderer.h"
 
 namespace engine {
 
@@ -73,6 +75,8 @@ public:
     for (auto &entry : _entries) {
       ENGLog("  [%s] : %i", entry.second.name.c_str(), (int)entry.second.average);
     }
+
+    ENGLog("Draw calls: %i", getEngine()->sceneRenderer()->ropCount());
   }
 
   static double getMilliseconds() {

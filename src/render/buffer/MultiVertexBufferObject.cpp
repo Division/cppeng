@@ -10,7 +10,7 @@
 void MultiVertexBufferObject::map() {
 
   if (_buffers.size() <= _currentIndex) {
-    ENGLog("multi vbo added");
+//    ENGLog("multi vbo added");
     _buffers.emplace_back(std::make_shared<SwappableVertexBufferObject>(_target, _usage, _bufferSize));
   }
 
@@ -70,7 +70,7 @@ void MultiVertexBufferObject::_nextVBO() {
   _currentOffset = 0;
 
   if (_buffers.size() <= _currentIndex) {
-    ENGLog("multi vbo added");
+//    ENGLog("multi vbo added");
     _buffers.emplace_back(std::make_shared<SwappableVertexBufferObject>(_target, _usage, _bufferSize));
   }
 

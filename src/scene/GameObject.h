@@ -17,6 +17,17 @@ typedef std::shared_ptr<GameObject> GameObjectPtr;
 
 typedef int GameObjectID;
 
+struct CullingData {
+  enum class Type : int {
+    Sphere,
+    OBB
+  };
+
+  CullingData::Type type;
+  Sphere sphere;
+  AABB bounds;
+};
+
 class IGameObjectManager : public ITransformManager {
 public:
   virtual void addGameObject(GameObjectPtr addGameObject) = 0;
@@ -41,9 +52,13 @@ public:
 
   int id() const { return _id; }
 
+  void layer(unsigned int value) { _layer = value; }
+  unsigned int layer() const { return _layer; }
+
   void sid(const std::string &sid) { _sid = sid; }
   std::string sid() const { return _sid; }
 
+  bool isRenderable() const { return _isRenderable; }
   bool active() const { return _active; }
   void active(const bool active) { _active = active; }
   bool destroyed() const { return _destroyed; }
@@ -53,6 +68,8 @@ public:
 
   const TransformPtr transform() const { return _transform; }
   TransformPtr transform() { return _transform; }
+
+  const CullingData &cullingData() const { return _cullingData; }
 
   virtual void start(); // called only once just before the first update()
   virtual void update(float dt);
@@ -65,7 +82,11 @@ protected:
   std::string _name;
   std::string _sid; // sid of the HierarchyData
 
+  unsigned int _layer = 1 << 0;
+
   AnimationControllerPtr _animation;
+  CullingData _cullingData;
+  bool _isRenderable = false;
   bool _active = true;
   bool _destroyed = false;
   TransformPtr _transform;

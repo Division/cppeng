@@ -81,8 +81,8 @@ void LightGrid::_appendItem(const std::shared_ptr<ICameraParamsProvider> camera,
     }
   }
 
-  auto startX = (int)round(floorf(fminf(fmaxf(bounds.min.x / _cellSize - 1, 0), _cellsX - 1)));
-  auto startY = (int)round(floorf(fminf(fmaxf(bounds.min.y / _cellSize - 1, 0), _cellsY - 1)));
+  auto startX = (int)round(floorf(fminf(fmaxf(bounds.min.x / _cellSize, 0), _cellsX - 1)));
+  auto startY = (int)round(floorf(fminf(fmaxf(bounds.min.y / _cellSize, 0), _cellsY - 1)));
   auto endX = (int)round(floorf(fmaxf(fminf(bounds.max.x / _cellSize, _cellsX - 1), 0)));
   auto endY = (int)round(floorf(fmaxf(fminf(bounds.max.y / _cellSize, _cellsY - 1), 0)));
 

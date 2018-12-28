@@ -44,6 +44,8 @@ public:
   void projectorTexture(const TexturePtr texture) { _projectorTexture = texture; }
   TexturePtr projectorTexture() const { return _projectorTexture; }
 
+  unsigned int ropCount() const { return _ropCounter; }
+
   void clearQueues();
   void setupBuffers(ScenePtr &scene, ICameraParamsProviderPtr &camera, ICameraParamsProviderPtr &camera2D);
   void populateQueues(std::shared_ptr<Scene> scene, ICameraParamsProviderPtr camera);
@@ -60,14 +62,10 @@ private:
 
   std::vector<RenderOperation> _queues[(int)RenderQueue::Count];
   unsigned int _ropCounter;
-  int _mainCameraOffset = 0;
-  int _2dCameraOffset = 0;
 
   std::vector<RenderOperation *>_skinningRops;
 private:
-  void _prepareQueues(std::shared_ptr<Scene> scene, std::shared_ptr<Camera> camera);
   void _processRenderPipeline(RenderMode mode);
-  void _renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera);
   void setupAndUploadUBO(RenderOperation *rop);
   void _uploadSkinning(RenderOperation *rop);
 };

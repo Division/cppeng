@@ -5,6 +5,18 @@
 #ifndef CPPWRAPPER_MATH_H
 #define CPPWRAPPER_MATH_H
 
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_access.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtx/compatibility.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/norm.hpp>
+
 using namespace glm;
 
 struct Sphere {
@@ -13,15 +25,15 @@ struct Sphere {
 };
 
 struct OBB {
-  vec3 position;
-  vec3 size;
-  quat rotation;
+  mat4 matrix;
+  vec3 min = vec3(-1);
+  vec3 max = vec3(1);
 
   OBB() = default;
-  OBB(const vec3 &position, const vec3 &size, const quat &rotation = quat()) {
-    this->position = position;
-    this->rotation = rotation;
-    this->size = size;
+  OBB(const mat4 &matrix, const vec3 &min, const vec3 &max) {
+    this->min = min;
+    this->max = max;
+    this->matrix = matrix;
   }
 };
 
@@ -80,6 +92,8 @@ struct AABB {
     return result;
   }
 };
+
+Sphere boundingSphereForFrustum(float width, float height, float zNear, float zFar, float fov);
 
 struct Rect {
   float x = 0;

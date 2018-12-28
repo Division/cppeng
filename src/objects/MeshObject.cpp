@@ -6,7 +6,12 @@
 //#include <render/material/Material.h>
 
 MeshObject::MeshObject() : GameObject() {
+  _isRenderable = true;
+  _cullingData.type = CullingData::Type::OBB;
+}
 
+void MeshObject::update(float dt) {
+  _cullingData.bounds = _mesh->aabb();
 }
 
 void MeshObject::render(IRenderer &renderer) {

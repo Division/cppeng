@@ -101,9 +101,9 @@ void DebugDraw::drawAABB(const AABB &bounds, const vec4 &color) {
 }
 
 void DebugDraw::drawOBB(const OBB &bounds, const vec4 &color) {
-  vec3 size = bounds.size;
-  vec3 min = -size / 2.0f;
-  vec3 max = size / 2.0f;
+  vec3 size = bounds.max - bounds.min;
+  vec3 min = bounds.min;
+  vec3 max = bounds.max;
   vec3 vertices[] = {
       min,
       min + size * vec3(0, 0, 1),
@@ -116,7 +116,7 @@ void DebugDraw::drawOBB(const OBB &bounds, const vec4 &color) {
   };
 
   for (vec3 &v : vertices) {
-    v = vec3(bounds.rotation * vec4(v, 1)) + bounds.position;
+    v = vec3(bounds.matrix * vec4(v, 1));
   }
 
   for (int i = 0; i < 4; i++) {

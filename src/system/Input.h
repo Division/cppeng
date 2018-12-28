@@ -35,6 +35,7 @@ enum class Key : int {
   Space,
   Esc,
   Equal,
+  Tab,
 
   MouseLeft,
   MouseRight,

@@ -19,6 +19,8 @@ public:
 
   MeshPtr mesh() const { return _mesh; }
   void mesh(MeshPtr mesh) { _mesh = mesh; }
+
+  void update(float dt) override;
 protected:
   MeshPtr _mesh;
   MaterialPtr _material;

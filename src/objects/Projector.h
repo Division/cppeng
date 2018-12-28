@@ -25,8 +25,6 @@ public:
 
   Projector() = default;
 
-  AABB bounds();
-
   vec4 color() const { return _color; }
   void color(vec4 value) { _color = value; }
 
@@ -71,8 +69,6 @@ public:
 
   UBOStruct::Projector getProjectorStruct() const;
 
-  void render(IRenderer &renderer) override;
-
   void postUpdate() override;
 
   // IShadowCaster
@@ -86,6 +82,7 @@ public:
   mat4 cameraViewMatrix() const override { return _viewMatrix; }
   mat4 cameraProjectionMatrix() const override { return _getProjection(); }
   vec4 cameraViewport() const override { return viewport(); }
+  const Frustum &frustum() const override { return _frustum; };
   unsigned int cameraIndex() const override { return _cameraIndex; }; // index is an offset in the corresponding UBO
   void cameraIndex(unsigned int index) override { _cameraIndex = index; };
   bool castShadows() const override { return this->type() == ProjectorType::Projector && _castShadows; }; // only projectors cast shadows
@@ -99,6 +96,7 @@ private:
   // common
   vec4 _color = vec4(1, 1, 1, 1);
   unsigned int _index = 0; // index in scene array
+  Frustum _frustum;
   mat4 _viewProjection;
   mat4 _viewMatrix;
   float _aspect = 1;

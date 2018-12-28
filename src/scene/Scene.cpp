@@ -7,6 +7,7 @@
 #include "objects/Camera.h"
 #include "objects/LightObject.h"
 #include <algorithm>
+#include "EngineMain.h"
 
 #define IS_CAMERA(object) (bool)(dynamic_cast<Camera *>((object).get()))
 #define IS_LIGHT(object) (bool)(dynamic_cast<LightObject *>((object).get()))
@@ -54,8 +55,7 @@ void Scene::_processAddedObject(GameObjectPtr object) {
     // Object is projector
   else if (IS_PROJECTOR(object)) {
     ProjectorPtr projector = std::dynamic_pointer_cast<Projector>(object);
-    _projectors.push_back(projector); // TODO: try to find free empty index
-    projector->_index = _projectors.size() - 1;
+    _projectors.push_back(projector);
   }
 }
 
@@ -147,6 +147,7 @@ void Scene::update(float dt) {
 
   for (auto &object : _gameObjects) {
     if (object->active()) {
+      getEngine()->debugDraw()->drawOBB({ object->transform()->worldMatrix(), object->cullingData().bounds.min, object->cullingData().bounds.max }, vec4(1, 1, 0, 1));
       object->_processAnimations(dt);
     }
   }
@@ -158,6 +159,10 @@ void Scene::update(float dt) {
       object->postUpdate();
     }
   }
+
+  for (auto &iterator : _visibilityMap) {
+    iterator.second.hasData = false;
+  }
 }
 
 void Scene::_updateTransforms() {
@@ -165,3 +170,34 @@ void Scene::_updateTransforms() {
     transform.second->_updateTransform(nullptr, false);
   }
 }
+
+Scene::Visibility &Scene::_getVisibilityForCamera(const std::shared_ptr<ICameraParamsProvider> &camera) const {
+  auto &visibility = _visibilityMap[camera];
+  visibility.hasData = true;
+  visibility.projectors.clear();
+  visibility.lights.clear();
+  visibility.objects.clear();
+
+  auto &frustum = camera->frustum();
+  unsigned int counter = 0;
+  for (auto &object : _projectors) {
+    if (!_objectIsVisible(object, frustum)) { continue; }
+    object->_index = counter++;
+    visibility.projectors.push_back(object);
+  }
+
+  counter = 0;
+  for (auto &object : _lights) {
+    if (!_objectIsVisible(object, frustum)) { continue; }
+    object->_index = counter++;
+    visibility.lights.push_back(object);
+  }
+
+  for (auto &object : _gameObjects) {
+    if (!object->isRenderable() || !_objectIsVisible(object, frustum)) { continue; }
+    visibility.objects.push_back(object);
+  }
+
+  return visibility;
+}
+

@@ -8,6 +8,7 @@
 #include "scene/GameObject.h"
 #include "EngMath.h"
 #include "render/renderer/ICameraParamsProvider.h"
+#include "utils/Frustum.h"
 
 // Right now only one camera's render target can only be the main framebuffer
 class Camera : public GameObject, public ICameraParamsProvider {
@@ -20,7 +21,7 @@ public:
 
   const mat4 &projectionMatrix() const { return _projectionMatrix; }
   const mat4 &viewMatrix() const { return _viewMatrix; }
-  const mat4 viewProjectionMatrix() const { return _projectionMatrix * _viewMatrix; }
+  const mat4 viewProjectionMatrix() const { return _viewProjectionMatrix; }
   const vec4 viewport() const { return _viewport; }
   const uvec2 screenSize() const { return uvec2(_viewport.z, _viewport.w); }
   void postUpdate() override;
@@ -34,6 +35,11 @@ public:
   void fov(float fov) { _fov = fov; }
   float fov() const { return _fov; }
 
+  // Visibility check
+  bool aabbVisible(const AABB &aabb) const { return _frustum.isVisible(aabb.min, aabb.max); };
+  bool obbVisible(const OBB &obb) const { return _frustum.isVisible(obb.matrix, obb.min, obb.max); };
+  bool sphereVisible(const vec3 &center, const float radius) const { return _frustum.isVisible(center, radius); };
+
   // ICameraParamsProvider
   uvec2 cameraViewSize() const override { return  screenSize(); }
   vec3 cameraPosition() const override { return transform()->worldPosition(); }
@@ -45,6 +51,7 @@ public:
   mat4 cameraViewMatrix() const override { return viewMatrix(); }
   mat4 cameraProjectionMatrix() const override { return projectionMatrix(); }
   vec4 cameraViewport() const override { return viewport(); }
+  const Frustum &frustum() const override { return _frustum; };
   unsigned int cameraIndex() const override { return _cameraIndex; }; // index is an offset in the corresponding UBO
   void cameraIndex(unsigned int index) override { _cameraIndex = index; };
 
@@ -52,6 +59,8 @@ protected:
   mat4 _projectionMatrix;
   mat4 _viewMatrix;
   vec4 _viewport;
+  mat4 _viewProjectionMatrix;
+  Frustum _frustum;
 
   float _fov = 45.0f;
   unsigned long _mask = ~0ul; // mask to filter gameObjects

@@ -128,4 +128,8 @@ float SceneRenderer::shadowAtlasSize() {
   return SHADOW_ATLAS_SIZE;
 }
 
+unsigned int SceneRenderer::ropCount() const {
+  return _renderer->ropCount();
+}
+
 

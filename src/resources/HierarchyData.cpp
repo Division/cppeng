@@ -22,8 +22,6 @@ void HierarchyData::loadFromJSON(const json &jsonData) {
 //  material = hasMaterial ? jsonData["material"] : "";
   light = isLight ? jsonData["light"] : "";
 
-  ENGLog("%s(%s), geom: %s, material: %s", name.c_str(), id.c_str(), geometry.c_str(), material.c_str());
-
   transform = loader::getMatrixFromJSON(jsonData["transform"]);
 
   if (jsonData.find("originalNodeID") != jsonData.end()) {

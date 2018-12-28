@@ -28,9 +28,9 @@ UBOManager::UBOManager() {
   );
 
   _skinningMatrices = std::make_shared<MultiVertexBufferObject>(
-      GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW,
-      engine::GLCaps::maxUBOSize(),
-      engine::GLCaps::uboOffsetAlignment()
+    GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW,
+    engine::GLCaps::maxUBOSize(),
+    engine::GLCaps::uboOffsetAlignment()
   );
 
   _light = std::make_shared<SwappableVertexBufferObject>(GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW, lightMaxSize);
@@ -44,10 +44,6 @@ void UBOManager::updateLights(const std::vector<LightObjectPtr> &lights) {
 
   // note that elements in lights array may be null
   for (auto &light : lights) {
-    if (!light) {
-      continue;
-    }
-
     UBOStruct::Light lightData = light->getLightStruct();
     buffer->appendData((void *) &lightData, sizeof(lightData), alignBytes);
   }
@@ -59,10 +55,6 @@ void UBOManager::updateProjectors(const std::vector<ProjectorPtr> &projectors) {
 
   // note that elements in projectors array may be null
   for (auto &projector : projectors) {
-    if (!projector) {
-      continue;
-    }
-
     UBOStruct::Projector projectorData = projector->getProjectorStruct();
     buffer->appendData((void *) &projectorData, sizeof(projectorData), alignBytes);
   }

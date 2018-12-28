@@ -46,6 +46,8 @@ public:
 
   void createBuffer();
 
+  AABB aabb() const { return _aabb; }
+
   // Properties
 
   GLuint vao() const { return _vao; }
@@ -95,8 +97,10 @@ private:
   void _deleteBuffer();
   void _updateFaceCount();
   void _prepareVAO();
+  void _calculateAABB();
 
 private:
+  AABB _aabb;
   std::shared_ptr<VertexBufferObject> _vbo;
   std::shared_ptr<VertexBufferObject> _indexBuffer;
 

@@ -26,14 +26,13 @@ public:
   LightObject();
 
   float radius() const { return _radius; }
-  void radius(float value) { _radius = value; _updateAttenuation(); }
-  AABB bounds();
+  void radius(float value) { _radius = value; }
 
   float squareAttenuation() const { return _squareAttenuation; }
-  void squareAttenuation(float value) { _squareAttenuation = value; _updateRadius(); }
+  void squareAttenuation(float value) { _squareAttenuation = value; }
 
   float linearAttenuation() const { return _linearAttenuation; }
-  void linearAttenuation(float value) { _linearAttenuation = value; _updateRadius(); }
+  void linearAttenuation(float value) { _linearAttenuation = value; }
 
   void attenuation(float linear, float square);
 
@@ -72,6 +71,7 @@ public:
   mat4 cameraViewMatrix() const override { return _viewMatrix; }
   mat4 cameraProjectionMatrix() const override { return _projectionMatrix; }
   vec4 cameraViewport() const override { return _viewport; }
+  const Frustum &frustum() const override { return _frustum; };
   unsigned int cameraIndex() const override { return _cameraIndex; };
   void cameraIndex(unsigned int index) override { _cameraIndex = index; };
 
@@ -88,6 +88,7 @@ private:
   float _coneAngle = 30;
 
   // Shadows
+  Frustum _frustum;
   mat4 _projectionMatrix;
   mat4 _viewMatrix;
   vec4 _viewport;

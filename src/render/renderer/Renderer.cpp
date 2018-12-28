@@ -52,7 +52,7 @@ void Renderer::setupAndUploadUBO(RenderOperation *rop) {
   if (rop->material->hasTransformBlock()) {
     UBOStruct::TransformStruct transformStruct;
     transformStruct.transform = rop->modelMatrix;
-    transformStruct.normalMatrix = glm::inverseTranspose(rop->modelMatrix);
+//    transformStruct.normalMatrix = glm::inverseTranspose(rop->modelMatrix);
     rop->material->setTransformBlock(transformStruct);
   }
 
@@ -175,14 +175,6 @@ void Renderer::clearQueues() {
   for (auto &queue : _queues) {
     queue.clear();
   }
-}
-
-void Renderer::_renderCamera(std::shared_ptr<Scene> scene, std::shared_ptr<ICameraParamsProvider> camera) {
-
-}
-
-void Renderer::_prepareQueues(std::shared_ptr<Scene> scene, CameraPtr camera) {
-
 }
 
 void Renderer::_processRenderPipeline(RenderMode mode) {

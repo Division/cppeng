@@ -35,7 +35,7 @@ public:
   void renderScene(ScenePtr scene, ICameraParamsProviderPtr camera, ICameraParamsProviderPtr camera2D = nullptr) const;
   TexturePtr depthTexture();
   TexturePtr shadowMapDepthTexture();
-
+  unsigned int ropCount() const;
 
 private:
   std::shared_ptr<DebugDraw> _debugDraw;

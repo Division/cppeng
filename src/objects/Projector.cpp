@@ -8,15 +8,29 @@
 #include "EngMath.h"
 #include "render/renderer/SceneRenderer.h"
 
-AABB Projector::bounds() {
-  auto position = transform()->worldPosition();
-  return AABB::fromSphere(position, 10);
-}
-
-
 void Projector::postUpdate() {
   _viewMatrix = glm::inverse(transform()->worldMatrix());
   _viewProjection = _getProjection() * _viewMatrix;
+  _frustum.calcPlanes(_viewProjection);
+
+  auto position = transform()->worldPosition();
+
+  if (_isOrthographic) {
+    float height = _orthographicSize;
+    float width = _aspect * _orthographicSize;
+    _cullingData.sphere.position = transform()->forward() * ((_zFar - _zNear) * 0.5f + _zNear) + position;
+    _cullingData.sphere.radius = glm::length(vec3(width / 2, height / 2, (_zFar - _zNear) / 2));
+  } else {
+    _cullingData.sphere = boundingSphereForFrustum(_aspect, 1, _zNear, _zFar, RAD(_fov));
+    _cullingData.sphere.position = transform()->backward() * _cullingData.sphere.position.z + position;
+  }
+
+  _cullingData.type = CullingData::Type::Sphere;
+
+  if (_debugEnabled) {
+    auto debugDraw = getEngine()->debugDraw();
+    debugDraw->drawFrustum(_viewProjection, glm::vec4(1,1,1,1));
+  }
 }
 
 mat4 Projector::_getProjection() const {
@@ -49,13 +63,6 @@ UBOStruct::Projector Projector::getProjectorStruct() const {
   result.projectionMatrix = _viewProjection;
 
   return result;
-}
-
-void Projector::render(IRenderer &renderer) {
-  if (_debugEnabled) {
-    auto debugDraw = getEngine()->debugDraw();
-    debugDraw->drawFrustum(_viewProjection, glm::vec4(1,1,1,1));
-  }
 }
 
 // Fills the result vector with world-space frustum edge vertices

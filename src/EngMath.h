@@ -6,16 +6,6 @@
 #define CPPWRAPPER_ENGMATH_H
 
 #include <math.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_access.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
-#include <glm/gtx/compatibility.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtx/norm.hpp>
 #include "utils/Math.h"
 
 #define PI M_PI

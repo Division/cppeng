@@ -7,6 +7,7 @@
 #include "EngineMain.h"
 #include "render/debug/DebugDraw.h"
 #include "render/renderer/SceneRenderer.h"
+#include "utils/Math.h"
 
 void LightObject::_updateAttenuation() {
   _squareAttenuation = 1.0f / (_radius * _radius * _lightCutoff);
@@ -17,7 +18,7 @@ void LightObject::_updateRadius() {
 }
 
 LightObject::LightObject() : GameObject() {
-  _updateRadius();
+  _cullingData.type = CullingData::Type::Sphere;
 }
 
 UBOStruct::Light LightObject::getLightStruct() const {
@@ -75,7 +76,7 @@ void LightObject::render(IRenderer &renderer) {
   rop.modelMatrix = transform()->worldMatrix();
   rop.debugInfo = name();
   renderer.addRenderOperation(rop, RenderQueue::Opaque);
-  getEngine()->debugDraw()->drawAABB(this->bounds(), vec4(this->color(), 1));
+//  getEngine()->debugDraw()->drawAABB(this->bounds(), vec4(this->color(), 1));
 }
 
 float LightObject::getSpotRadius(float height) {
@@ -84,18 +85,6 @@ float LightObject::getSpotRadius(float height) {
   }
 
   return 0;
-}
-
-AABB LightObject::bounds() {
-  if (_type == LightObjectType::Spot) {
-//    float spotRadius = getSpotRadius(_radius);
-//    vec3 left = transform()->left();
-    auto position = transform()->worldPosition();
-    return AABB::fromSphere(position, _radius);
-  } else {
-    auto position = transform()->worldPosition();
-    return AABB::fromSphere(position, _radius);
-  };
 }
 
 void LightObject::attenuation(float linear, float square) {
@@ -109,4 +98,14 @@ void LightObject::postUpdate() {
   // Shadow maps are square, so aspect is 1
   _projectionMatrix = glm::perspective(glm::radians(_coneAngle), 1.0f, _zMin, _radius);
   _viewMatrix = glm::inverse(transform()->worldMatrix());
+  _frustum.calcPlanes(_projectionMatrix * _viewMatrix);
+
+  auto position = transform()->worldPosition();
+  if (_type == LightObjectType::Spot) {
+    _cullingData.sphere = boundingSphereForFrustum(1, 1, 0, _radius, RAD(_coneAngle));
+    _cullingData.sphere.position += position;
+  } else {
+    _cullingData.sphere.position = position;
+    _cullingData.sphere.radius = _radius;
+  };
 }

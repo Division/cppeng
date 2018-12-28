@@ -298,6 +298,8 @@ void Mesh::createBuffer() {
     this->_prepareVAO();
   }
 
+  _calculateAABB();
+
   // Free data arrays
   if (!_keepData) {
     std::vector<GLfloat>().swap(_vertices);
@@ -495,4 +497,20 @@ void Mesh::calculateTBN() {
   }
 
   _hasTBN = true;
+}
+
+void Mesh::_calculateAABB() {
+  if (_vertexCount == 0) {
+    _aabb.min = vec3(0);
+    _aabb.max = vec3(0);
+    return;
+  }
+
+  vec3 *vertices = (vec3 *)&_vertices[0];
+  _aabb.min = vertices[0];
+  _aabb.max = vertices[0];
+  for (int i = 1; i < _vertexCount; i++) {
+    _aabb.min = glm::min(_aabb.min, vertices[i]);
+    _aabb.max = glm::max(_aabb.max, vertices[i]);
+  }
 }

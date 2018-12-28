@@ -42,4 +42,6 @@ void Camera::postUpdate() {
   this->_updateViewport();
   this->_updateProjection();
   this->_updateView();
+  _viewProjectionMatrix = _projectionMatrix * _viewMatrix;
+  _frustum.calcPlanes(_viewProjectionMatrix);
 }
