@@ -9,7 +9,7 @@
 #include "render/renderer/RenderPass.h"
 #include "render/shader/Uniform.h"
 
-const unsigned int CELL_COUNT = 8;
+const unsigned int CELL_COUNT = 4;
 const auto MAX_MAPS = CELL_COUNT * CELL_COUNT;
 
 ShadowMap::ShadowMap(unsigned int resolutionX, unsigned int resolutionY, std::shared_ptr<Renderer> renderer) {

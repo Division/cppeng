@@ -15,16 +15,20 @@
 
 using namespace nlohmann;
 
+struct MaterialData {
+  std::shared_ptr<std::string> diffuse;
+  unsigned char diffuseUV = 0;
+};
+
 struct HierarchyData {
   std::string name;
   std::string id;
   std::string sid;
-  std::string material;
   std::string geometry;
   std::string light;
   std::string originalNodeID;
   bool hasGeometry = false;
-  bool hasMaterial = false;
+  std::shared_ptr<MaterialData> material;
   bool isLight = false;
   mat4 transform;
   std::vector<std::shared_ptr<HierarchyData>> children;

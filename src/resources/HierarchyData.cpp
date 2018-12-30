@@ -15,8 +15,16 @@ void HierarchyData::loadFromJSON(const json &jsonData) {
 
   hasGeometry = jsonData.find("geometry") != jsonData.end() && !jsonData["geometry"].empty();
   isLight = jsonData.find("light") != jsonData.end() && !jsonData["light"].empty();
-//  hasMaterial = jsonData.find("material") != jsonData.end() && !jsonData["material"].empty();
-  hasMaterial = false; // ignore material for now
+  bool hasMaterial = jsonData.find("material") != jsonData.end() && !jsonData["material"].empty();
+  if (hasMaterial) {
+    auto materialJSON = jsonData["material"];
+    material = std::make_shared<MaterialData>();
+    if (materialJSON.find("diffuse") != materialJSON.end() && !materialJSON["diffuse"].empty()) {
+      material->diffuse = std::make_shared<std::string>(materialJSON["diffuse"][0]["texture"].get<std::string>());
+      material->diffuseUV = 0;
+    }
+  }
+//  hasMaterial = false; // ignore material for now
 
   geometry = hasGeometry ? jsonData["geometry"] : "";
 //  material = hasMaterial ? jsonData["material"] : "";
