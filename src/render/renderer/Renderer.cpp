@@ -52,6 +52,7 @@ void Renderer::setupAndUploadUBO(RenderOperation *rop) {
   if (rop->material->hasTransformBlock()) {
     UBOStruct::TransformStruct transformStruct;
     transformStruct.transform = rop->modelMatrix;
+    transformStruct.layer = rop->layer;
 //    transformStruct.normalMatrix = glm::inverseTranspose(rop->modelMatrix);
     rop->material->setTransformBlock(transformStruct);
   }

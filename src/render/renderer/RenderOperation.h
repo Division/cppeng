@@ -15,6 +15,7 @@ struct RenderOperation {
   MeshPtr mesh;
   MaterialPtr material;
   mat4 modelMatrix;
+  unsigned int layer = 1u << 0;
   GLenum mode = GL_TRIANGLES;
   unsigned int index;
   bool isSkinning = false;

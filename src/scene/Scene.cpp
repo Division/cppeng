@@ -48,7 +48,6 @@ void Scene::_processAddedObject(GameObjectPtr object) {
   else if (IS_LIGHT(object)) {
     LightObjectPtr light = std::dynamic_pointer_cast<LightObject>(object);
     _lights.push_back(light); // TODO: try to find free empty index
-    light->_index = _lights.size() - 1;
     _lightCount += 1;
   }
 
@@ -181,20 +180,25 @@ Scene::Visibility &Scene::_getVisibilityForCamera(const std::shared_ptr<ICameraP
   auto &frustum = camera->frustum();
   unsigned int counter = 0;
   for (auto &object : _projectors) {
-    if (!_objectIsVisible(object, frustum)) { continue; }
+    auto layerVisible = (bool)(object->layer() & camera->cameraVisibilityMask());
+    if (!layerVisible || !_objectIsVisible(object, frustum)) { continue; }
     object->_index = counter++;
     visibility.projectors.push_back(object);
   }
 
   counter = 0;
   for (auto &object : _lights) {
-    if (!_objectIsVisible(object, frustum)) { continue; }
+    auto layerVisible = (bool)(object->layer() & camera->cameraVisibilityMask());
+    if (!layerVisible || !_objectIsVisible(object, frustum)) { continue; }
     object->_index = counter++;
     visibility.lights.push_back(object);
   }
 
+//  ENGLog("visible lights: %i, projectors: %i", visibility.lights.size(), visibility.projectors.size());
+
   for (auto &object : _gameObjects) {
-    if (!object->isRenderable() || !_objectIsVisible(object, frustum)) { continue; }
+    auto layerVisible = (bool)(object->layer() & camera->cameraVisibilityMask());
+    if (!layerVisible || !object->isRenderable() || !_objectIsVisible(object, frustum)) { continue; }
     visibility.objects.push_back(object);
   }
 

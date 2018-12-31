@@ -60,6 +60,7 @@ protected:
 
   // Helper
   bool _objectIsVisible(const GameObjectPtr &object, const Frustum &frustum) const {
+    if (!object->active()) { return false; }
     auto &cullingData = object->cullingData();
     if (cullingData.type == CullingData::Type::Sphere) {
       return frustum.isVisible(cullingData.sphere.position, cullingData.sphere.radius);

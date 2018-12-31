@@ -78,11 +78,12 @@ public:
 
 protected:
   virtual void _processAnimations(float dt); // called after update, but before postUpdate and transforms calculation
+  RenderOperation _getDefaultRenderOp() const { RenderOperation result; result.layer = layer(); return result; };
 
   std::string _name;
   std::string _sid; // sid of the HierarchyData
 
-  unsigned int _layer = 1 << 0;
+  unsigned int _layer = 1 << 0; // default layer is 1
 
   AnimationControllerPtr _animation;
   CullingData _cullingData;

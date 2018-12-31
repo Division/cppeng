@@ -11,7 +11,9 @@ MeshObject::MeshObject() : GameObject() {
 }
 
 void MeshObject::update(float dt) {
-  _cullingData.bounds = _mesh->aabb();
+  if (_mesh) {
+    _cullingData.bounds = _mesh->aabb();
+  }
 }
 
 void MeshObject::render(IRenderer &renderer) {
@@ -19,7 +21,7 @@ void MeshObject::render(IRenderer &renderer) {
     return;
   }
 
-  RenderOperation rop;
+  RenderOperation rop = _getDefaultRenderOp();
   rop.mesh = _mesh;
   rop.material = _material;
   rop.modelMatrix = transform()->worldMatrix();

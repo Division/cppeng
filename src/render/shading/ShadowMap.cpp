@@ -29,7 +29,6 @@ void ShadowMap::renderShadowMaps(const std::vector<IShadowCasterPtr> &shadowCast
   _depthAtlas->bind();
   glDepthMask(GL_TRUE);
   glClear(GL_DEPTH_BUFFER_BIT);
-//  glCullFace(GL_FRONT);
   glCullFace(GL_BACK);
 
   auto pass = std::make_shared<RenderPass>();

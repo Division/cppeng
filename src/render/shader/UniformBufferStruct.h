@@ -14,6 +14,8 @@ namespace UBOStruct {
   struct TransformStruct {
     mat4 transform; // offset = 0, size = 64
     mat4 normalMatrix; // offset = 64, alignment = 16, size = 64
+    unsigned int layer;
+    vec3 padding;
   };
 
   struct SkinningMatrices {
@@ -30,6 +32,8 @@ namespace UBOStruct {
     mat4 projectionMatrix;
     vec2 shadowmapScale;
     vec2 shadowmapOffset;
+    unsigned int mask;
+    vec3 padding;
   };
 
   struct Projector {
@@ -42,7 +46,8 @@ namespace UBOStruct {
     vec2 shadowmapOffset;
     mat4 projectionMatrix;
     float linearAttenuation = 0;
-    vec3 padding; // ending padding
+    unsigned int mask;
+    vec2 padding; // ending padding
   };
 
   struct Camera {

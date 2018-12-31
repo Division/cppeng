@@ -39,6 +39,7 @@ public:
   bool aabbVisible(const AABB &aabb) const { return _frustum.isVisible(aabb.min, aabb.max); };
   bool obbVisible(const OBB &obb) const { return _frustum.isVisible(obb.matrix, obb.min, obb.max); };
   bool sphereVisible(const vec3 &center, const float radius) const { return _frustum.isVisible(center, radius); };
+  void cameraVisibilityMask(unsigned int mask) { _visibilityMask = mask; };
 
   // ICameraParamsProvider
   uvec2 cameraViewSize() const override { return  screenSize(); }
@@ -51,11 +52,13 @@ public:
   mat4 cameraViewMatrix() const override { return viewMatrix(); }
   mat4 cameraProjectionMatrix() const override { return projectionMatrix(); }
   vec4 cameraViewport() const override { return viewport(); }
+  unsigned int cameraVisibilityMask() const override { return _visibilityMask; };
   const Frustum &frustum() const override { return _frustum; };
   unsigned int cameraIndex() const override { return _cameraIndex; }; // index is an offset in the corresponding UBO
   void cameraIndex(unsigned int index) override { _cameraIndex = index; };
 
 protected:
+  unsigned int _visibilityMask = ~0u; // all visible by default
   mat4 _projectionMatrix;
   mat4 _viewMatrix;
   vec4 _viewport;
@@ -63,7 +66,6 @@ protected:
   Frustum _frustum;
 
   float _fov = 45.0f;
-  unsigned long _mask = ~0ul; // mask to filter gameObjects
 
   Mode _mode = Mode::Perspective;
   float _orthographicSize = 0.0f;

@@ -19,6 +19,7 @@ void LightObject::_updateRadius() {
 
 LightObject::LightObject() : GameObject() {
   _cullingData.type = CullingData::Type::Sphere;
+  _layer = ~0u;
 }
 
 UBOStruct::Light LightObject::getLightStruct() const {
@@ -28,6 +29,7 @@ UBOStruct::Light LightObject::getLightStruct() const {
   result.squareAttenuation = squareAttenuation();
   result.linearAttenuation = linearAttenuation();
   result.color = color();
+  result.mask = cameraVisibilityMask();
 
   // Assign for point light as well because point light shadow is calculated like spotlight shadow
   result.coneAngle = cosf(RAD(_coneAngle) / 2.0f);
@@ -70,7 +72,7 @@ void LightObject::render(IRenderer &renderer) {
   }
 
   _debugMaterial->color(vec4(color(), 1));
-  RenderOperation rop;
+  RenderOperation rop = _getDefaultRenderOp();
   rop.mesh = _debugMesh;
   rop.material = _debugMaterial;
   rop.modelMatrix = transform()->worldMatrix();
@@ -90,7 +92,6 @@ float LightObject::getSpotRadius(float height) {
 void LightObject::attenuation(float linear, float square) {
   _linearAttenuation = linear;
   _squareAttenuation = square;
-  _updateRadius();
 }
 
 void LightObject::postUpdate() {

@@ -44,6 +44,9 @@ public:
   void orthographicSize(float orthographicSize) { _orthographicSize = orthographicSize; }
   float orthographicSize() const { return _orthographicSize; }
 
+  void aspect(float aspect) { _aspect = aspect; }
+  float aspect() const { return _aspect; }
+
   float linearAttenuation() const { return _linearAttenuation; }
   void linearAttenuation(float value) { _linearAttenuation = value; }
 
@@ -64,6 +67,7 @@ public:
   void type(ProjectorType value) { _type = value; }
 
   unsigned int index() const { return _index; }
+  void cameraVisibilityMask(unsigned int mask) { _visibilityMask = mask; };
 
   void setDebugEnabled(bool enabled) { _debugEnabled = enabled; }
 
@@ -82,6 +86,7 @@ public:
   mat4 cameraViewMatrix() const override { return _viewMatrix; }
   mat4 cameraProjectionMatrix() const override { return _getProjection(); }
   vec4 cameraViewport() const override { return viewport(); }
+  unsigned int cameraVisibilityMask() const override { return _visibilityMask; };
   const Frustum &frustum() const override { return _frustum; };
   unsigned int cameraIndex() const override { return _cameraIndex; }; // index is an offset in the corresponding UBO
   void cameraIndex(unsigned int index) override { _cameraIndex = index; };
@@ -93,6 +98,9 @@ protected:
   vec4 viewport() const override { return _viewport; };
 
 private:
+  // ICameraParamsProvider
+  unsigned int _visibilityMask = ~0u; // all visible by default
+
   // common
   vec4 _color = vec4(1, 1, 1, 1);
   unsigned int _index = 0; // index in scene array

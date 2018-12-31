@@ -89,7 +89,7 @@ void SkinnedMeshObject::render(IRenderer &renderer) {
   memcpy(&skinningMatrices.matrices[0], &_matrices[0], sizeof(mat4) * _matrices.size());
   _material->setSkinningMatrices(skinningMatrices);
 
-  RenderOperation rop;
+  RenderOperation rop = _getDefaultRenderOp();
   rop.mesh = _mesh;
   rop.material = _material;
   rop.modelMatrix = transform()->worldMatrix();

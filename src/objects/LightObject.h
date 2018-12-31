@@ -49,6 +49,7 @@ public:
 
   bool castShadows() const override { return _castShadows; };
   void castShadows(bool value) { _castShadows = value; }
+  void cameraVisibilityMask(unsigned int mask) { _visibilityMask = mask; };
 
   unsigned int index() const { return _index; }
 
@@ -71,11 +72,15 @@ public:
   mat4 cameraViewMatrix() const override { return _viewMatrix; }
   mat4 cameraProjectionMatrix() const override { return _projectionMatrix; }
   vec4 cameraViewport() const override { return _viewport; }
+  unsigned int cameraVisibilityMask() const override { return _visibilityMask; };
   const Frustum &frustum() const override { return _frustum; };
   unsigned int cameraIndex() const override { return _cameraIndex; };
   void cameraIndex(unsigned int index) override { _cameraIndex = index; };
 
 private:
+  // ICameraParamsProvider
+  unsigned int _visibilityMask = ~0u; // all visible by default
+
   // Common light properties
   float _radius = 13;
   vec3 _color = vec3(1, 1, 1);

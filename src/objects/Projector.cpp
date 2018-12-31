@@ -52,6 +52,7 @@ UBOStruct::Projector Projector::getProjectorStruct() const {
   result.color = _color;
   result.scale = vec2(_spriteBounds.width, _spriteBounds.height);
   result.offset = vec2(_spriteBounds.x, _spriteBounds.y);
+  result.mask = cameraVisibilityMask();
 
   if (castShadows()) {
     result.shadowmapScale = vec2(_viewport.z, _viewport.w) / SceneRenderer::shadowAtlasSize();

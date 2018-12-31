@@ -1,14 +1,14 @@
 Engine info
 =============
 
-This is a not-for-production rendering engine. I work on during my free time to improve my programming skills.
+This is a not-for-production rendering engine. I work on it during my free time to improve my programming skills.
 Here's how it works.
 
 Lighting
 ============= 
 
 Basic tiled forward shading is implemented. Lights are assigned on CPU by projection light AABB on the grid.
-There is a buffer (texture buffer) to store screen grid cells, every cell contains offset in the light data buffer and count of point/spot/projectors/decals encoded into G and B channels.
+There is a buffer (GL_TEXTURE_BUFFER. WebGL build uses regular GL_TEXTURE_2D) to store screen grid cells, every cell contains offset in the light data buffer and count of point/spot/projectors/decals encoded into G and B channels.
 The second texture buffer contains indices of the corresponding lights/decals/projectors.
 The light / projector data is stored in UBO array.
 
@@ -34,10 +34,17 @@ Buffers
 The engine has high-level wrappers for OpenGL buffers that also helps to work with limited size uniform buffers (usually 64kb).
 `MultiVertexBufferObject` automatically switches to the next VBO for writing data if it's current buffer doesn't have enough space. 
 
-Skinning
+Shaders
 =============
 
-Matrices (with blending and interpolation) are calculated on CPU. Then they are stored in the UBO array of matrices. When rendering a skinned mesh object, buffer range is bound by calling `glBindBufferRange`       
+Most of the shaders are assembled from the root template file by conditionally include other templates based on the requested shader capabilities.  
+Materials use `ShaderCapsSet` to obtain a shader from the generator.
+Third party template engine is used to parse the shader templates.  
+
+Skinned Mesh Animation
+=============
+
+Matrices (with blending and interpolation) are calculated on CPU. Then they are uploaded into the UBO array of matrices. When rendering a skinned mesh object, buffer range is bound by calling `glBindBufferRange`       
 There is support for having geometry/skinning data and animations in the separate files.
 
 Model loading
@@ -50,22 +57,22 @@ The binary format structure:
 3) binary data as described in JSON
 
 Export script allows to skip geometry and keep `Maya` reference node IDs during export - to use `Maya` as a basic level editor.
-Also it's possible to export skinning mesh model as `mesh + joint data only` or `joint animations only`.
+Also it's possible to export skinning mesh model as `mesh + joints only` or `joint animations only`.
 
 Supported Platforms
 =============
 The engine doesn't contain platform specific code.
 Currently supported platforms is Mac OS and partial support for WebGL2 via emscripten (no shadows support in emscripten build).  
-Windows support is easy to add, need setup cmake for it.
+Windows support is easy to add, need to setup cmake for it.
 
 TODO
 =============
 
-* Layers for objects, lights/projectors and cameras
 * scene spatial partitioning
 * improve light tiles assignment (with compute shaders or at least split into multiple CPU threads)
 * Decouple material and object params (e.g. skinning matrices)
 * Flare billboard for lights
+* use 4x3 matrices when possible
 * sort render queues
 * OpenGL state cache
 * Bloom
