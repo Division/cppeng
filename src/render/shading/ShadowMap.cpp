@@ -24,6 +24,20 @@ ShadowMap::ShadowMap(unsigned int resolutionX, unsigned int resolutionY, std::sh
   _shadowmapBlock = UNIFORM_TEXTURE_BLOCKS.at(UniformName::ShadowMap);
 }
 
+void ShadowMap::setupShadowCasters(const std::vector<IShadowCasterPtr> &shadowCasters) {
+  unsigned int index = 0;
+  for (auto &caster : shadowCasters) {
+    if (index >= MAX_MAPS) {
+      caster->viewport(vec4(0,0,0,0));
+      continue;
+    }
+
+    vec4 viewport = (vec4)getCellPixelRect(index);
+    caster->viewport(viewport);
+    index++;
+  }
+}
+
 void ShadowMap::renderShadowMaps(const std::vector<IShadowCasterPtr> &shadowCasters, const ScenePtr &scene) {
   _depthAtlas->depthBuffer()->bind(_shadowmapBlock);
   _depthAtlas->bind();

@@ -9,14 +9,6 @@
 #include "render/renderer/SceneRenderer.h"
 #include "utils/Math.h"
 
-void LightObject::_updateAttenuation() {
-  _squareAttenuation = 1.0f / (_radius * _radius * _lightCutoff);
-}
-
-void LightObject::_updateRadius() {
-  _radius = fabs(( -_linearAttenuation - std::sqrtf(_linearAttenuation * _linearAttenuation - 4 * _squareAttenuation * (1 - 1 / _lightCutoff))) / (2 * _squareAttenuation));
-}
-
 LightObject::LightObject() : GameObject() {
   _cullingData.type = CullingData::Type::Sphere;
   _layer = ~0u;
@@ -26,8 +18,8 @@ UBOStruct::Light LightObject::getLightStruct() const {
   UBOStruct::Light result;
 
   result.position = transform()->worldPosition();
-  result.squareAttenuation = squareAttenuation();
-  result.linearAttenuation = linearAttenuation();
+  result.attenuation = attenuation();
+  result.radius = radius();
   result.color = color();
   result.mask = cameraVisibilityMask();
 
@@ -54,7 +46,7 @@ void LightObject::enableDebug() {
   _debugMesh = std::make_shared<Mesh>();
   switch (_type) {
     case LightObjectType::Point:
-      MeshGeneration::generateSphere(_debugMesh, 10, 10, 0.2);
+      MeshGeneration::generateSphere(_debugMesh, 10, 10, _radius);
       break;
 
     case LightObjectType::Spot:
@@ -87,11 +79,6 @@ float LightObject::getSpotRadius(float height) {
   }
 
   return 0;
-}
-
-void LightObject::attenuation(float linear, float square) {
-  _linearAttenuation = linear;
-  _squareAttenuation = square;
 }
 
 void LightObject::postUpdate() {

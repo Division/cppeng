@@ -37,9 +37,7 @@ SceneRenderer::SceneRenderer() {
 void SceneRenderer::renderScene(ScenePtr scene, ICameraParamsProviderPtr camera, ICameraParamsProviderPtr camera2D) const {
   if (!camera) { return; }
 
-  _renderer->setupBuffers(scene, camera, camera2D);
-
-  // Shadow maps
+  // Shadow casters
   auto &visibleLights = scene->visibleLights(camera);
   _shadowCasters.clear();
   for (auto &light : visibleLights) {
@@ -54,6 +52,10 @@ void SceneRenderer::renderScene(ScenePtr scene, ICameraParamsProviderPtr camera,
       _shadowCasters.push_back(std::static_pointer_cast<IShadowCaster>(projector));
     }
   }
+
+  _shadowMap->setupShadowCasters(_shadowCasters);
+
+  _renderer->setupBuffers(scene, camera, camera2D);
 
   _shadowMap->renderShadowMaps(_shadowCasters, scene);
   //

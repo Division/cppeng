@@ -17,7 +17,9 @@ class ShadowMap {
 public:
   ShadowMap(unsigned int resolutionX, unsigned int resolutionY, std::shared_ptr<Renderer> renderer);
 
+  void setupShadowCasters(const std::vector<IShadowCasterPtr> &shadowCasters);
   void renderShadowMaps(const std::vector<IShadowCasterPtr> &shadowCasters, const ScenePtr &scene);
+
   TexturePtr depthAtlas();
 private:
   uvec2 _resolution;

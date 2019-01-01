@@ -28,13 +28,8 @@ public:
   float radius() const { return _radius; }
   void radius(float value) { _radius = value; }
 
-  float squareAttenuation() const { return _squareAttenuation; }
-  void squareAttenuation(float value) { _squareAttenuation = value; }
-
-  float linearAttenuation() const { return _linearAttenuation; }
-  void linearAttenuation(float value) { _linearAttenuation = value; }
-
-  void attenuation(float linear, float square);
+  float attenuation() const { return _attenuation; }
+  void attenuation(float value) { _attenuation = value; }
 
   LightObjectType type() const { return _type; }
   void type(LightObjectType value) { _type = value; }
@@ -84,9 +79,7 @@ private:
   // Common light properties
   float _radius = 13;
   vec3 _color = vec3(1, 1, 1);
-  float _squareAttenuation = 0.44;
-  float _linearAttenuation = 0.35;
-  float _lightCutoff = 0.001;
+  float _attenuation = 2;
   unsigned int _index; // index in scene array
 
   // Spotlight properties
@@ -100,9 +93,6 @@ private:
   float _zMin = 0.1f;
   bool _castShadows = false;
   unsigned int _cameraIndex = 0;
-
-  void _updateAttenuation();
-  void _updateRadius();
 
   LightObjectType _type = LightObjectType::Point;
 

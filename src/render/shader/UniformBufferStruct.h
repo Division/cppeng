@@ -24,9 +24,9 @@ namespace UBOStruct {
 
   struct Light {
     vec3 position; // offset = 0, size = 12
-    float squareAttenuation = 0; // offset = 12, alignment = 4, size = 4
+    float attenuation = 1; // offset = 12, alignment = 4, size = 4
     vec3 color; // offset = 16, alignment = 16, size = 12
-    float linearAttenuation = 0;
+    float radius;
     vec3 direction;
     float coneAngle = 0;
     mat4 projectionMatrix;
