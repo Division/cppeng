@@ -67,8 +67,6 @@ void LightObject::render(IRenderer &renderer) {
   RenderOperation rop = _getDefaultRenderOp();
   rop.mesh = _debugMesh;
   rop.material = _debugMaterial;
-  rop.modelMatrix = transform()->worldMatrix();
-  rop.debugInfo = name();
   renderer.addRenderOperation(rop, RenderQueue::Opaque);
 //  getEngine()->debugDraw()->drawAABB(this->bounds(), vec4(this->color(), 1));
 }

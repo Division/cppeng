@@ -14,9 +14,9 @@ namespace UBOStruct {
   struct ObjectParams {
     mat4 transform; // offset = 0, size = 64
     mat4 normalMatrix; // offset = 64, alignment = 16, size = 64
-    vec2 uvScale;
-    vec2 uvOffset;
-    unsigned int layer;
+    vec2 uvScale = vec2(1, 1);
+    vec2 uvOffset = vec2(0, 0);
+    unsigned int layer = 1u << 0;
     vec3 padding;
   };
 

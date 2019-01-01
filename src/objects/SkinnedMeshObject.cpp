@@ -44,7 +44,6 @@ void SkinnedMeshObject::setSkinningData(ModelBundlePtr bundle, SkinningDataPtr s
       _jointList.push_back(_jointMap.at(jointName));
     }
 
-    _matrices.resize(_jointList.size());
   } else {
     _animation = std::make_shared<AnimationController>();
   }
@@ -58,26 +57,30 @@ void SkinnedMeshObject::start() {
   animation()->play("default", true);
 }
 
+void SkinnedMeshObject::_debugDraw() {
+  for (int i = 0; i < _mesh->vertexCount(); i++) {
+    vec3 vertex = _mesh->getVertex(i);
+    vec4 weight = _mesh->getWeights(i);
+    vec4 jointIndices = _mesh->getJointIndices(i);
+
+    mat4 matrix = _skinningMatrices.matrices[(int)jointIndices.x] * weight.x +
+                  _skinningMatrices.matrices[(int)jointIndices.y] * weight.y +
+                  _skinningMatrices.matrices[(int)jointIndices.z] * weight.z;
+    vertex = vec3(matrix * vec4(vertex, 1));
+    getEngine()->debugDraw()->drawPoint(vertex, vec3(1, 1, 1));
+  }
+
+
+  transform()->forEachChild(true, [&](TransformPtr transform) {
+    if (transform->parent()->gameObject()->id() == this->id()) { return; }
+    getEngine()->debugDraw()->drawLine(transform->worldPosition(), transform->parent()->worldPosition(), vec4(1, 0, 0, 1));
+  });
+};
+
 void SkinnedMeshObject::postUpdate() {
   for (int i = 0; i < _jointList.size(); i++) {
     _skinningMatrices.matrices[i] = _jointList[i]->transform()->worldMatrix() * _skinningData->bindPoses[i];
   }
-
-//  for (int i = 0; i < _mesh->vertexCount(); i++) {
-//    vec3 vertex = _mesh->getVertex(i);
-//    vec4 weight = _mesh->getWeights(i);
-//    vec4 jointIndices = _mesh->getJointIndices(i);
-//
-//    mat4 matrix = _matrices[jointIndices.x] * weight.x + _matrices[jointIndices.y] * weight.y + _matrices[jointIndices.z] * weight.z;
-//    vertex = vec3(matrix * vec4(vertex, 1));
-//    getEngine()->debugDraw()->drawPoint(vertex, vec3(1, 1, 1));
-//  }
-//
-
-//  transform()->forEachChild(true, [&](TransformPtr transform) {
-//    if (transform->parent()->gameObject()->id() == this->id()) { return; }
-//    getEngine()->debugDraw()->drawLine(transform->worldPosition(), transform->parent()->worldPosition(), vec4(1, 0, 0, 1));
-//  });
 }
 
 void SkinnedMeshObject::render(IRenderer &renderer) {
@@ -89,8 +92,5 @@ void SkinnedMeshObject::render(IRenderer &renderer) {
   rop.skinningMatrices = &_skinningMatrices;
   rop.mesh = _mesh;
   rop.material = _material;
-  rop.modelMatrix = transform()->worldMatrix();
-  rop.renderOrder = renderOrder;
-  rop.debugInfo = name();
   renderer.addRenderOperation(rop, _renderQueue);
 }

@@ -48,7 +48,7 @@ public:
 
   virtual ~GameObject() = default;
 
-  std::string name() const { return _name; }
+  const std::string &name() const { return _name; }
   void name(const std::string &name) { _name = name; }
 
   int id() const { return _id; }
@@ -80,9 +80,12 @@ public:
 protected:
   virtual void _processAnimations(float dt); // called after update, but before postUpdate and transforms calculation
   RenderOperation _getDefaultRenderOp() {
+    _objectParamsStruct.transform = transform()->worldMatrix();
+    _objectParamsStruct.layer = layer();
+
     RenderOperation result;
     result.objectParams = &_objectParamsStruct;
-    result.layer = layer();
+    result.debugInfo = &_name;
     return result;
   };
 

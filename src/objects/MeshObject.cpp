@@ -24,8 +24,5 @@ void MeshObject::render(IRenderer &renderer) {
   RenderOperation rop = _getDefaultRenderOp();
   rop.mesh = _mesh;
   rop.material = _material;
-  rop.modelMatrix = transform()->worldMatrix();
-  rop.renderOrder = renderOrder;
-  rop.debugInfo = name();
   renderer.addRenderOperation(rop, _renderQueue);
 }

@@ -143,8 +143,6 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
     lineROP.objectParams = &_renderParams;
     lineROP.mesh = lineMesh;
     lineROP.material = _material;
-    lineROP.modelMatrix = mat4();
-    lineROP.debugInfo = "debug lines";
     lineROP.mode = GL_LINES;
     renderer->addRenderOperation(lineROP, RenderQueue::Debug);
   }
@@ -157,8 +155,6 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
     pointROP.objectParams = &_renderParams;
     pointROP.mesh = pointMesh;
     pointROP.material = _material;
-    pointROP.modelMatrix = mat4();
-    pointROP.debugInfo = "debug points";
     pointROP.mode = GL_POINTS;
     renderer->addRenderOperation(pointROP, RenderQueue::Debug);
   }
@@ -169,9 +165,8 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
     imageROP.objectParams = &image.renderParams;
     imageROP.mesh = _quadMesh;
     imageROP.material = image.material;
-    imageROP.modelMatrix = glm::translate(mat4(), vec3(image.bounds.x, image.bounds.y, 0));
-    imageROP.modelMatrix = glm::scale(imageROP.modelMatrix, vec3(image.bounds.z, image.bounds.w, 1));
-    imageROP.debugInfo = "debug texture";
+    image.renderParams.transform = glm::translate(mat4(), vec3(image.bounds.x, image.bounds.y, 0));
+    image.renderParams.transform = glm::scale(image.renderParams.transform, vec3(image.bounds.z, image.bounds.w, 1));
     imageROP.mode = GL_TRIANGLES;
     renderer->addRenderOperation(imageROP, RenderQueue::UI);
   }
@@ -182,9 +177,8 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
     imageROP.objectParams = &image.renderParams;
     imageROP.mesh = _quadMesh;
     imageROP.material = image.material;
-    imageROP.modelMatrix = glm::translate(mat4(), vec3(image.bounds.x, image.bounds.y, 0));
-    imageROP.modelMatrix = glm::scale(imageROP.modelMatrix, vec3(image.bounds.z, image.bounds.w, 1));
-    imageROP.debugInfo = "debug depth map";
+    image.renderParams.transform = glm::translate(mat4(), vec3(image.bounds.x, image.bounds.y, 0));
+    image.renderParams.transform = glm::scale(image.renderParams.transform, vec3(image.bounds.z, image.bounds.w, 1));
     imageROP.mode = GL_TRIANGLES;
     renderer->addRenderOperation(imageROP, RenderQueue::UI);
   }

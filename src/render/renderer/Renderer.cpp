@@ -49,11 +49,6 @@ void Renderer::renderMesh(MeshPtr mesh, GLenum mode) {
 }
 
 void Renderer::setupAndUploadUBO(RenderOperation *rop) {
-  if (rop->objectParams) {
-    rop->objectParams->transform = rop->modelMatrix;
-    rop->objectParams->layer = rop->layer;
-  }
-
   if (rop->skinningMatrices) {
     _skinningRops.push_back(rop);
   }

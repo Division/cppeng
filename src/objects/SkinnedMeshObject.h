@@ -25,6 +25,7 @@ public:
 
 protected:
   void _processAnimations(float dt) override;
+  void _debugDraw();
 
 protected:
   GameObjectPtr _rootJoint = nullptr;
@@ -32,7 +33,6 @@ protected:
   UBOStruct::SkinningMatrices _skinningMatrices;
   std::unordered_map<std::string, GameObjectPtr> _jointMap;
   std::vector<GameObjectPtr> _jointList;
-  std::vector<mat4> _matrices;
 };
 
 
