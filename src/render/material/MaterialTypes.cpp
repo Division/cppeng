@@ -135,7 +135,7 @@ MaterialTextureProjection::MaterialTextureProjection() {
   _shader->addUniform(UniformName::ProjectedTexture);
   _shader->addUniform(UniformName::ProjectedTextureMatrix);
 
-  _shader->addUniformBlock(UniformBlockName::Transform);
+  _shader->addUniformBlock(UniformBlockName::ObjectParams);
   _shader->addUniformBlock(UniformBlockName::Light);
   _shader->addUniformBlock(UniformBlockName::Camera);
 }

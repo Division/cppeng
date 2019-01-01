@@ -14,8 +14,6 @@ set(ENGINE_SOURCES
         src/EngineMain.h
         src/render/shader/Shader.cpp
         src/render/shader/Shader.h
-        src/common/ICleanable.h
-        src/common/ICleanableObserver.h
         src/Resources.cpp
         src/Resources.h
         src/system/Logging.h

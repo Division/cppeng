@@ -49,19 +49,16 @@ void Renderer::renderMesh(MeshPtr mesh, GLenum mode) {
 }
 
 void Renderer::setupAndUploadUBO(RenderOperation *rop) {
-  if (rop->material->hasTransformBlock()) {
-    UBOStruct::TransformStruct transformStruct;
-    transformStruct.transform = rop->modelMatrix;
-    transformStruct.layer = rop->layer;
-//    transformStruct.normalMatrix = glm::inverseTranspose(rop->modelMatrix);
-    rop->material->setTransformBlock(transformStruct);
+  if (rop->objectParams) {
+    rop->objectParams->transform = rop->modelMatrix;
+    rop->objectParams->layer = rop->layer;
   }
 
   if (rop->isSkinning) {
     _skinningRops.push_back(rop);
   }
 
-  _uboManager->setTransformBlock(rop);
+  _uboManager->setObjectParamsBlock(rop);
 }
 
 void Renderer::_uploadSkinning(RenderOperation *rop) {

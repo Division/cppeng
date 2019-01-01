@@ -21,7 +21,7 @@ UBOManager::UBOManager() {
   auto lightMaxSize = sizeof(UBOStruct::Light) * MAX_LIGHTS;
   auto projectorMaxSize = sizeof(UBOStruct::Projector) * MAX_LIGHTS;
 
-  _transform = std::make_shared<MultiVertexBufferObject>(
+  _objectParams = std::make_shared<MultiVertexBufferObject>(
     GL_UNIFORM_BUFFER, GL_DYNAMIC_DRAW,
     engine::GLCaps::maxUBOSize(),
     engine::GLCaps::uboOffsetAlignment()
@@ -74,12 +74,10 @@ int UBOManager::appendCamera(std::shared_ptr<ICameraParamsProvider> camera) {
   return index;
 }
 
-void UBOManager::setTransformBlock(RenderOperation *rop) {
-  MaterialPtr material = rop->material;
-  if (material->hasTransformBlock()) {
-    auto &transformStruct = material->getTransformStruct();
-    auto address = _transform->appendData((void *) &transformStruct, sizeof(transformStruct));
-    rop->transformBlockOffset = address;
+void UBOManager::setObjectParamsBlock(RenderOperation *rop) {
+  if (rop->objectParams) {
+    auto address = _objectParams->appendData((void *)rop->objectParams, sizeof(UBOStruct::ObjectParams));
+    rop->objectParamsBlockOffset = address;
   }
 }
 
@@ -91,7 +89,7 @@ void UBOManager::setSkinningMatrices(RenderOperation *rop) {
 }
 
 void UBOManager::swap() {
-  _transform->swapBuffers();
+  _objectParams->swapBuffers();
   _skinningMatrices->swapBuffers();
 
   _light->swap();
@@ -134,17 +132,17 @@ void UBOManager::setupForRender(RenderOperation *rop, RenderMode mode) {
 
   shader->bind();
 
-  // For now depth only pass doesn't need shader bingings
+  // depth only pass doesn't need material bindings (e.g. textures)
   if (!isDepthOnly) {
     material->uploadBindings(shader);
     material->activateTextures();
   }
 
-  if (material->hasTransformBlock()) {
-    auto address = rop->transformBlockOffset;
-    auto size = sizeof(UBOStruct::TransformStruct);
-    auto slot = (GLuint)UniformBlockName::Transform;
-    auto vbo = _transform->getVBO(address.index);
+  if (rop->objectParams) {
+    auto address = rop->objectParamsBlockOffset;
+    auto size = sizeof(UBOStruct::ObjectParams);
+    auto slot = (GLuint)UniformBlockName::ObjectParams;
+    auto vbo = _objectParams->getVBO(address.index);
     glBindBufferRange(GL_UNIFORM_BUFFER, slot, vbo, address.offset, size);
   } else {
     ENGLog("No transform");
@@ -170,11 +168,11 @@ void UBOManager::activateCamera(unsigned int offset) {
 }
 
 void UBOManager::map() {
-  _transform->map();
+  _objectParams->map();
 }
 
 void UBOManager::unmap() {
-  _transform->unmap();
+  _objectParams->unmap();
 }
 
 void UBOManager::mapSkinning() {

@@ -11,14 +11,14 @@ struct ShaderConfig {
   std::vector<UniformBlockName> uniformBlocks;
 };
 
-const std::vector<UniformBlockName> DEFAULT_UBO = { UniformBlockName::Transform, UniformBlockName::Camera };
+const std::vector<UniformBlockName> DEFAULT_UBO = { UniformBlockName::ObjectParams, UniformBlockName::Camera };
 
 const std::map<ShaderCaps, ShaderConfig> UNIFORMS_PER_CAP = {
     { ShaderCaps::ObjectData, { {}, DEFAULT_UBO } },
     { ShaderCaps::Color, { { UniformName::Color }, DEFAULT_UBO } },
     { ShaderCaps::Lighting, {
       { UniformName::ShadowMap, UniformName::LightGrid, UniformName::LightIndices, UniformName::ProjectorTexture},
-      { UniformBlockName::Transform, UniformBlockName::Camera, UniformBlockName::Light, UniformBlockName::Projector }
+      { UniformBlockName::ObjectParams, UniformBlockName::Camera, UniformBlockName::Light, UniformBlockName::Projector }
     } },
     { ShaderCaps::NormalMap, { { UniformName::NormalMap }, DEFAULT_UBO } },
     { ShaderCaps::Texture0, { { UniformName::Texture0 }, DEFAULT_UBO } },
@@ -27,7 +27,7 @@ const std::map<ShaderCaps, ShaderConfig> UNIFORMS_PER_CAP = {
     { ShaderCaps::TerrainLayer0, { { UniformName::TerrainDiffuse0, UniformName::TerrainNormal0 }, { DEFAULT_UBO } } },
     { ShaderCaps::TerrainLayer1, { { UniformName::TerrainDiffuse1, UniformName::TerrainNormal1, UniformName::TerrainSplatmap }, {} } },
     { ShaderCaps::TerrainLayer2, { { UniformName::TerrainDiffuse2, UniformName::TerrainNormal2, UniformName::TerrainSplatmap }, {} } },
-    { ShaderCaps::Skinning, { {}, { UniformBlockName::SkinningMatrices, UniformBlockName::Transform, UniformBlockName::Camera } } }
+    { ShaderCaps::Skinning, { {}, { UniformBlockName::SkinningMatrices, UniformBlockName::ObjectParams, UniformBlockName::Camera } } }
 };
 
 const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
@@ -110,10 +110,6 @@ void Shader::_setupAttribs(GLuint program) {
   for (auto &keyValue : SHADER_ATTRIB_NAMES) {
     glBindAttribLocation(program, (GLuint)keyValue.first, keyValue.second.c_str());
   }
-}
-
-void Shader::notifyDirty(ICleanable *uniform) {
-
 }
 
 void Shader::bind() {

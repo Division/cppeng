@@ -11,6 +11,8 @@
 
 // Note: materials should not be instantiated every frame
 
+// TODO: these materials probably should be refactored into a single configurable material class
+
 class MaterialSingleColor: public Material {
 public:
   MaterialSingleColor();

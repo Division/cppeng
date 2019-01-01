@@ -10,16 +10,19 @@
 #include "EngineGL.h"
 #include "render/material/Material.h"
 #include "render/buffer/MultiVBOAddress.h"
+#include "render/shader/UniformBufferStruct.h"
 
 struct RenderOperation {
   MeshPtr mesh;
   MaterialPtr material;
+  UBOStruct::ObjectParams *objectParams = nullptr;
+
   mat4 modelMatrix;
   unsigned int layer = 1u << 0;
   GLenum mode = GL_TRIANGLES;
   unsigned int index;
   bool isSkinning = false;
-  MultiVBOAddress transformBlockOffset; // signed int to use -1 as unready marker
+  MultiVBOAddress objectParamsBlockOffset; // signed int to use -1 as unready marker
   MultiVBOAddress skinningOffset;
   int renderOrder = 0;
   std::string debugInfo;

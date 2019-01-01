@@ -18,7 +18,7 @@ DebugDraw::DebugDraw() {
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Texture0);
   _textureShader = getEngine()->getShaderWithCaps(caps);
-  _textureShader->addUniformBlock(UniformBlockName::Transform);
+  _textureShader->addUniformBlock(UniformBlockName::ObjectParams);
   _textureShader->addUniformBlock(UniformBlockName::Camera);
 
   auto generator = getEngine()->shaderGenerator();
@@ -26,7 +26,7 @@ DebugDraw::DebugDraw() {
   _depthMapShader = generator->getShaderWithCaps(caps, "debug/depth.glsl");
   _depthMapShader->addUniform(UniformName::Texture0);
   _depthMapShader->addUniform(UniformName::NearFar);
-  _depthMapShader->addUniformBlock(UniformBlockName::Transform);
+  _depthMapShader->addUniformBlock(UniformBlockName::ObjectParams);
   _depthMapShader->addUniformBlock(UniformBlockName::Camera);
 
   _lineMeshes[0] = std::make_shared<Mesh>(true, 2, GL_DYNAMIC_DRAW);
@@ -140,6 +140,7 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
     lineMesh->setColors(_lineColors);
     lineMesh->createBuffer();
     RenderOperation lineROP;
+    lineROP.objectParams = &_renderParams;
     lineROP.mesh = lineMesh;
     lineROP.material = _material;
     lineROP.modelMatrix = mat4();
@@ -153,6 +154,7 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
     pointMesh->setColors(_pointColors);
     pointMesh->createBuffer();
     RenderOperation pointROP;
+    pointROP.objectParams = &_renderParams;
     pointROP.mesh = pointMesh;
     pointROP.material = _material;
     pointROP.modelMatrix = mat4();
@@ -164,6 +166,7 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
   for (int i = 0; i < _imageCount; i++) {
     auto &image = _images[i];
     RenderOperation imageROP;
+    imageROP.objectParams = &image.renderParams;
     imageROP.mesh = _quadMesh;
     imageROP.material = image.material;
     imageROP.modelMatrix = glm::translate(mat4(), vec3(image.bounds.x, image.bounds.y, 0));
@@ -176,6 +179,7 @@ void DebugDraw::render(std::shared_ptr<IRenderer> &renderer) {
   for (int i = 0; i < _depthMapImageCount; i++) {
     auto &image = _depthMapImages[i];
     RenderOperation imageROP;
+    imageROP.objectParams = &image.renderParams;
     imageROP.mesh = _quadMesh;
     imageROP.material = image.material;
     imageROP.modelMatrix = glm::translate(mat4(), vec3(image.bounds.x, image.bounds.y, 0));

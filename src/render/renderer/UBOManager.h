@@ -21,7 +21,7 @@ class ICameraParamsProvider;
 class UBOManager {
 public:
   UBOManager();
-  void setTransformBlock(RenderOperation *rop);
+  void setObjectParamsBlock(RenderOperation *rop);
   void setSkinningMatrices(RenderOperation *rop);
   void swap();
   void upload(bool includeLighting);
@@ -35,8 +35,8 @@ public:
   void mapSkinning();
   void unmapSkinning();
 private:
-  // Data related to objects transformation
-  std::shared_ptr<MultiVertexBufferObject> _transform;
+  // Data related to various object parameters
+  std::shared_ptr<MultiVertexBufferObject> _objectParams;
 
   // Skinned mesh matrices
   std::shared_ptr<MultiVertexBufferObject> _skinningMatrices;

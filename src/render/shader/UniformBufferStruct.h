@@ -11,9 +11,11 @@
 // Data structures shared between shaders
 namespace UBOStruct {
 
-  struct TransformStruct {
+  struct ObjectParams {
     mat4 transform; // offset = 0, size = 64
     mat4 normalMatrix; // offset = 64, alignment = 16, size = 64
+    vec2 uvScale;
+    vec2 uvOffset;
     unsigned int layer;
     vec3 padding;
   };

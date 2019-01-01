@@ -64,11 +64,6 @@ struct UniformBlockBinding {
   UniformBlockName block;
 };
 
-struct TransformBinding: public UniformBlockBinding {
-  explicit TransformBinding() : UniformBlockBinding(UniformBlockName::Transform) {}
-  UBOStruct::TransformStruct data;
-};
-
 struct SkinningMatricesBinding: public UniformBlockBinding {
   explicit SkinningMatricesBinding() : UniformBlockBinding(UniformBlockName::SkinningMatrices) {}
   int jointCount = 0;

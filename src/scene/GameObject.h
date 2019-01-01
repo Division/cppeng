@@ -11,6 +11,7 @@
 #include "system/Logging.h"
 #include <string>
 #include "AnimationController.h"
+#include "render/shader/UniformBufferStruct.h"
 
 class GameObject;
 typedef std::shared_ptr<GameObject> GameObjectPtr;
@@ -78,7 +79,12 @@ public:
 
 protected:
   virtual void _processAnimations(float dt); // called after update, but before postUpdate and transforms calculation
-  RenderOperation _getDefaultRenderOp() const { RenderOperation result; result.layer = layer(); return result; };
+  RenderOperation _getDefaultRenderOp() {
+    RenderOperation result;
+    result.objectParams = &_objectParamsStruct;
+    result.layer = layer();
+    return result;
+  };
 
   std::string _name;
   std::string _sid; // sid of the HierarchyData
@@ -86,11 +92,15 @@ protected:
   unsigned int _layer = 1 << 0; // default layer is 1
 
   AnimationControllerPtr _animation;
+
+  UBOStruct::ObjectParams _objectParamsStruct;
+
   CullingData _cullingData;
   bool _isRenderable = false;
   bool _active = true;
   bool _destroyed = false;
   TransformPtr _transform;
+
   IGameObjectManager *_manager;
   void _setManager (IGameObjectManager *manager);
   GameObjectID _id;

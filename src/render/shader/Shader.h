@@ -7,8 +7,6 @@
 
 #include "EngineGL.h"
 #include "Uniform.h"
-#include <common/ICleanableObserver.h>
-#include <common/ICleanable.h>
 #include <vector>
 #include <string>
 #include <map>
@@ -39,7 +37,6 @@ class Shader
 {
 public:
   Shader(const std::string &vertexSource, const std::string &fragmentSource);
-  virtual void notifyDirty(ICleanable *uniform);
 
   void bind();
   void unbind();
@@ -60,7 +57,6 @@ private:
   std::unique_ptr<Uniform> _uniforms[(int)UniformName::Count];
   std::unique_ptr<UniformBlock> _uniformBlocks[(int)UniformBlockName::Count];
   GLuint _program;
-  std::vector<ICleanable *> _dirtyUniforms;
 };
 
 typedef std::shared_ptr<Shader> ShaderPtr;

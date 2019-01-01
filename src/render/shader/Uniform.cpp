@@ -51,7 +51,7 @@ const std::map<UniformName, unsigned int> UNIFORM_TEXTURE_BLOCKS = {
 };
 
 const std::map<UniformBlockName, std::string> UNIFORM_BLOCK_NAMES = {
-    { UniformBlockName::Transform, "TransformBlock" },
+    { UniformBlockName::ObjectParams, "ObjectParamsBlock" },
     { UniformBlockName::SkinningMatrices, "SkinningMatricesBlock" },
     { UniformBlockName::Light, "LightBlock" },
     { UniformBlockName::Camera, "CameraBlock" },

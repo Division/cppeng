@@ -11,6 +11,7 @@
 #include "render/renderer/IRenderer.h"
 #include "EngTypes.h"
 #include "render/material/Material.h"
+#include "render/shader/UniformBufferStruct.h"
 
 class Mesh;
 class MaterialDebug;
@@ -56,12 +57,14 @@ private:
     explicit Image(vec4 bounds = vec4()) : material(std::make_shared<DebugTextureMaterial>()), bounds(bounds) {}
     std::shared_ptr<DebugTextureMaterial> material;
     vec4 bounds;
+    UBOStruct::ObjectParams renderParams;
   };
 
   struct DepthMapImage {
     explicit DepthMapImage(vec4 bounds = vec4()) : material(std::make_shared<DebugDepthMapMaterial>()), bounds(bounds) {}
     std::shared_ptr<DebugDepthMapMaterial> material;
     vec4 bounds;
+    UBOStruct::ObjectParams renderParams;
   };
 
   ShaderPtr _textureShader;
@@ -83,6 +86,7 @@ private:
   std::shared_ptr<Mesh> _lineMeshes[2]; // two meshes to swap
   std::shared_ptr<Mesh> _pointMeshes[2];
   std::shared_ptr<MaterialDebug> _material;
+  UBOStruct::ObjectParams _renderParams;
 };
 
 
