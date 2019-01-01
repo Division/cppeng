@@ -18,7 +18,7 @@ public:
     std::vector<GameObjectPtr> objects;
     std::vector<ProjectorPtr> projectors;
     std::vector<LightObjectPtr> lights;
-    bool hasData = false;
+    bool hasData = false; // when false, cache values are recalculated
   };
 
 public:

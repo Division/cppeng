@@ -60,7 +60,7 @@ void SkinnedMeshObject::start() {
 
 void SkinnedMeshObject::postUpdate() {
   for (int i = 0; i < _jointList.size(); i++) {
-    _matrices[i] = _jointList[i]->transform()->worldMatrix() * _skinningData->bindPoses[i];
+    _skinningMatrices.matrices[i] = _jointList[i]->transform()->worldMatrix() * _skinningData->bindPoses[i];
   }
 
 //  for (int i = 0; i < _mesh->vertexCount(); i++) {
@@ -85,16 +85,12 @@ void SkinnedMeshObject::render(IRenderer &renderer) {
     return;
   }
 
-  UBOStruct::SkinningMatrices skinningMatrices;
-  memcpy(&skinningMatrices.matrices[0], &_matrices[0], sizeof(mat4) * _matrices.size());
-  _material->setSkinningMatrices(skinningMatrices);
-
   RenderOperation rop = _getDefaultRenderOp();
+  rop.skinningMatrices = &_skinningMatrices;
   rop.mesh = _mesh;
   rop.material = _material;
   rop.modelMatrix = transform()->worldMatrix();
   rop.renderOrder = renderOrder;
   rop.debugInfo = name();
-  rop.isSkinning = true;
   renderer.addRenderOperation(rop, _renderQueue);
 }

@@ -19,10 +19,6 @@ public:
   const ShaderPtr shaderSkinning() const { return _shaderSkinning; }
   const ShaderPtr shaderDepthOnly() const { return _shaderDepthOnly; }
   const ShaderPtr shaderDepthOnlySkinning() const { return _shaderDepthOnlySkinning; }
-  
-  bool hasSkinning() { return _bindings.hasSkinning; }
-  void setSkinningMatrices(const UBOStruct::SkinningMatrices &value) { _bindings.skinningMatrices.data = value; }
-  const UBOStruct::SkinningMatrices &getSkinningMatrices() { return _bindings.skinningMatrices.data; }
 
   void uploadBindings(ShaderPtr shader) const;
   void activateTextures() const;

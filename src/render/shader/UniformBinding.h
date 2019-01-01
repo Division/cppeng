@@ -56,18 +56,4 @@ struct TextureBinding: public UniformBinding {
   unsigned int textureUnit;
 };
 
-// Uniform Buffer Data Bindings
-
-struct UniformBlockBinding {
-  explicit UniformBlockBinding(UniformBlockName name) : block(name) {}
-  bool enabled = false;
-  UniformBlockName block;
-};
-
-struct SkinningMatricesBinding: public UniformBlockBinding {
-  explicit SkinningMatricesBinding() : UniformBlockBinding(UniformBlockName::SkinningMatrices) {}
-  int jointCount = 0;
-  UBOStruct::SkinningMatrices data;
-};
-
 #endif //CPPWRAPPER_UNIFORMBINDING_H

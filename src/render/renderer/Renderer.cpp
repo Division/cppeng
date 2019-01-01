@@ -54,7 +54,7 @@ void Renderer::setupAndUploadUBO(RenderOperation *rop) {
     rop->objectParams->layer = rop->layer;
   }
 
-  if (rop->isSkinning) {
+  if (rop->skinningMatrices) {
     _skinningRops.push_back(rop);
   }
 

@@ -18,10 +18,6 @@ public:
   std::vector<FloatBinding> floatBindings;
   std::vector<IntBinding> intBindings;
   std::vector<TextureBinding> textureBindings;
-
-  // Skinning matrices uniform block
-  bool hasSkinning = false;
-  SkinningMatricesBinding skinningMatrices;
 };
 
 

@@ -83,8 +83,8 @@ void UBOManager::setObjectParamsBlock(RenderOperation *rop) {
 
 void UBOManager::setSkinningMatrices(RenderOperation *rop) {
   MaterialPtr material = rop->material;
-  auto &skinningMatrices = material->getSkinningMatrices();
-  auto address = _skinningMatrices->appendData((void *) &skinningMatrices, sizeof(skinningMatrices));
+  auto skinningMatrices = rop->skinningMatrices;
+  auto address = _skinningMatrices->appendData((void *)skinningMatrices, sizeof(UBOStruct::SkinningMatrices));
   rop->skinningOffset = address;
 }
 
@@ -119,7 +119,7 @@ void UBOManager::upload(bool includeLighting) {
 void UBOManager::setupForRender(RenderOperation *rop, RenderMode mode) {
   MaterialPtr material = rop->material;
 
-  bool isSkinning = rop->isSkinning;
+  bool isSkinning = (bool)rop->skinningMatrices;
   bool isDepthOnly = mode == RenderMode::DepthOnly;
 
   ShaderPtr shader;
@@ -148,7 +148,7 @@ void UBOManager::setupForRender(RenderOperation *rop, RenderMode mode) {
     ENGLog("No transform");
   }
 
-  if (rop->isSkinning) {
+  if (rop->skinningMatrices) {
     auto address = rop->skinningOffset;
     auto size = sizeof(UBOStruct::SkinningMatrices);
     auto slot = (GLuint)UniformBlockName::SkinningMatrices;

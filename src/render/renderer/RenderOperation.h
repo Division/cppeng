@@ -16,26 +16,16 @@ struct RenderOperation {
   MeshPtr mesh;
   MaterialPtr material;
   UBOStruct::ObjectParams *objectParams = nullptr;
+  UBOStruct::SkinningMatrices *skinningMatrices = nullptr;
 
   mat4 modelMatrix;
   unsigned int layer = 1u << 0;
   GLenum mode = GL_TRIANGLES;
   unsigned int index;
-  bool isSkinning = false;
   MultiVBOAddress objectParamsBlockOffset; // signed int to use -1 as unready marker
   MultiVBOAddress skinningOffset;
   int renderOrder = 0;
   std::string debugInfo;
-
-  void reset () {
-    mesh = nullptr;
-    material = nullptr;
-    modelMatrix = mat4();
-    index = 0;
-    isSkinning = false;
-    renderOrder = 0;
-    debugInfo = "";
-  }
 };
 
 #endif //CPPWRAPPER_RENDEROPERATION_H

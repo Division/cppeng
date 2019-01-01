@@ -96,7 +96,7 @@ const vec3 Transform::backward() const {
   return vec3(_worldMatrix[2]);
 }
 
-void Transform::setMatrix(const mat4 matrix) {
+void Transform::setMatrix(const mat4 &matrix) {
   quat r;
   vec3 skew;
   vec4 perspective;

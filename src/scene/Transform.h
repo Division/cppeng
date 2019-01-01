@@ -45,7 +45,7 @@ public:
   const vec3 backward() const;
 
   const vec3 &position() const { return _position; }
-  const vec3 worldPosition() const { _updateTransformUpwards(); return vec3(_worldMatrix[3]); }
+  const vec3 worldPosition(bool skipUpdate = false) const { if (!skipUpdate) { _updateTransformUpwards(); }; return vec3(_worldMatrix[3]); }
   void position(const vec3 &position) { _position = position; setDirty(); }
   const quat &rotation() { return _rotation; }
   void rotation(const quat &rotation) { _rotation = rotation; setDirty(); }
@@ -53,7 +53,7 @@ public:
   void scale(const vec3 &scale) { _scale = scale; setDirty(); }
 
   void translate(const vec3 &delta) { position(_position + delta); }
-  void setMatrix(const mat4 matrix);
+  void setMatrix(const mat4 &matrix);
 
   const mat4 &worldMatrix() const { return _worldMatrix; }
 
