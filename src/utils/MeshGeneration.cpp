@@ -111,7 +111,7 @@ void MeshGeneration::generateQuad(MeshPtr mesh, vec2 size, vec2 origin) {
       vec3(-1, 1, 0) * halfSize + offset
   };
 
-  std::vector<vec2> texCoords= {
+  std::vector<vec2> texCoords = {
       vec2(0, 1),
       vec2(0, 0),
       vec2(1, 0),

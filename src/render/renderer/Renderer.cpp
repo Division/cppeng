@@ -206,6 +206,17 @@ void Renderer::_processRenderPipeline(RenderMode mode) {
     return;
   }
 
+  // Translucent
+  auto &translucentQueue = _queues[(int)RenderQueue::Translucent];
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  for (auto &rop : translucentQueue) {
+    _uboManager->setupForRender(&rop, mode);
+    renderMesh(rop.mesh, rop.mode);
+  }
+  glDisable(GL_BLEND);
+  // ---------------
+
   // Debug
   auto &debugQueue = _queues[(int)RenderQueue::Debug];
   glDisable(GL_DEPTH_TEST);

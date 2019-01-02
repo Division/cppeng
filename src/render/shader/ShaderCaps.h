@@ -16,6 +16,7 @@ enum class ShaderCaps : int {
   ObjectData,
   VertexColor,
   PointSize,
+  Billboard,
   Lighting,
   Texture0,
   Texture1,

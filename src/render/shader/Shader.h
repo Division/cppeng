@@ -25,6 +25,7 @@ enum class ShaderAttrib : int {
   Bitangent,
   Tangent,
   TexCoord0,
+  Corner,
   VertexColor,
   TexCoord1,
   JointWeights,

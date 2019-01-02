@@ -19,6 +19,7 @@ struct RenderOperation {
   UBOStruct::SkinningMatrices *skinningMatrices = nullptr;
 
   GLenum mode = GL_TRIANGLES;
+  bool depthTest = true;
   unsigned int index;
   MultiVBOAddress objectParamsBlockOffset;
   MultiVBOAddress skinningOffset;

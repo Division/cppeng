@@ -71,6 +71,7 @@ public:
   TransformPtr transform() { return _transform; }
 
   const CullingData &cullingData() const { return _cullingData; }
+  void cullingData(CullingData data) { _cullingData = data; }
 
   virtual void start(); // called only once just before the first update()
   virtual void update(float dt);

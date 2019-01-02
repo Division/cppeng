@@ -10,12 +10,6 @@ MeshObject::MeshObject() : GameObject() {
   _cullingData.type = CullingData::Type::OBB;
 }
 
-void MeshObject::update(float dt) {
-  if (_mesh) {
-    _cullingData.bounds = _mesh->aabb();
-  }
-}
-
 void MeshObject::render(IRenderer &renderer) {
   if (!_mesh || !_material) {
     return;
@@ -25,4 +19,10 @@ void MeshObject::render(IRenderer &renderer) {
   rop.mesh = _mesh;
   rop.material = _material;
   renderer.addRenderOperation(rop, _renderQueue);
+}
+
+void MeshObject::start() {
+  if (_mesh) {
+    _cullingData.bounds = _mesh->aabb();
+  }
 }

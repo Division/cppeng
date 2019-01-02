@@ -23,6 +23,20 @@ protected:
   int _colorBinging = -1;
 };
 
+class MaterialBillboard: public Material {
+public:
+  MaterialBillboard();
+  void texture(TexturePtr texture) { _bindings.textureBindings[_texture0Binding].texture = texture; }
+  TexturePtr texture() const { return _bindings.textureBindings[_texture0Binding].texture; }
+
+  void color(vec4 color) { _bindings.vec4Bindings[_colorBinging].v = color; }
+  vec4 color() const { return _bindings.vec4Bindings[_colorBinging].v; }
+
+protected:
+  int _texture0Binding = -1;
+  int _colorBinging = -1;
+};
+
 class MaterialDebug: public Material {
 public:
   MaterialDebug();

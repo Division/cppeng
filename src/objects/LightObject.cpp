@@ -8,6 +8,7 @@
 #include "render/debug/DebugDraw.h"
 #include "render/renderer/SceneRenderer.h"
 #include "utils/Math.h"
+#include "utils/MeshGeneration.h"
 
 LightObject::LightObject() : GameObject() {
   _cullingData.type = CullingData::Type::Sphere;
@@ -59,16 +60,22 @@ void LightObject::enableDebug() {
 }
 
 void LightObject::render(IRenderer &renderer) {
-  if (!_debugMesh || !_debugMaterial) {
-    return;
+  if (_flareTexture) {
+    RenderOperation rop = _getDefaultRenderOp();
+    rop.mesh = _flareMesh;
+    rop.material = _flareMaterial;
+    _flareMaterial->color(vec4(color(), 1));
+    rop.depthTest = false;
+    renderer.addRenderOperation(rop, RenderQueue::Translucent);
   }
 
-  _debugMaterial->color(vec4(color(), 1));
-  RenderOperation rop = _getDefaultRenderOp();
-  rop.mesh = _debugMesh;
-  rop.material = _debugMaterial;
-  renderer.addRenderOperation(rop, RenderQueue::Opaque);
-//  getEngine()->debugDraw()->drawAABB(this->bounds(), vec4(this->color(), 1));
+  if (_debugMesh && _debugMaterial) {
+    _debugMaterial->color(vec4(color(), 1));
+    RenderOperation rop = _getDefaultRenderOp();
+    rop.mesh = _debugMesh;
+    rop.material = _debugMaterial;
+    renderer.addRenderOperation(rop, RenderQueue::Opaque);
+  }
 }
 
 float LightObject::getSpotRadius(float height) {
@@ -94,4 +101,39 @@ void LightObject::postUpdate() {
     _cullingData.sphere.position = position;
     _cullingData.sphere.radius = _radius;
   };
+}
+
+void LightObject::setFlare(const TexturePtr &texture, float size) {
+  _flareTexture = texture;
+
+  if (fabs(size - _flareSize) > 0.0001 && size > 0) {
+    _flareSize = size;
+    if (!_flareMesh) {
+      _flareMesh = std::make_shared<Mesh>(true, 3, GL_DYNAMIC_DRAW);
+      _flareMaterial = std::make_shared<MaterialBillboard>();
+
+      float halfSize = size / 2.0f;
+
+      std::vector<vec2> corners = {
+          vec2(-1, 1) * halfSize,
+          vec2(-1, -1) * halfSize,
+          vec2(1, -1) * halfSize,
+          vec2(1, -1) * halfSize,
+          vec2(1, 1) * halfSize,
+          vec2(-1, 1) * halfSize
+      };
+
+      _flareMesh->setCorners(corners);
+    }
+
+    MeshGeneration::generateQuad(_flareMesh, vec2(0));
+    _flareMesh->createBuffer();
+  }
+
+  if (_flareSize <= 0.0001) {
+    _flareTexture = nullptr;
+  }
+
+  _flareMaterial->texture(_flareTexture);
+  _isRenderable = (bool)_flareTexture;
 }

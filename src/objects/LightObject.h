@@ -40,6 +40,8 @@ public:
   float coneAngle() const { return _coneAngle; }
   void coneAngle(float value) { _coneAngle = value; }
 
+  void setFlare(const TexturePtr &texture, float size);
+
   float getSpotRadius(float height);
 
   bool castShadows() const override { return _castShadows; };
@@ -84,6 +86,12 @@ private:
 
   // Spotlight properties
   float _coneAngle = 30;
+
+  // Flare
+  MeshPtr _flareMesh; // Right now the mesh is not shared. Will be improved after particle render implemented.
+  float _flareSize = 0;
+  TexturePtr _flareTexture;
+  std::shared_ptr<MaterialBillboard> _flareMaterial;
 
   // Shadows
   Frustum _frustum;

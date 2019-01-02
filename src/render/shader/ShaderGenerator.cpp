@@ -50,6 +50,7 @@ const std::map<ShaderCaps, std::string> CAPS_TO_PARAM_MAP = {
     { ShaderCaps::Color, "COLOR" },
     { ShaderCaps::VertexColor, "VERTEX_COLOR" },
     { ShaderCaps::PointSize, "POINT_SIZE" },
+    { ShaderCaps::Billboard, "BILLBOARD" },
     { ShaderCaps::Lighting, "LIGHTING" },
     { ShaderCaps::NormalMap, "NORMAL_MAP" },
     { ShaderCaps::SpecularMap, "SPECULAR_MAP" },
@@ -107,6 +108,8 @@ void ShaderGenerator::setupTemplates () {
 }
 
 void ShaderGenerator::addTemplate(const std::string &name) {
+  if (_templateMap.count(name)) { return; }
+
   auto path = TEMPLATE_ROOT + name;
   _templateMap[name] = _env.parse_template(path);
   _addTemplateCallback(name);

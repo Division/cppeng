@@ -23,6 +23,24 @@ MaterialDebug::MaterialDebug() {
   _setup(caps);
 }
 
+MaterialBillboard::MaterialBillboard() {
+  ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
+  caps->addCap(ShaderCaps::Texture0);
+  caps->addCap(ShaderCaps::Color);
+  caps->addCap(ShaderCaps::Billboard);
+
+//  _supportsSkinning = false;
+  _setup(caps);
+
+//  auto generator = getEngine()->shaderGenerator();
+//  generator->addTemplate("effects/billboard.glsl");
+//  _shader = generator->getShaderWithCaps(caps, "effects/billboard.glsl");
+
+  _texture0Binding = _addTextureBinding(UniformName::Texture0);
+  _colorBinging = _addVec4Binding(UniformName::Color);
+  color(vec4(1, 1, 1, 1));
+}
+
 MaterialTexture::MaterialTexture() {
   ShaderCapsSetPtr caps = std::make_shared<ShaderCapsSet>();
   caps->addCap(ShaderCaps::Texture0);
@@ -139,3 +157,5 @@ MaterialTextureProjection::MaterialTextureProjection() {
   _shader->addUniformBlock(UniformBlockName::Light);
   _shader->addUniformBlock(UniformBlockName::Camera);
 }
+
+

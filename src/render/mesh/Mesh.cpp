@@ -14,6 +14,7 @@ const int JOINTS_MAX = Mesh::JOINTS_MAX;
 const int VERTEX_SIZE = 3;
 const int NORMAL_SIZE = 3;
 const int TEXCOORD_SIZE = 2;
+const int CORNER_SIZE = 2;
 const int JOINT_INDEX_SIZE = JOINT_PER_VERTEX_MAX;
 const int WEIGHT_SIZE = JOINT_PER_VERTEX_MAX;
 const int COLOR_SIZE = 4;
@@ -37,6 +38,7 @@ Mesh::Mesh(bool keepData, int componentCount, GLenum bufferUsage) :
   _hasNormals = false;
   _hasTBN = false;
   _hasTexCoord0 = false;
+  _hasCorners = false;
   _hasWeights = false;
   _hasColors = false;
 
@@ -146,6 +148,20 @@ void Mesh::setTexCoord0(const std::vector<vec2> &texcoords) {
   _hasTexCoord0 = true;
 }
 
+void Mesh::setCorners(const float *components, int count) {
+  _corners.resize(count * CORNER_SIZE);
+  memcpy(&_corners[0], components, sizeof(vec2) * count);
+
+  _hasCorners = true;
+}
+
+void Mesh::setCorners(const std::vector<vec2> &corners) {
+  _corners.resize(corners.size() * CORNER_SIZE);
+  memcpy(&_corners[0], &corners[0], sizeof(vec2) * corners.size());
+
+  _hasCorners = true;
+}
+
 void Mesh::_updateFaceCount() {
   if (!_hasIndices) {
     _faceCount = (int)floor((float)_vertexCount/ (float)_componentCount);
@@ -207,6 +223,11 @@ void Mesh::createBuffer() {
     _texCoord0OffsetBytes = currentOffset * 4;
     currentOffset += TEXCOORD_SIZE;
   }
+  if (_hasCorners) {
+    _cornerOffset = currentOffset;
+    _cornerOffsetBytes = currentOffset * 4;
+    currentOffset += CORNER_SIZE;
+  }
   if (_hasWeights) {
     _weightOffset = currentOffset;
     _weightOffsetBytes = currentOffset * 4;
@@ -259,6 +280,12 @@ void Mesh::createBuffer() {
       currentOffset = offset + _texCoord0Offset;
       bufferData[currentOffset] = _texCoord0[i * 2];
       bufferData[currentOffset + 1] = _texCoord0[i * 2 + 1];
+    }
+
+    if (_hasCorners) {
+      currentOffset = offset + _cornerOffset;
+      bufferData[currentOffset] = _corners[i * 2];
+      bufferData[currentOffset + 1] = _corners[i * 2 + 1];
     }
 
     if (_hasWeights) {
@@ -365,6 +392,13 @@ void Mesh::_prepareVAO() {
     glVertexAttribPointer(attribIndex, TEXCOORD_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
   }
 
+  if (_hasCorners) {
+    attribIndex = (GLuint)ShaderAttrib::Corner;
+    offset = BUFFER_OFFSET(this->cornerOffsetBytes());
+    glEnableVertexAttribArray(attribIndex);
+    glVertexAttribPointer(attribIndex, CORNER_SIZE, GL_FLOAT, GL_FALSE, this->strideBytes(), offset);
+  }
+
   if (_hasWeights) {
     attribIndex = (GLuint)ShaderAttrib::JointWeights;
     offset = BUFFER_OFFSET(this->weightOffsetBytes());
@@ -388,6 +422,7 @@ int Mesh::_getStrideSize() {
   if (_hasTBN) result += NORMAL_SIZE * 2;
   if (_hasColors) result += COLOR_SIZE;
   if (_hasTexCoord0) result += TEXCOORD_SIZE;
+  if (_hasCorners) result += CORNER_SIZE;
   if (_hasWeights) result += JOINT_INDEX_SIZE + WEIGHT_SIZE;
   return result;
 }

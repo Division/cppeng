@@ -38,6 +38,9 @@ public:
   void setTexCoord0(const std::vector<vec2> &texcoords);
   void setTexCoord0(const float *texcoordComponents, int count);
 
+  void setCorners(const std::vector<vec2> &corners);
+  void setCorners(const float *components, int count);
+
   void setIndices(const GLushort *indices, int indexCount);
   void setIndices(const std::vector<GLushort> &indices);
 
@@ -88,6 +91,7 @@ public:
   int tangentOffsetBytes() const { return _tangentOffsetBytes; };
   int bitangentOffsetBytes() const { return _bitangentOffsetBytes; };
   int texCoordOffsetBytes() const { return _texCoord0OffsetBytes; };
+  int cornerOffsetBytes() const { return _cornerOffsetBytes; };
   int jointIndexOffsetBytes() const { return _jointIndexOffsetBytes; };
   int weightOffsetBytes() const { return _weightOffsetBytes; };
   int colorOffsetBytes() const { return _colorOffsetBytes; };
@@ -119,6 +123,7 @@ private:
   bool _hasNormals;
   bool _hasTBN;
   bool _hasTexCoord0;
+  bool _hasCorners;
   bool _hasWeights;
   bool _hasColors;
 
@@ -133,6 +138,8 @@ private:
   int _bitangentOffsetBytes;
   int _texCoord0Offset;
   int _texCoord0OffsetBytes;
+  int _cornerOffset;
+  int _cornerOffsetBytes;
   int _jointIndexOffset;
   int _jointIndexOffsetBytes;
   int _weightOffset;
@@ -147,6 +154,7 @@ private:
   std::vector<GLfloat> _tangents;
   std::vector<GLfloat> _bitangents;
   std::vector<GLfloat> _texCoord0;
+  std::vector<GLfloat> _corners;
   std::vector<GLfloat> _weights;
   std::vector<GLfloat> _jointIndices;
   std::vector<GLfloat> _colors;

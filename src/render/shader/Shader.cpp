@@ -36,6 +36,7 @@ const std::map<ShaderAttrib, std::string> SHADER_ATTRIB_NAMES = {
   { ShaderAttrib::Tangent, "aTangent" },
   { ShaderAttrib::Bitangent, "aBitangent" },
   { ShaderAttrib::TexCoord0, "aTexCoord0" },
+  { ShaderAttrib::Corner, "aCorner" },
   { ShaderAttrib::VertexColor, "aVertexColor" },
   { ShaderAttrib::JointWeights, "aJointWeights" },
   { ShaderAttrib::JointIndices, "aJointIndices" }
