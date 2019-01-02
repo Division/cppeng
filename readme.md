@@ -1,3 +1,7 @@
+Demo video
+=============
+https://www.youtube.com/watch?v=y6VYrjj4sHw
+
 Engine info
 =============
 This is a not-for-production rendering engine. I work on it during my free time to improve my programming skills.
