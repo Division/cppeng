@@ -52,7 +52,7 @@ private:
 class SwappableTexture2DBuffer: public SwappableBufferObject<Texture2DBuffer> {
 public:
   SwappableTexture2DBuffer(int targetWidth, GLenum internalFormat)
-      : _targetWidth(targetWidth), _internalFormat(internalFormat), SwappableBufferObject<Texture2DBuffer>(2) {
+      : SwappableBufferObject<Texture2DBuffer>(2), _targetWidth(targetWidth), _internalFormat(internalFormat)  {
     _createBuffers();
   }
 
@@ -65,7 +65,7 @@ protected:
 class SwappableTextureBufferObject : public SwappableBufferObject<TextureBufferObject> {
 public:
   SwappableTextureBufferObject(GLenum format, GLenum usage)
-      : _format(format), _usage(usage), SwappableBufferObject<TextureBufferObject>(2) {
+      :SwappableBufferObject<TextureBufferObject>(2), _format(format), _usage(usage) {
     _createBuffers();
   }
 

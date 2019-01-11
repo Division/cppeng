@@ -20,7 +20,6 @@ struct RenderOperation {
 
   GLenum mode = GL_TRIANGLES;
   bool depthTest = true;
-  unsigned int index;
   MultiVBOAddress objectParamsBlockOffset;
   MultiVBOAddress skinningOffset;
   std::string *debugInfo = nullptr;

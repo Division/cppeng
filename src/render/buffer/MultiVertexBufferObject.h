@@ -23,7 +23,7 @@
 class MultiVertexBufferObject {
 public:
   MultiVertexBufferObject(GLenum target, GLenum usage, unsigned int bufferSize, unsigned int alignment, GLenum access = GL_MAP_WRITE_BIT) :
-      _target(target), _usage(usage), _bufferSize(bufferSize), _alignment(alignment), _access(access) {}
+      _target(target), _usage(usage), _access(access), _bufferSize(bufferSize), _alignment(alignment) {}
 
   unsigned int getVBO(unsigned int index);
   void map();

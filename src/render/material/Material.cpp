@@ -84,9 +84,9 @@ void Material::uploadBindings(ShaderPtr shader) const {
     shader->getUniform(binding.uniform)->setVec2(binding.v);
   }
 
-  for (auto &binding : _bindings.floatBindings) {
+//  for (auto &binding : _bindings.floatBindings) {
 //    shader->getUniform(binding.uniform)->set(binding.v);
-  }
+//  }
 
   for (auto &binding : _bindings.intBindings) {
     shader->getUniform(binding.uniform)->setInt(binding.value);

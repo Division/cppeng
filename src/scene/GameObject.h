@@ -31,6 +31,7 @@ struct CullingData {
 
 class IGameObjectManager : public ITransformManager {
 public:
+  virtual ~IGameObjectManager() = default;
   virtual void addGameObject(GameObjectPtr addGameObject) = 0;
   virtual void destroyGameObject(GameObjectPtr addGameObject) = 0;
 };

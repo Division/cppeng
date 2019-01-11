@@ -6,7 +6,7 @@
 #include "../src/scene/Scene.h"
 #include "../src/EngMath.h"
 #include "../src/system/Logging.h"
-#include "EngineMain.h""
+#include "EngineMain.h"
 
 TEST_CASE( "Camera and transform" ) {
 //  auto scene = new Scene();

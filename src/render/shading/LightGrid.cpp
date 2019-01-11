@@ -127,8 +127,6 @@ void LightGrid::appendLights(const std::vector<LightObjectPtr> &lights,
 void LightGrid::appendProjectors(const std::vector<ProjectorPtr> &projectors,
                                  std::shared_ptr<ICameraParamsProvider> camera) {
   for (auto &projector : projectors) {
-    vec3 position = projector->transform()->worldPosition();
-
     projector->getEdgePoints(_lightEdges);
 
     _appendItem(camera, _lightEdges, [&](LightGridCell *cell) {

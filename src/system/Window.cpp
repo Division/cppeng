@@ -36,7 +36,7 @@ void Window::initOpenGLWindow(int width, int height) {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
 
-  _window = glfwCreateWindow(800, 600, "My Title", NULL, NULL);
+  _window = glfwCreateWindow(width, height, "My Title", NULL, NULL);
   glfwMakeContextCurrent(_window);
 
 #ifndef __EMSCRIPTEN__
@@ -59,7 +59,6 @@ void Window::swapBuffers() {
 }
 
 void Window::processEvents() {
-  auto prevSize = size();
   glfwPollEvents();
   _updateSize();
 }

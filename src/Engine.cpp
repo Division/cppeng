@@ -21,6 +21,9 @@
 #include "EngineMain.h"
 #include "utils/Performance.h"
 
+#include <chrono>
+#include <thread>
+
 using namespace glm;
 
 #ifdef __EMSCRIPTEN__
@@ -68,6 +71,8 @@ void mainLoop(void *arg) {
   engine->_window->processEvents();
   engine->update(dt);
 
+//  std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
   engine::Performance::startTimer(engine::Performance::Entry::SwapBuffers);
     engine->_window->swapBuffers();
   engine::Performance::stopTimer(engine::Performance::Entry::SwapBuffers);
@@ -100,7 +105,7 @@ void Engine::startEmscriptenLoop() {
 #endif
 
 void Engine::setup(std::weak_ptr<IGame> game) {
-  _window->initOpenGLWindow(640, 480);
+  _window->initOpenGLWindow(960, 540);
   _game = game;
 
   glClearColor(0, 0, 0, 1);

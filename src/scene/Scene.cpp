@@ -60,11 +60,10 @@ void Scene::_processAddedObject(GameObjectPtr object) {
 
 void Scene::_processRemovedObject(GameObjectPtr object) {
   // Object is camera
-  if (IS_CAMERA(object)) {
-    auto cameraPosition = std::find(_cameras.begin(), _cameras.end(), std::static_pointer_cast<Camera>(object));
-  }
+//  if (IS_CAMERA(object)) {
+//  }
 
-  else if (IS_LIGHT(object)) {
+  if (IS_LIGHT(object)) {
     for (auto &light : _lights) {
       if (light->id() == object->id()) {
         light = nullptr; // just set to null for future reuse
@@ -103,7 +102,7 @@ void Scene::destroyGameObject(GameObjectPtr object) {
 
     if (foundObject == _gameObjects.end()) {
       std::string error = "ERROR destroying object, not found in the list";
-      ENGLog(error.c_str());
+      ENGLog("%s", error.c_str());
       throw error;
     }
 

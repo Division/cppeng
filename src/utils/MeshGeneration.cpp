@@ -14,8 +14,6 @@ void MeshGeneration::generateSphere(MeshPtr mesh, int parallelCount, int meridia
 
     for (int i = 0; i < meridianCount; i++) {
       float meridian = (float)(2.0 * M_PI * (float)i / (float)meridianCount);
-      float x = radius * sinf(parallel) * cosf(meridian);
-      float z = radius * cosf(parallel);
 
       vertices.emplace_back(vec3(radius * sinf(parallel) * cosf(meridian),
                          radius * sinf(parallel) * sinf(meridian),

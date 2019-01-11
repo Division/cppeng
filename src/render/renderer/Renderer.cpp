@@ -235,7 +235,6 @@ void Renderer::addRenderOperation(RenderOperation &rop, RenderQueue renderQueue)
   }
 
   auto &queue = _queues[(int)renderQueue];
-  rop.index = _ropCounter++;
   queue.push_back(rop);
 }
 
