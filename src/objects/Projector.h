@@ -9,8 +9,8 @@
 #include <memory>
 #include "utils/MeshGeneration.h"
 #include "render/material/MaterialTypes.h"
-#import "EngTypes.h"
-#import "EngMath.h"
+#include "EngTypes.h"
+#include "EngMath.h"
 #include "render/shading/IShadowCaster.h"
 
 enum class ProjectorType : int {
@@ -111,8 +111,8 @@ private:
   float _zNear = 1;
   float _zFar = 10;
   float _fov = 30; // Perspective projectors properties in degrees
-  float _squareAttenuation = 0.44;
-  float _linearAttenuation = 0.35;
+  float _squareAttenuation = 0.44f;
+  float _linearAttenuation = 0.35f;
   ProjectorType _type = ProjectorType::Decal;
   Rect _spriteBounds = Rect(0, 0, 1, 1);
 

@@ -84,7 +84,7 @@ void MultiVertexBufferObject::_setCurrentBufferMapping(bool mapped) {
 
   auto &buffer = _buffers[_currentIndex];
 
-#if not USE_MEMORY_BUFFER_MAP
+#if !USE_MEMORY_BUFFER_MAP
   if (mapped) {
     buffer->current()->bind();
     buffer->current()->resize(_bufferSize);

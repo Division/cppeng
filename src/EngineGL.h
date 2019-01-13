@@ -11,7 +11,10 @@
 #else
 #define ENGINE_USE_BUFFER_TEXTURE false
 #endif
+
+#ifndef _MSC_VER
 #define GLFW_INCLUDE_GLEXT
+#endif
 #include <GLFW/glfw3.h>
 
 namespace engine {

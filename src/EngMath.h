@@ -2,6 +2,10 @@
 // Created by Sidorenko Nikita on 3/28/18.
 //
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #ifndef CPPWRAPPER_ENGMATH_H
 #define CPPWRAPPER_ENGMATH_H
 

@@ -12,6 +12,7 @@
 #include "system/Logging.h"
 #include "EngineMain.h"
 #include "render/renderer/SceneRenderer.h"
+#include <chrono>
 
 namespace engine {
 
@@ -83,7 +84,7 @@ public:
     auto now = std::chrono::system_clock::now().time_since_epoch();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now);
 
-    return ms.count();
+    return (double)ms.count();
   }
 
 private:

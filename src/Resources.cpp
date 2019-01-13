@@ -31,7 +31,7 @@ bool Resources::loadShaderFromStream(std::istream &stream, const std::string &na
     char buffer[64];
     do {
       stream.read(buffer, sizeof(buffer));
-      long readCount = stream.gcount();
+      auto readCount = stream.gcount();
       fileSourceStream.write(buffer, readCount);
     } while (!stream.fail());
 

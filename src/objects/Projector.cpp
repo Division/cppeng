@@ -47,8 +47,8 @@ UBOStruct::Projector Projector::getProjectorStruct() const {
   UBOStruct::Projector result;
 
   result.position = transform()->worldPosition();
-  result.squareAttenuation = _squareAttenuation;
-  result.linearAttenuation = _linearAttenuation;
+  result.attenuation = _squareAttenuation;
+  result.radius = _zFar;
   result.color = _color;
   result.scale = vec2(_spriteBounds.width, _spriteBounds.height);
   result.offset = vec2(_spriteBounds.x, _spriteBounds.y);

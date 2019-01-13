@@ -6,10 +6,9 @@
 #include <fstream>
 #include <sstream>
 #include "render/texture/SpriteSheet.h"
-#include "memory"
 #include "system/Logging.h"
 
-SpriteSheetPtr loader::loadSpritesheet(const std::string &filename) {
+std::shared_ptr<SpriteSheet> loader::loadSpritesheet(const std::string &filename) {
   std::ifstream file(filename);
   std::string jsonString((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 

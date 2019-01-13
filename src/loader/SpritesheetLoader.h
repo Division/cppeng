@@ -6,10 +6,12 @@
 #define CPPWRAPPER_SPRITESHEETLOADER_H
 
 #include <EngTypes.h>
+#include <string>
+#include <memory>
 
 namespace loader {
 
-  SpriteSheetPtr loadSpritesheet(const std::string &filename);
+  std::shared_ptr<SpriteSheet> loadSpritesheet(const std::string &filename);
 
 }
 

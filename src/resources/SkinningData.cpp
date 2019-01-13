@@ -19,9 +19,9 @@ void SkinningData::loadFromJSON(const std::string &name, const json &jsonData) {
   }
 
   auto &jsonBindPoses = jsonData["bindPoses"];
-  int size = jsonBindPoses .size();
+  size_t size = jsonBindPoses.size();
   bindPoses.resize(jsonBindPoses.size());
-  for (int i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; i++) {
     bindPoses[i] = loader::getMatrixFromJSON(jsonBindPoses.at(i));
   }
 

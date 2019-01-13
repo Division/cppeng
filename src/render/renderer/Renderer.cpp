@@ -161,6 +161,7 @@ void Renderer::renderScene(RenderPassPtr view) {
   auto viewport = camera->cameraViewport();
   glViewport((int)viewport.x, (int)viewport.y, (int)viewport.z, (int)viewport.w);
   _processRenderPipeline(view->mode());
+  glFlush();
 }
 
 void Renderer::clearQueues() {

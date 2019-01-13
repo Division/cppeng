@@ -18,7 +18,7 @@ void Terrain::loadHeightmap(const std::string &filename) {
   stream.seekg(0, std::ios::beg);
   stream.read((char *)&_heightmap[0], fileSize);
 
-  auto dimension = (int)sqrtf(pointCount); // assume it always square
+  auto dimension = (int)sqrtf((float)pointCount); // assume it always square
   _dimensions = ivec2(dimension, dimension);
 
   _generateMesh();
@@ -73,7 +73,7 @@ void Terrain::_createMaterial() {
 
 //  auto material = std::make_shared<MaterialLighting>();
 
-  auto material = std::make_shared<MaterialTerrain>(_layers.size(), (bool)_specularmap);
+  auto material = std::make_shared<MaterialTerrain>((int)_layers.size(), (bool)_specularmap);
   for (int i = 0; i < _layers.size(); i++) {
     material->diffuse(_layers[i].diffuse, i);
     material->normalMap(_layers[i].normal, i);

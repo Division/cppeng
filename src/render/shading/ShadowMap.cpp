@@ -17,7 +17,7 @@ ShadowMap::ShadowMap(unsigned int resolutionX, unsigned int resolutionY, std::sh
   _renderer = renderer;
   _depthAtlas = std::make_shared<FrameBufferObject>(resolutionX, resolutionY, false, true);
 
-  float emptySpacing = (CELL_COUNT - 1) * _pixelSpacing;
+  float emptySpacing = (float)((CELL_COUNT - 1u) * _pixelSpacing);
   _cellPixelSize = glm::floor(vec2(resolutionX - emptySpacing, resolutionY - emptySpacing) / (float)CELL_COUNT);
   _cellSize = vec2(_cellPixelSize) / vec2(_resolution);
 
@@ -72,7 +72,7 @@ Rect ShadowMap::getCellPixelRect(unsigned int index) {
   unsigned int x = index % CELL_COUNT * (_cellPixelSize.x + _pixelSpacing);
   unsigned int y = index / CELL_COUNT * (_cellPixelSize.y + _pixelSpacing);
 
-  return Rect(x, y, _cellPixelSize.x, _cellPixelSize.y);
+  return Rect((float)x, (float)y, (float)_cellPixelSize.x, (float)_cellPixelSize.y);
 }
 
 Rect ShadowMap::getCellRect(unsigned int index) {

@@ -40,14 +40,14 @@ namespace UBOStruct {
 
   struct Projector {
     vec3 position; // offset = 0, size = 12
-    float squareAttenuation = 0; // offset = 12, alignment = 4, size = 4
+    float attenuation = 0; // offset = 12, alignment = 4, size = 4
     vec4 color; // offset = 16, alignment = 16, size = 12
     vec2 scale;
     vec2 offset;
     vec2 shadowmapScale;
     vec2 shadowmapOffset;
     mat4 projectionMatrix;
-    float linearAttenuation = 0;
+    float radius = 0;
     unsigned int mask;
     vec2 padding; // ending padding
   };

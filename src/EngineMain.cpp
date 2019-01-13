@@ -2,7 +2,7 @@
 // Created by Sidorenko Nikita on 1/17/18.
 //
 
-#import <EngineMain.h>
+#include <EngineMain.h>
 
 std::shared_ptr<Engine> engineInstance = nullptr;
 

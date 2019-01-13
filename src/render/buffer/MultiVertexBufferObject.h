@@ -10,7 +10,7 @@
 #include "MultiVBOAddress.h"
 #include "VertexBufferObject.h"
 
-#define USE_MEMORY_BUFFER_MAP false
+#define USE_MEMORY_BUFFER_MAP true
 
 // Some buffers (e.g. UBO) have limited maximum capacity
 // To handle all required data, multiple buffers should be allocated

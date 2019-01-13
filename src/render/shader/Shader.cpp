@@ -88,7 +88,7 @@ GLuint Shader::_compileShader(const std::string &vertexSource, const std::string
 
 GLuint Shader::_loadShader(const std::string &source, GLenum type) {
   GLuint shader = glCreateShader(type);
-  GLint len = source.length();
+  auto len = (GLint)source.length();
   const GLchar *sourcePtr = source.c_str();
   glShaderSource(shader, 1, &sourcePtr, &len);
   glCompileShader(shader);

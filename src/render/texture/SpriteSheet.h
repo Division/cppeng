@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include "Texture.h"
 #include "nlohmann/json.hpp"
+#include <memory>
 
 using namespace nlohmann;
 
@@ -37,6 +38,8 @@ private:
   std::vector<std::string> _spriteNames;
   std::unordered_map<std::string, SpriteData> _sprites;
 };
+
+typedef std::shared_ptr<SpriteSheet> SpriteSheetPtr;
 
 
 #endif //CPPWRAPPER_SPRITESHEET_H

@@ -2,7 +2,7 @@
 // Created by Sidorenko Nikita on 1/27/18.
 //
 
-#import "ShaderLoader.h"
+#include "ShaderLoader.h"
 #include <sstream>
 #include <iostream>
 #include <system/Logging.h>

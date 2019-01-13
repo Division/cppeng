@@ -29,7 +29,7 @@ private:
   mutable GLuint _id = 0;
 
 private:
-  GLuint _target;
+  GLuint _target = 0;
   void _genID() const;
   void _uploadData();
 };

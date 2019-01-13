@@ -314,7 +314,7 @@ void Mesh::createBuffer() {
 
   if (_hasIndices) {
     _indexBuffer = std::make_shared<VertexBufferObject>(GL_ELEMENT_ARRAY_BUFFER, _bufferUsage);
-    auto indexSize = _indices.size() * sizeof(GLushort);
+    unsigned int indexSize = (unsigned int)_indices.size() * (unsigned int)sizeof(GLushort);
     _indexBuffer->resize(indexSize);
     _indexBuffer->writeData((void *)&_indices[0], 0, indexSize);
     _indexBuffer->upload();

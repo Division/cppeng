@@ -53,7 +53,7 @@ struct IntBinding: public UniformBinding {
 struct TextureBinding: public UniformBinding {
   explicit TextureBinding(UniformName name) : UniformBinding(name) {}
   TexturePtr texture;
-  unsigned int textureUnit;
+  unsigned int textureUnit = 0;
 };
 
 #endif //CPPWRAPPER_UNIFORMBINDING_H

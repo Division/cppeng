@@ -25,8 +25,8 @@ void SpriteSheet::loadFromJSON(const json &jsonData) {
   _spritesheetName = jsonData["meta"]["image"];
 
   auto frames = jsonData["frames"];
-  int frameCount = frames.size();
-  for (int i = 0; i < frameCount; i++) {
+  auto frameCount = frames.size();
+  for (size_t i = 0; i < frameCount; i++) {
     auto spriteData = frames.at(i);
     auto frame = spriteData["frame"];
     addSprite(spriteData["filename"], frame["x"], frame["y"], frame["w"], frame["h"]);
